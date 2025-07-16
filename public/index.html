@@ -97,7 +97,7 @@
                 const imageFiles = await response.json();
                 imageFiles.forEach(filename => {
                     const img = document.createElement('img');
-                    img.src = `/get-image/${filename}?${new Date().getTime()}`;
+                    img.src = `/get-image/${filename.filename}?${new Date().getTime()}`;
                     img.alt = filename;
                     img.style.maxWidth = '100%';
                     img.style.borderRadius = '4px';
