@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Viewer</title>
+    <link rel="stylesheet" href="components/clock.css">
+    <style>
+        @font-face {
+            font-family: 'LXGWWenKaiGB-Regular';
+            src: url('LXGWWenKaiGB-Regular.woff2');
+        }
+        * {
+            font-family: 'LXGWWenKaiGB-Regular';
+        }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #000000;
+        }
+        .image-container {
+            position: relative;
+            margin-top: 200px;
+            padding: 20px;
+            background-color: rgb(34, 34, 34);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .modal {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            margin: 0 auto;
+            display: flex;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.3s ease, visibility 0s 0.3s;
+        }
+        .modal.active {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+            transition: opacity 0.3s ease, visibility 0s;
+        }
+        .modal-content {
+            max-width: 90%;
+            max-height: 90%;
+            transform: scale(0.8);
+            opacity: 0;
+            transition: transform 0.3s ease, opacity 0.3s ease;
+            transform-origin: center center;
+            touch-action: none;
+        }
+        .modal.active .modal-content {
+            transform: scale(1);
+            opacity: 1;
+        }
+        .close-btn {
+            display:none
+        }
+        img {
+            max-width: 80vw;
+            max-height: 80vh;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="image-container">
+        <script src="components/clock.js"></script>
+    </div>
+<div class="modal" id="imageModal">
+    <span class="close-btn">&times;</span>
+    <img class="modal-content" id="modalImage" />
+</div>
+    <script>
+        // 获取所有图片并显示
+        document.addEventListener('DOMContentLoaded', async () => {
+            const container = document.querySelector('.image-container');
+            try {
+                const response = await fetch('/get-all-images');
+                if (!response.ok) throw new Error('Failed to fetch images');
+                const imageFiles = await response.json();
+                imageFiles.forEach(filename => {
+                    const img = document.createElement('img');
+                    img.src = `/get-image/${filename}?${new Date().getTime()}`;
+                    img.alt = filename;
+                    img.style.maxWidth = '100%';
+                    img.style.borderRadius = '4px';
+                    img.style.cursor = 'pointer';
+                    img.addEventListener('click', () => {
+                        const modal = document.getElementById('imageModal');
+                        const modalImg = document.getElementById('modalImage');
+                        modalImg.style.cursor = 'grab';
+                        modal.classList.add('active');
+                        modalImg.src = img.src;
+                        currentScale = 1;
+                        offsetX = 0;
+                        offsetY = 0;
+
+                    });
+                    container.appendChild(img);
+                });
+            } catch (error) {
+                container.innerHTML = '<p>Error loading images</p>';
+                console.error(error);
+            }
+
+            // 关闭模态框和图片缩放功能
+            function setupModalHandlers() {
+                const modal = document.getElementById('imageModal');
+                const modalImg = document.getElementById('modalImage');
+                const closeBtn = document.querySelector('.close-btn');
+                let currentScale = 1;
+                let isDragging = false;
+                let startX, startY;
+                let offsetX = 0, offsetY = 0;
+                const minScale = 0.5;
+                const maxScale = 5;
+
+                // 关闭模态框
+                closeBtn.addEventListener('click', () => {
+                    modal.classList.remove('active');
+                    currentScale = 1;
+                    offsetX = 0;
+                    offsetY = 0;
+                    modalImg.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${currentScale})`;
+                });
+
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        modal.classList.remove('active');
+                        currentScale = 1;
+                        offsetX = 0;
+                        offsetY = 0;
+                        modalImg.style.removeProperty('transform');
+                    }
+                });
+
+                // 鼠标滚轮缩放图片
+                function updateImageTransform() {
+                    modalImg.style.transform = `translate(${offsetX}px, ${offsetY}px) scale(${currentScale})`;
+                }
+
+                modalImg.addEventListener('mousedown', (e) => {
+                    isDragging = true;
+                    startX = e.clientX - offsetX;
+                    startY = e.clientY - offsetY;
+                    modalImg.style.cursor = 'grabbing';
+                    e.preventDefault();
+                });
+
+                document.addEventListener('mousemove', (e) => {
+                    if (!isDragging) return;
+                    offsetX = e.clientX - startX;
+                    offsetY = e.clientY - startY;
+                    updateImageTransform();
+                });
+
+                document.addEventListener('mouseup', () => {
+                    isDragging = false;
+                    modalImg.style.cursor = 'grab';
+                });
+
+                modal.addEventListener('mouseleave', () => {
+                    isDragging = false;
+                    modalImg.style.cursor = 'grab';
+                });
+
+                modalImg.addEventListener('wheel', (e) => {
+                    e.preventDefault();
+                    const delta = e.deltaY > 0 ? -0.1 : 0.1;
+                    currentScale = Math.max(minScale, Math.min(maxScale, currentScale + delta));
+                    updateImageTransform();
+                });
+
+                // 触摸缩放支持
+                let initialDistance = null;
+                let initialScale = 1;
+
+                modalImg.addEventListener('touchstart', (e) => {
+                    if (e.touches.length === 2) {
+                        initialDistance = getTouchDistance(e.touches);
+                        initialScale = currentScale;
+                    } else if (e.touches.length === 1) {
+                        isDragging = true;
+                        startX = e.touches[0].clientX - offsetX;
+                        startY = e.touches[0].clientY - offsetY;
+                        modalImg.style.cursor = 'grabbing';
+                    }
+                });
+
+                modalImg.addEventListener('touchmove', (e) => {
+                    if (e.touches.length === 2 && initialDistance) {
+                        e.preventDefault();
+                        const currentDistance = getTouchDistance(e.touches);
+                        const scaleFactor = currentDistance / initialDistance;
+                        currentScale = Math.max(minScale, Math.min(maxScale, initialScale * scaleFactor));
+                        updateImageTransform();
+                    } else if (e.touches.length === 1 && isDragging) {
+                        e.preventDefault();
+                        offsetX = e.touches[0].clientX - startX;
+                        offsetY = e.touches[0].clientY - startY;
+                        updateImageTransform();
+                    }
+                });
+
+                modalImg.addEventListener('touchend', () => {
+                    initialDistance = null;
+                    isDragging = false;
+                    modalImg.style.cursor = 'grab';
+                });
+
+                function getTouchDistance(touches) {
+                    const dx = touches[0].clientX - touches[1].clientX;
+                    const dy = touches[0].clientY - touches[1].clientY;
+                    return Math.sqrt(dx * dx + dy * dy);
+                }
+
+                // ESC键关闭
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape' && modal.style.display === 'flex') {
+                        modal.style.display = 'none';
+                        currentScale = 1;
+                        offsetX = 0;
+                        offsetY = 0;
+                        modalImg.style.removeProperty('transform');
+                    }
+                });
+            }
+            // 在DOM加载完成后初始化模态框处理
+            // 直接调用初始化函数，因为脚本位于body底部，DOM已加载完成
+            setupModalHandlers();
+        });
+    </script>
+</body>
+</html>

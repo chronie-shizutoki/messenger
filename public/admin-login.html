@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理员二维码登录</title>
+    <style>
+        @font-face {
+            font-family: 'LXGWWenKaiGB-Regular';
+            src: url('LXGWWenKaiGB-Regular.woff2');
+        }
+        * {
+            font-family: 'LXGWWenKaiGB-Regular';
+        }
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f5f5f5;
+        }
+        .login-container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .qr-container {
+            margin: 20px auto;
+            padding: 15px;
+            background-color: white;
+            border-radius: 4px;
+            display: inline-block;
+        }
+        #qrImage {
+            max-width: 250px;
+            height: auto;
+        }
+        .status-message {
+            margin: 20px 0;
+            padding: 10px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .pending {
+            color: #666;
+            border: 1px solid #ddd;
+        }
+        .expired {
+            color: #a94442;
+            background-color: #f2dede;
+            border: 1px solid #ebccd1;
+        }
+        .error {
+            color: #a94442;
+            background-color: #f2dede;
+            border: 1px solid #ebccd1;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .back-link {
+            margin-top: 20px;
+            color: #337ab7;
+            text-decoration: none;
+        }
+        .back-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1>管理员二维码登录</h1>
+        <p>请使用管理员APP扫描下方二维码登录</p>
+        <div class="qr-container">
+            <img id="qrImage" alt="登录二维码" />
+        </div>
+        <div id="statusMessage" class="status-message pending">
+            二维码生成中...
+        </div>
+        <button id="refreshBtn">刷新二维码</button>
+        <a href="/" class="back-link">返回图片查看页</a>
+    </div>
+
+    <script>
+        let sessionId = null;
+        let checkLoginInterval = null;
+
+        // 获取并显示二维码
+        function generateQRCode() {
+            fetch('/admin/generate-qr')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        showError(data.error);
+                        return;
+                    }
+
+                    sessionId = data.sessionId;
+                    document.getElementById('qrImage').src = data.qrUrl;
+                    document.getElementById('statusMessage').textContent = '请扫描二维码登录';
+                    document.getElementById('statusMessage').className = 'status-message pending';
+
+                    // 开始轮询检查登录状态
+                    startLoginCheck();
+                })
+                .catch(error => {
+                    showError('获取二维码失败，请重试');
+                    console.error('QR generation error:', error);
+                });
+        }
+
+        // 轮询检查登录状态
+        function startLoginCheck() {
+            // 清除之前的轮询
+            if (checkLoginInterval) {
+                clearInterval(checkLoginInterval);
+            }
+
+            checkLoginInterval = setInterval(() => {
+                if (!sessionId) return;
+
+                fetch(`/admin/check-login/${sessionId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        switch (data.status) {
+                            case 'confirmed':
+                                // 登录成功，重定向到管理员页面
+                                window.location.href = '/admin.html';
+                                break;
+                            case 'expired':
+                                clearInterval(checkLoginInterval);
+                                document.getElementById('statusMessage').textContent = '二维码已过期，请刷新';
+                                document.getElementById('statusMessage').className = 'status-message expired';
+                                break;
+                            case 'invalid':
+                                clearInterval(checkLoginInterval);
+                                showError('无效的会话，请刷新二维码');
+                                break;
+                            // 'pending'状态不做处理
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Login check error:', error);
+                    });
+            }, 1000); // 每秒检查一次
+        }
+
+        // 显示错误消息
+        function showError(message) {
+            const statusElement = document.getElementById('statusMessage');
+            statusElement.textContent = message;
+            statusElement.className = 'status-message error';
+        }
+
+        // 页面加载时生成二维码
+        document.addEventListener('DOMContentLoaded', generateQRCode);
+
+        // 刷新按钮事件
+        document.getElementById('refreshBtn').addEventListener('click', generateQRCode);
+    </script>
+</body>
+</html>
