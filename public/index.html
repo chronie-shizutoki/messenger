@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script src="capacitor.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Image Viewer</title>
@@ -92,12 +93,13 @@
         document.addEventListener('DOMContentLoaded', async () => {
             const container = document.querySelector('.image-container');
             try {
-                const response = await fetch('/get-all-images');
+                const baseUrl = window.Capacitor ? 'http://192.168.0.197:3000' : '';
+                const response = await fetch(`${baseUrl}/get-all-images`);
                 if (!response.ok) throw new Error('Failed to fetch images');
                 const imageFiles = await response.json();
                 imageFiles.forEach(filename => {
                     const img = document.createElement('img');
-                    img.src = `/get-image/${filename.filename}?${new Date().getTime()}`;
+                    img.src = `${baseUrl}/get-image/${filename.filename}?${new Date().getTime()}`;
                     img.alt = filename;
                     img.style.maxWidth = '100%';
                     img.style.borderRadius = '4px';

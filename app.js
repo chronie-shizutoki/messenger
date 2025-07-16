@@ -22,7 +22,7 @@ app.use(session({
 }));
 
 const cors = require('cors');
-app.use(cors());
+app.use(cors({ origin: '*' }));
 
 const PORT = process.env.PORT || 3000;
 const IMAGE_PATH = path.join(__dirname, 'public', 'images', 'sample.svg');
