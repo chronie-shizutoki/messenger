@@ -98,6 +98,27 @@
             color: white;
             font-weight: bold;
             border-bottom: 1px solid #444444;
+            position: relative;
+        }
+        .toggle-chat {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2em;
+            cursor: pointer;
+            padding: 0 5px;
+        }
+        .chat-container.collapsed {
+            height: 40px;
+        }
+        .chat-container.collapsed #status-indicator,
+        .chat-container.collapsed #chat-container,
+        .chat-container.collapsed #input-area {
+            display: none;
         }
         #status-indicator {
             padding: 8px 10px;
@@ -322,7 +343,10 @@
         });
     </script>
     <div class="chat-container">
-        <div class="chat-header">聊天</div>
+        <div class="chat-header">
+    聊天
+    <button class="toggle-chat" style="float: right; background: none; border: none; color: white; cursor: pointer;">−</button>
+</div>
         <div id="status-indicator"></div>
         <div id="chat-container"></div>
         <div id="input-area">
@@ -333,5 +357,13 @@
 
     <script src="lib/socket.io.js"></script>
     <script src="chat-client.js"></script>
+    <script>
+        // 聊天框折叠功能
+        document.querySelector('.toggle-chat').addEventListener('click', function() {
+            const chatContainer = document.querySelector('.chat-container');
+            chatContainer.classList.toggle('collapsed');
+            this.textContent = chatContainer.classList.contains('collapsed') ? '+' : '−';
+        });
+    </script>
 </body>
 </html>
