@@ -1,9 +1,0 @@
-{
-  "appId": "com.quiettime.imageviewer",
-  "appName": "ImageViewer",
-  "webDir": "public",
-  "server": {
-    "url": "http://192.168.0.197:3000",
-    "allowNavigation": ["*"]
-  }
-}
