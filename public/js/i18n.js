@@ -1,7 +1,7 @@
 class I18n {
   constructor() {
     const userLanguage = navigator.language || 'en-US';
-    this.supportedLanguages = ['en-US', 'zh-CN', 'ja-JP', 'zh-TW', 'zh-HK', 'zh-SG', 'ko-KR', 'en-GB', 'es-ES', 'fr-FR', 'ms-MY']; // 支持的语言列表
+    this.supportedLanguages = ['en-GB', 'en-US', 'es-ES', 'fr-FR', 'ja-JP', 'ko-KR', 'ms-MY', 'zh-CN', 'zh-HK', 'zh-SG', 'zh-TW']; // 支持的语言列表
     this.locale = this.getBestMatchingLanguage(userLanguage);
     this.translations = {};
     this.init();
@@ -68,17 +68,17 @@ class I18n {
 
     // 语言代码到显示名称的映射
     const languageNames = {
+      'en-GB': 'English (UK)',
       'en-US': 'English (US)',
+      'es-ES': 'Español (España)',
+      'fr-FR': 'Français (France)',
+      'ja-JP': '日本語 (日本)',
+      'ko-KR': '한국어 (대한민국)',
+      'ms-MY': 'Bahasa Melayu (Malaysia)',
       'zh-CN': '简体中文（中国大陆）',
-      'ja-JP': '日本語',
-      'zh-TW': '正體中文（台湾）',
       'zh-HK': '繁體中文（香港）',
       'zh-SG': '简体中文（新加坡）',
-      'ko-KR': '한국어',
-      'en-GB': 'English (UK)',
-      'es-ES': 'Español',
-      'fr-FR': 'Français',
-      'ms-MY': 'Bahasa Melayu'
+      'zh-TW': '正體中文（台灣）'
     };
 
     // 为每种支持的语言创建选项
