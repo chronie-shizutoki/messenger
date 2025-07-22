@@ -6,7 +6,20 @@
     <title data-i18n="upload.title"></title>
     <link rel="stylesheet" href="lib/font-awesome/all.min.css">
     <link rel="stylesheet" href="/css/upload.css" type="text/css">
-    <script src="js/i18n.js">    
+    <script src="js/i18n.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 检查i18n是否已初始化
+            if (window.i18n && window.i18n.translations) {
+                i18n.applyTranslations();
+            } else {
+                // 监听i18n初始化完成事件
+                document.addEventListener('i18nInitialized', function onI18nInit() {
+                    i18n.applyTranslations();
+                    document.removeEventListener('i18nInitialized', onI18nInit);
+                });
+            }
+        });
     </script>
     <style>
         @font-face {
@@ -250,6 +263,14 @@
             createParticles();
             setupImagePreview();
             setupUploadForm();
+            // 立即检查i18n状态并应用翻译
+            if (window.i18n && window.i18n.translations) {
+                i18n.applyTranslations();
+            } else {
+                document.addEventListener('i18nInitialized', function() {
+                    i18n.applyTranslations();
+                });
+            }
         });
     </script>
 </body>

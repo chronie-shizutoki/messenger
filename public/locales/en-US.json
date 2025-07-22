@@ -10,7 +10,9 @@
     "network_error": "Upload error, please check your network connection.",
     "select_error": "Please select an image file to upload"
   },
-  "chat.title": "Chat",
-  "chat.placeholder": "Enter message...",
-  "chat.send": "Send"
+  "chat": {
+    "title": "Chat",
+    "send": "Send"
+  },
+  "chat.placeholder": "Enter message..."
 }

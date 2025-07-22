@@ -9,7 +9,9 @@
     "error": "图片上传失败，请重试。",
     "network_error": "上传发生错误，请检查网络连接。",
     "select_error": "请选择要上传的图片文件"},
-  "chat.title": "聊天",
-  "chat.placeholder": "输入消息...",
-  "chat.send": "发送"
+  "chat": {
+    "title": "聊天",
+    "send": "发送"
+  },
+  "chat.placeholder": "输入消息..."
 }

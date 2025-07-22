@@ -10,7 +10,9 @@
       "network_error": "アップロードエラーが発生しました。ネットワーク接続を確認してください。",
       "select_error": "アップロードする画像ファイルを選択してください"
     },
-  "chat.title": "チャット",
-  "chat.placeholder": "メッセージを入力...",
-  "chat.send": "送信"
+  "chat": {
+    "title": "チャット",
+    "send": "送信"
+  },
+  "chat.placeholder": "メッセージを入力..."
 }

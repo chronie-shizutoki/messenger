@@ -108,11 +108,21 @@ class I18n {
     document.body.prepend(dropdown);
   }
   applyTranslations() {
-    // 翻译普通文本
-    document.querySelectorAll('[data-i18n]').forEach(element => {
-      const key = element.getAttribute('data-i18n');
-      element.textContent = this.translations[key] || key;
-    });
+        // 支持嵌套键的翻译文本替换
+        document.querySelectorAll('[data-i18n]').forEach(element => {
+            const key = element.getAttribute('data-i18n');
+            const keys = key.split('.');
+            let value = this.translations;
+            for (const k of keys) {
+                if (value && typeof value === 'object' && k in value) {
+                    value = value[k];
+                } else {
+                    value = key;
+                    break;
+                }
+            }
+            element.textContent = value;
+        });
 
     // 翻译占位符
     document.querySelectorAll('[data-i18n-placeholder]').forEach(element => {
