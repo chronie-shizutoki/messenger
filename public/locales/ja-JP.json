@@ -14,5 +14,9 @@
     "title": "チャット",
     "send": "送信"
   },
-  "chat.placeholder": "メッセージを入力..."
+  "chat.placeholder": "メッセージを入力...",
+  "notification.push_url_placeholder": "プッシュ通知URLを入力",
+  "notification": {
+    "save_button": "保存"
+  }
 }

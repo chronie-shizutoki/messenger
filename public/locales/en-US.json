@@ -14,5 +14,9 @@
     "title": "Chat",
     "send": "Send"
   },
-  "chat.placeholder": "Message..." 
+  "chat.placeholder": "Message...",
+  "notification.push_url_placeholder": "Enter push notification URL",
+  "notification": {
+    "save_button": "Save"
+  }
 }

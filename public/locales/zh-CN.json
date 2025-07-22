@@ -14,5 +14,9 @@
     "title": "聊天",
     "send": "发送"
   },
-  "chat.placeholder": "输入消息..."
+  "chat.placeholder": "输入消息...",
+  "notification.push_url_placeholder": "输入推送通知链接",
+  "notification": {
+    "save_button": "保存"
+  }
 }

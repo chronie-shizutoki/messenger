@@ -47,7 +47,7 @@ const fileFilter = (req, file, cb) => {
   if (allowedTypes.includes(ext)) {
     cb(null, true);
   } else {
-    cb(new Error('只允许上传图片文件: ' + allowedTypes.join(', ')), false);
+    cb(new Error('only allow upload image file: ' + allowedTypes.join(', ')), false);
   }
 };
 
@@ -113,7 +113,7 @@ app.get('/get-thumbnail/:filename', (req, res) => {
 // 管理员图片上传接口
 app.post('/upload/upload-image', upload.single('image'), async (req, res) => {
   if (!req.file) {
-    return res.status(400).send('未选择图片文件');
+    return res.status(400).send('not select image file');
   }
 
   try {
@@ -123,7 +123,7 @@ app.post('/upload/upload-image', upload.single('image'), async (req, res) => {
       .resize(200, 200, { fit: 'inside', withoutEnlargement: true })
       .toFile(thumbnailPath);
   } catch (error) {
-    console.error('生成缩略图失败:', error);
+    console.error('create thumbnail error:', error);
   }
 
   res.redirect('/upload.html?upload=success');
@@ -159,15 +159,27 @@ db.run(`CREATE TABLE IF NOT EXISTS messages (
   timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
 )`);
 
+// 初始化推送订阅表
+db.run(`CREATE TABLE IF NOT EXISTS push_subscriptions (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  push_url TEXT NOT NULL UNIQUE,
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+)`);
+
+// 获取所有推送链接
+db.all('SELECT push_url FROM push_subscriptions', (err, urls) => {
+  global.pushUrls = err ? [] : urls.map(row => row.push_url);
+});
+
 // 处理Socket连接
 io.on('connection', (socket) => {
-  console.log('[服务器] 新客户端连接:', socket.id);
+  console.log('emit connection:', socket.id);
 
   // 测试连接
-  socket.emit('connection test', '服务器连接成功');
+  socket.emit('connection test', 'connect success');
   socket.on('client test', (data) => {
-    console.log('[服务器] 收到客户端测试消息:', data);
-    socket.emit('server response', '已收到测试消息: ' + data);
+    console.log('emit client test message:', data);
+    socket.emit('server response', 'server response: ' + data);
   });
 
   // 保存消息到数据库
@@ -184,16 +196,68 @@ io.on('connection', (socket) => {
     });
   }
 
-  // 接收并广播消息
-  socket.on('chat message', (msg, callback) => {
-    console.log('[服务器] 收到消息:', msg);
+  // 保存推送链接
+socket.on('save push url', (url, callback) => {
+  if (!url || !url.startsWith('http')) {
+    return callback('not input push url');
+  }
+  
+  // 检查链接是否已存在
+  db.get('SELECT id FROM push_subscriptions WHERE push_url = ?', [url], (err, row) => {
+    if (err) return callback('check push url error');
+    
+    if (row) {
+      // 链接已存在
+      callback(null, 'push url already exist');
+    } else {
+      // 插入新链接
+      db.run('INSERT INTO push_subscriptions (push_url) VALUES (?)', [url], (err) => {
+        if (err) return callback('save push url error');
+        // 更新全局推送链接列表
+        global.pushUrls.push(url);
+        callback(null, 'push url saved');
+      });
+    }
+  });
+});
+
+// 删除推送链接
+socket.on('remove push url', (url, callback) => {
+  db.run('DELETE FROM push_subscriptions WHERE push_url = ?', [url], (err) => {
+    if (err) return callback('remove push url error');
+    // 更新全局推送链接列表
+    global.pushUrls = global.pushUrls.filter(u => u !== url);
+    callback(null, 'push url removed');
+  });
+});
+
+// 获取所有推送链接
+socket.on('get push urls', (callback) => {
+  callback(null, global.pushUrls);
+});
+
+// 接收并广播消息
+socket.on('chat message', (msg, callback) => {
+    console.log('emit chat message:', msg);
     saveMessage(msg.content, (err, savedMsg) => {
       if (err) {
-        console.error('[服务器] 消息保存失败:', err);
+        console.error('emit chat message error:', err);
         return callback(err);
       }
       io.emit('chat message', savedMsg);
-      callback(null);
+
+// 发送推送通知给所有订阅者
+global.pushUrls.forEach(pushUrl => {
+  try {
+    const encodedContent = encodeURIComponent(savedMsg.content);
+    const fullUrl = pushUrl.endsWith('/') ? `${pushUrl}${encodedContent}` : `${pushUrl}/${encodedContent}`;
+    fetch(fullUrl).catch(err => console.error('emit push url error:', err));
+  } catch (e) {
+    console.error('emit push url error:', e);
+  }
+});
+
+callback(null);
     });
   });
 
@@ -206,7 +270,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('disconnect', () => {
-    console.log('[服务器] 客户端断开连接:', socket.id);
+    console.log('emit disconnect:', socket.id);
   });
 });
 

@@ -14,5 +14,9 @@
     "title": "Sembang", 
     "send": "Hantar" 
   },
-  "chat.placeholder": "Taip mesej..." 
+  "chat.placeholder": "Taip mesej...",
+  "notification.push_url_placeholder": "Masukkan URL pemberitahuan push",
+  "notification": {
+    "save_button": "Simpan"
+  }
 }

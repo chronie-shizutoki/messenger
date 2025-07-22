@@ -14,5 +14,9 @@
     "title": "Chat / 傾偈", 
     "send": "Send" 
   },
-  "chat.placeholder": "打啲嘢啦..." 
+  "chat.placeholder": "打啲嘢啦...", 
+  "notification.push_url_placeholder": "輸入推送通知連結",
+  "notification": {
+    "save_button": "儲存"
+  }
 }

@@ -11,7 +11,7 @@ function updateStatus(text, isError = false) {
 }
 
 // 消息渲染函数
-function addMessageToDOM(message) {
+function addMessageToDOM(message, isHistorical = false) {
   const div = document.createElement('div');
   div.className = 'message';
   div.innerHTML = `
@@ -20,6 +20,7 @@ function addMessageToDOM(message) {
   `;
   chatContainer.appendChild(div);
   chatContainer.scrollTop = chatContainer.scrollHeight;
+
 }
 
 // XSS防护
@@ -44,7 +45,7 @@ function initSocket() {
     if (!historyLoaded) {
       socket.emit('get history', (err, messages) => {
         if (!err) {
-          messages.forEach(addMessageToDOM);
+          messages.forEach(msg => addMessageToDOM(msg, true));
           historyLoaded = true;
         }
       });
@@ -66,7 +67,39 @@ function initSocket() {
   };
 
   sendBtn.addEventListener('click', window.sendMessage);
-  inputEl.addEventListener('keypress', e => e.key === 'Enter' && window.sendMessage());
+inputEl.addEventListener('keypress', e => e.key === 'Enter' && window.sendMessage());
+
+// 推送链接管理逻辑
+document.getElementById('save-push-url').addEventListener('click', () => {
+  const pushUrl = document.getElementById('push-url-input').value.trim();
+  if (pushUrl) {
+    socket.emit('save push url', pushUrl, (err, msg) => {
+      updateStatus(err ? `save push url error: ${err}` : msg);
+    });
+  } else {
+    updateStatus('not input push url');
+  }
+});
+
+// 加载所有推送链接
+socket.on('connect', () => {
+  socket.emit('get push urls', (err, urls) => {
+    if (!err && urls && urls.length > 0) {
+      const urlList = urls.map(url => `<div class="push-url-item">${url}<button class="remove-url-btn">×</button></div>`).join('');
+      document.getElementById('push-url-list').innerHTML = urlList;
+      // 添加删除按钮事件
+      document.querySelectorAll('.remove-url-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const url = this.parentElement.textContent.trim().replace('×', '').trim();
+          socket.emit('remove push url', url, (err, msg) => {
+            updateStatus(err ? `remove push url error: ${err}` : msg);
+            this.parentElement.remove();
+          });
+        });
+      });
+    }
+  });
+})
 }
 
 document.addEventListener('DOMContentLoaded', initSocket);

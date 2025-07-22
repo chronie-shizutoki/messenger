@@ -14,5 +14,9 @@
     "title": "Discussion",
     "send": "Envoyer"
   },
-  "chat.placeholder": "Écrivez un message..."
+  "chat.placeholder": "Écrivez un message...",
+  "notification.push_url_placeholder": "Entrez l'URL de notification push",
+  "notification": {
+    "save_button": "Enregistrer"
+  }
 }
