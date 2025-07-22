@@ -82,21 +82,39 @@ document.getElementById('save-push-url').addEventListener('click', () => {
 });
 
 // 加载所有推送链接
+function renderPushUrls(urls) {
+  const list = document.getElementById('push-url-list');
+  list.innerHTML = '';
+  urls.forEach(url => {
+    const urlItem = document.createElement('div');
+    urlItem.className = 'push-url-item';
+    
+    const urlText = document.createElement('span');
+    urlText.textContent = url;
+    urlText.style.overflow = 'hidden';
+    urlText.style.textOverflow = 'ellipsis';
+    urlText.style.whiteSpace = 'nowrap';
+    
+    const removeBtn = document.createElement('button');
+    removeBtn.className = 'remove-url-btn';
+    removeBtn.innerHTML = '<i class="fa fa-trash"></i> ×';
+    removeBtn.onclick = () => {
+      socket.emit('remove push url', url, (err, msg) => {
+        updateStatus(err ? `remove push url error: ${err}` : msg);
+        urlItem.remove();
+      });
+    };
+    
+    urlItem.appendChild(urlText);
+    urlItem.appendChild(removeBtn);
+    list.appendChild(urlItem);
+  });
+}
+
 socket.on('connect', () => {
   socket.emit('get push urls', (err, urls) => {
     if (!err && urls && urls.length > 0) {
-      const urlList = urls.map(url => `<div class="push-url-item">${url}<button class="remove-url-btn">×</button></div>`).join('');
-      document.getElementById('push-url-list').innerHTML = urlList;
-      // 添加删除按钮事件
-      document.querySelectorAll('.remove-url-btn').forEach(btn => {
-        btn.addEventListener('click', function() {
-          const url = this.parentElement.textContent.trim().replace('×', '').trim();
-          socket.emit('remove push url', url, (err, msg) => {
-            updateStatus(err ? `remove push url error: ${err}` : msg);
-            this.parentElement.remove();
-          });
-        });
-      });
+      renderPushUrls(urls);
     }
   });
 })

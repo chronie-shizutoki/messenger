@@ -246,14 +246,27 @@ socket.on('chat message', (msg, callback) => {
       }
       io.emit('chat message', savedMsg);
 
-// 发送推送通知给所有订阅者
+// 发送推送通知给所有订阅者 (区分ntfy和普通URL)
 global.pushUrls.forEach(pushUrl => {
   try {
-    const encodedContent = encodeURIComponent(savedMsg.content);
-    const fullUrl = pushUrl.endsWith('/') ? `${pushUrl}${encodedContent}` : `${pushUrl}/${encodedContent}`;
-    fetch(fullUrl).catch(err => console.error('emit push url error:', err));
+    // 检测是否为ntfy链接 (包含ntfy.sh域名)
+    if (pushUrl.includes('ntfy.sh')) {
+      // ntfy格式: 使用POST请求
+      fetch(pushUrl, {
+        method: 'POST',
+        body: savedMsg.content,
+        headers: {
+          'Content-Type': 'text/plain'
+        }
+      }).catch(err => console.error('ntfy推送错误:', err));
+    } else {
+      // 普通URL格式: 使用原有GET请求方式
+      const encodedContent = encodeURIComponent(savedMsg.content);
+      const fullUrl = pushUrl.endsWith('/') ? `${pushUrl}${encodedContent}` : `${pushUrl}/${encodedContent}`;
+      fetch(fullUrl).catch(err => console.error('普通推送错误:', err));
+    }
   } catch (e) {
-    console.error('emit push url error:', e);
+    console.error('推送处理异常:', e);
   }
 });
 
