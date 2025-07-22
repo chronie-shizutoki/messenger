@@ -1,7 +1,7 @@
 class I18n {
   constructor() {
     const userLanguage = navigator.language || 'en-US';
-    this.supportedLanguages = ['en-US', 'zh-CN', 'ja-JP', 'zh-TW', 'zh-HK', 'zh-SG', 'zh-MY', 'ko-KR', 'en-GB', 'es-ES', 'fr-FR', 'ms-MY']; // 支持的语言列表
+    this.supportedLanguages = ['en-US', 'zh-CN', 'ja-JP', 'zh-TW', 'zh-HK', 'zh-SG', 'ko-KR', 'en-GB', 'es-ES', 'fr-FR', 'ms-MY']; // 支持的语言列表
     this.locale = this.getBestMatchingLanguage(userLanguage);
     this.translations = {};
     this.init();
