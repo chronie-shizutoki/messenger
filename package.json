@@ -11,9 +11,8 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "@capacitor/android": "^7.4.2",
-    "@capacitor/cli": "^7.4.2",
-    "@capacitor/core": "^7.4.2",
+    "socket.io": "^4.8.1",
+    "sqlite3": "^5.1.7",
     "@simplewebauthn/browser": "^13.1.2",
     "@simplewebauthn/server": "^13.1.2",
     "cors": "^2.8.5",

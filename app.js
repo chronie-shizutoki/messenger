@@ -4,6 +4,9 @@ const session = require('express-session');
 const crypto = require('crypto');
 const qrcode = require('qrcode');
 const app = express();
+const http = require('http');
+const { Server } = require('socket.io');
+const sqlite3 = require('sqlite3').verbose();
 const fs = require('fs');
 const path = require('path');
 
@@ -281,6 +284,81 @@ app.get('/admin.html', authenticateAdmin, (req, res) => {
 })
 
 // 启动服务器，允许局域网访问
-app.listen(PORT, '0.0.0.0', () => {
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST", "OPTIONS"],
+    allowedHeaders: ["Content-Type"]
+  }
+});
+
+// 连接聊天数据库
+const db = new sqlite3.Database('chat.db', (err) => {
+  if (err) {
+    console.error(err.message);
+  }
+  console.log('Connected to the chat database.');
+});
+
+// 初始化消息表
+db.run(`CREATE TABLE IF NOT EXISTS messages (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  content TEXT,
+  timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+)`);
+
+// 处理Socket连接
+io.on('connection', (socket) => {
+  console.log('[服务器] 新客户端连接:', socket.id);
+
+  // 测试连接
+  socket.emit('connection test', '服务器连接成功');
+  socket.on('client test', (data) => {
+    console.log('[服务器] 收到客户端测试消息:', data);
+    socket.emit('server response', '已收到测试消息: ' + data);
+  });
+
+  // 保存消息到数据库
+  function saveMessage(content, callback) {
+    const timestamp = new Date().toISOString();
+    const insertQuery = 'INSERT INTO messages (content, timestamp) VALUES (?, ?)';
+    db.run(insertQuery, [content, timestamp], function(err) {
+      if (err) return callback(err);
+      callback(null, {
+        id: this.lastID,
+        content: content,
+        timestamp: timestamp
+      });
+    });
+  }
+
+  // 接收并广播消息
+  socket.on('chat message', (msg, callback) => {
+    console.log('[服务器] 收到消息:', msg);
+    saveMessage(msg.content, (err, savedMsg) => {
+      if (err) {
+        console.error('[服务器] 消息保存失败:', err);
+        return callback(err);
+      }
+      io.emit('chat message', savedMsg);
+      callback(null);
+    });
+  });
+
+  // 获取历史消息
+  socket.on('get history', (callback) => {
+    db.all('SELECT * FROM messages ORDER BY timestamp DESC LIMIT 100', (err, rows) => {
+      if (err) return callback(err);
+      callback(null, rows.reverse());
+    });
+  });
+
+  socket.on('disconnect', () => {
+    console.log('[服务器] 客户端断开连接:', socket.id);
+  });
+});
+
+server.listen(PORT, '0.0.0.0', () => {
   console.log(`Server running on http://0.0.0.0:${PORT}`);
 });

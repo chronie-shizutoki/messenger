@@ -25,10 +25,7 @@ function addMessageToDOM(message) {
 // XSS防护
 function escapeHTML(text) {
   return text.replace(/[&<>'"]/g, c => {
-    const entities = { '&':'&amp;', '<':'&lt;', '>':'&gt;', '\'':'&#39;', '"':'&quot;' };
-    return entities[c];
-  });
-}
+    const entities = { '&':'&amp;', '<':'&lt;', '>':'&gt;', '\'':'&#39;', '"':'&quot;'};    return entities[c];  });}
 
 // 初始化Socket
 let socketInitialized = false;
@@ -62,7 +59,7 @@ function initSocket() {
   window.sendMessage = () => {
     const message = inputEl.value.trim();
     if (!message || !socket.connected) return;
-    socket.emit('chat message', { content: message }, err => {
+    socket.emit('chat message', {content: message}, err => {
       if (!err) inputEl.value = '';
       else updateStatus(`发送失败: ${err}`, true);
     });
@@ -72,5 +69,4 @@ function initSocket() {
   inputEl.addEventListener('keypress', e => e.key === 'Enter' && window.sendMessage());
 }
 
-// 页面加载完成后初始化
 document.addEventListener('DOMContentLoaded', initSocket);
