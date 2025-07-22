@@ -7,6 +7,13 @@ class I18n {
     this.init();
   }
 
+  static getInstance() {
+    if (!window.i18n) {
+      window.i18n = new I18n();
+    }
+    return window.i18n;
+  }
+
   getBestMatchingLanguage(userLanguage) {
     const langCode = userLanguage.split('-')[0];
     // 首先尝试完全匹配
@@ -120,4 +127,5 @@ class I18n {
   }
 }
 // 在DOM加载完成后初始化国际化
-document.addEventListener('DOMContentLoaded', () => new I18n());
+// 立即初始化i18n实例
+window.i18n = I18n.getInstance();

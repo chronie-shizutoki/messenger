@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="upload.title"></title>
+    <link rel="stylesheet" href="lib/font-awesome/all.min.css">
+    <link rel="stylesheet" href="/css/upload.css" type="text/css">
+    <script src="js/i18n.js">    
+    </script>
+    <style>
+        @font-face {
+            font-family: 'LXGWWenKaiGB-Regular';
+            src: url('LXGWWenKaiGB-Regular.woff2');
+        }
+    </style>
+</head>
+<body>
+    <div class="background-animation" id="particles"></div>
+    <div class="upload-container">
+        <h1 data-i18n="upload.heading"></h1>
+        <div class="upload-icon">
+            <div class="icon-wrapper" id="uploadIcon">
+                <!-- 使用SVG替代外部icon -->
+                <svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="#5d9bff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 9 12 4 7 9"></polyline>
+                    <line x1="12" y1="4" x2="12" y2="15"></line>
+                </svg>
+            </div>
+        </div>
+        
+        <form id="uploadForm" action="/upload/upload-image" method="post" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="image" data-i18n="upload.select_file"></label>
+                <div class="file-input-container">
+                    <input type="file" id="image" name="image" accept=".jpg,.jpeg,.png,.gif,.svg" required>
+                </div>
+            </div>
+            
+            <div class="preview-container" id="previewContainer">
+                <img src="" alt="preview-image" class="preview-image" id="previewImage">
+                <div class="file-info" id="fileInfo"></div>
+            </div>
+            
+            <div class="progress-container" id="progressContainer">
+                <div class="progress-bar" id="progressBar"></div>
+            </div>
+            
+            <button type="submit" id="submitBtn" data-i18n="upload.button">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="17 9 12 4 7 9"></polyline>
+                        <line x1="12" y1="4" x2="12" y2="15"></line>
+                    </svg>
+                </button>
+        </form>
+        <div id="statusMessage" class="status-message"></div>
+        <a href="/" class="back-link" data-i18n="upload.back_link">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8ab4f8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+        </a>
+    </div>
+
+    <script>
+        // 创建背景粒子动画
+        function createParticles() {
+            const container = document.getElementById('particles');
+            const particleCount = 20;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // 随机大小和位置
+                const size = Math.random() * 30 + 10;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${Math.random() * 100}vw`;
+                particle.style.top = `${Math.random() * 100}vh`;
+                
+                // 随机动画延迟
+                particle.style.animationDelay = `${Math.random() * 15}s`;
+                
+                container.appendChild(particle);
+            }
+        }
+        
+        // 图片预览功能
+        function setupImagePreview() {
+            const fileInput = document.getElementById('image');
+            const previewContainer = document.getElementById('previewContainer');
+            const previewImage = document.getElementById('previewImage');
+            const fileInfo = document.getElementById('fileInfo');
+            const uploadIcon = document.getElementById('uploadIcon');
+            
+            fileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                
+                if (file) {
+                    // 显示文件信息
+                    const fileSize = (file.size / 1024 / 1024).toFixed(2);
+                    fileInfo.textContent = `${file.name} (${fileSize} MB)`;
+                    
+                    // 创建图片预览
+                    const reader = new FileReader();
+                    
+                    reader.onload = function(e) {
+                        previewImage.src = e.target.result;
+                        previewContainer.classList.add('show');
+                    }
+                    
+                    reader.readAsDataURL(file);
+                    
+                    // 改变图标样式
+                    uploadIcon.innerHTML = '<svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="#64ff96" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><path d="M16 13l-4 4-4-4"></path></svg>';
+                    uploadIcon.style.border = '3px solid rgba(100, 255, 150, 0.4)';
+                    uploadIcon.style.boxShadow = '0 0 25px rgba(100, 255, 150, 0.3)';
+                } else {
+                    previewContainer.classList.remove('show');
+                    uploadIcon.innerHTML = '<i class="fas fa-cloud-upload-alt"></i>';
+                    uploadIcon.style.border = '3px dashed rgba(100, 150, 255, 0.4)';
+                    uploadIcon.style.boxShadow = '0 0 25px rgba(93, 155, 255, 0.3)';
+                }
+            });
+        }
+        
+        // 处理文件上传
+        function setupUploadForm() {
+            const form = document.getElementById('uploadForm');
+            const statusMessage = document.getElementById('statusMessage');
+            const progressContainer = document.getElementById('progressContainer');
+            const progressBar = document.getElementById('progressBar');
+            const submitBtn = document.getElementById('submitBtn');
+            const fileInput = document.getElementById('image');
+            
+            // 检查URL参数中的上传状态
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('upload')) {
+                if (urlParams.get('upload') === 'success') {
+                    showStatus(i18n.t('upload.success'), 'success');
+                } else {
+                    showStatus(i18n.t('upload.error'), 'error');
+                }
+            }
+            
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                if (!fileInput.files.length) {
+                    showStatus(i18n.t('upload.select_error'), 'error');
+                    return;
+                }
+                
+                // 创建FormData对象
+                const formData = new FormData(form);
+                
+                // 禁用提交按钮
+                submitBtn.disabled = true;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 上传中...';
+                
+                // 显示进度条
+                progressContainer.classList.add('show');
+                progressBar.style.width = '0%';
+                
+                // 创建XMLHttpRequest对象
+                const xhr = new XMLHttpRequest();
+                xhr.open('POST', form.action);
+                
+                // 上传进度事件
+                xhr.upload.addEventListener('progress', function(e) {
+                    if (e.lengthComputable) {
+                        const percent = (e.loaded / e.total) * 100;
+                        progressBar.style.width = `${percent}%`;
+                    }
+                });
+                
+                // 上传完成事件
+                xhr.addEventListener('load', function() {
+                    progressBar.style.width = '100%';
+                    
+                    if (xhr.status >= 200 && xhr.status < 300) {
+                        // 上传成功
+                        setTimeout(() => {
+                            showStatus(i18n.t('upload.success'), 'success');
+                            progressContainer.classList.remove('show');
+                            
+                            // 重置表单
+                            form.reset();
+                            document.getElementById('previewContainer').classList.remove('show');
+                            document.getElementById('uploadIcon').innerHTML = '<i class="fas fa-cloud-upload-alt"></i>';
+                            document.getElementById('uploadIcon').style.border = '3px dashed rgba(100, 150, 255, 0.4)';
+                            document.getElementById('uploadIcon').style.boxShadow = '0 0 25px rgba(93, 155, 255, 0.3)';
+                            
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = '<i class="fas fa-upload"></i> 上传图片';
+                        }, 500);
+                    } else {
+                        // 上传失败
+                        setTimeout(() => {
+                            showStatus(i18n.t('upload.error'), 'error');
+                            progressContainer.classList.remove('show');
+                            
+                            submitBtn.disabled = false;
+                            submitBtn.innerHTML = '<i class="fas fa-upload"></i> 上传图片';
+                        }, 500);
+                    }
+                });
+                
+                // 上传错误事件
+                xhr.addEventListener('error', function() {
+                    showStatus(i18n.t('upload.network_error'), 'error');
+                    progressContainer.classList.remove('show');
+                    
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = '<i class="fas fa-upload"></i> 上传图片';
+                });
+                
+                // 发送请求
+                xhr.send(formData);
+            });
+        }
+        
+        // 显示状态消息
+        function showStatus(message, type) {
+            const statusMessage = document.getElementById('statusMessage');
+            
+            statusMessage.textContent = message;
+            statusMessage.className = 'status-message ' + type;
+            
+            // 添加show类触发动画
+            setTimeout(() => {
+                statusMessage.classList.add('show');
+            }, 10);
+            
+            // 5秒后隐藏消息
+            setTimeout(() => {
+                statusMessage.classList.remove('show');
+            }, 5000);
+        }
+        
+        // 点击上传图标触发文件选择
+        document.getElementById('uploadIcon').addEventListener('click', function() {
+            document.getElementById('image').click();
+        });
+        
+        // 页面加载完成后初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            createParticles();
+            setupImagePreview();
+            setupUploadForm();
+        });
+    </script>
+</body>
+</html>

@@ -61,7 +61,7 @@ function initSocket() {
     if (!message || !socket.connected) return;
     socket.emit('chat message', {content: message}, err => {
       if (!err) inputEl.value = '';
-      else updateStatus(`发送失败: ${err}`, true);
+      else updateStatus(`send message error: ${err}`, true);
     });
   };
 

@@ -52,7 +52,7 @@ http://localhost:3000
   - 点击空白处或使用右上角关闭按钮退出大图模式
 
 ### 上传图片
-1. 访问管理员页面：http://localhost:3000/admin.html
+1. 访问管理员页面：http://localhost:3000/upload.html
 2. 点击上传图标或选择文件按钮
 3. 选择要上传的图片文件
 4. 点击"上传图片"按钮
@@ -68,7 +68,7 @@ image-viewer/
 ├── package.json           # 项目依赖
 ├── public/
 │   ├── index.html         # 图片查看首页
-│   ├── admin.html         # 图片上传管理页面
+│   ├── upload.html         # 图片上传管理页面
 │   ├── chat-client.js     # 聊天客户端逻辑
 │   ├── components/        # UI组件
 │   └── lib/               # 第三方库

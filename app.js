@@ -111,7 +111,7 @@ app.get('/get-thumbnail/:filename', (req, res) => {
 });
 
 // 管理员图片上传接口
-app.post('/admin/upload-image', upload.single('image'), async (req, res) => {
+app.post('/upload/upload-image', upload.single('image'), async (req, res) => {
   if (!req.file) {
     return res.status(400).send('未选择图片文件');
   }
@@ -126,12 +126,12 @@ app.post('/admin/upload-image', upload.single('image'), async (req, res) => {
     console.error('生成缩略图失败:', error);
   }
 
-  res.redirect('/admin.html?upload=success');
+  res.redirect('/upload.html?upload=success');
 });
 
 // 管理员页面路由
-app.get('/admin.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'admin.html'));
+app.get('/upload.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'upload.html'));
 })
 
 // 启动服务器，允许局域网访问
