@@ -66,11 +66,26 @@ class I18n {
     const dropdown = document.createElement('select');
     dropdown.className = 'language-selector';
 
+    // 语言代码到显示名称的映射
+    const languageNames = {
+      'en-US': 'English (US)',
+      'zh-CN': '简体中文（中国大陆）',
+      'ja-JP': '日本語',
+      'zh-TW': '正體中文（台湾）',
+      'zh-HK': '繁體中文（香港）',
+      'zh-SG': '简体中文（新加坡）',
+      'ko-KR': '한국어',
+      'en-GB': 'English (UK)',
+      'es-ES': 'Español',
+      'fr-FR': 'Français',
+      'ms-MY': 'Bahasa Melayu'
+    };
+
     // 为每种支持的语言创建选项
     this.supportedLanguages.forEach(lang => {
       const option = document.createElement('option');
       option.value = lang;
-      option.textContent = lang.toUpperCase();
+      option.textContent = languageNames[lang] || lang.toUpperCase();
       option.selected = lang === this.locale;
       dropdown.appendChild(option);
     });
@@ -92,18 +107,30 @@ class I18n {
     dropdown.style.left = '50%';
     dropdown.style.transform = 'translateX(-50%)';
     dropdown.style.zIndex = '1000';
-    dropdown.style.padding = '12px 20px';
-    dropdown.style.border = '2px solid #4285f4';
-    dropdown.style.borderRadius = '50px';
-    dropdown.style.backgroundColor = 'transparent';
-    dropdown.style.color = 'rgb(255, 255, 255)';
-    dropdown.style.fontSize = '15px';
-    dropdown.style.fontWeight = '100';
+    dropdown.style.padding = '12px 24px';
+    dropdown.style.border = '2px solid #4f46e5';
+    dropdown.style.borderRadius = '12px';
+    dropdown.style.backgroundColor = 'rgba(30, 41, 59, 0.95)';
+    dropdown.style.color = 'rgba(255, 255, 255, 0.9)';
+    dropdown.style.fontSize = '16px';
+    dropdown.style.fontWeight = '500';
     dropdown.style.cursor = 'pointer';
-    dropdown.style.boxShadow = '0 2px 10px rgba(0, 0, 0, 0.1)';
-    dropdown.style.transition = 'all 0.3s ease';
+    dropdown.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)';
+    dropdown.style.transition = 'all 0.2s ease-in-out';
     dropdown.style.outline = 'none';
-    dropdown.style.textAlign = 'center';
+    dropdown.style.textAlign = 'left';
+    dropdown.style.minWidth = '180px';
+
+    // 添加悬停效果
+    dropdown.addEventListener('mouseenter', () => {
+      dropdown.style.borderColor = '#2563eb';
+      dropdown.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.18)';
+    });
+
+    dropdown.addEventListener('mouseleave', () => {
+      dropdown.style.borderColor = '#3b82f6';
+      dropdown.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+    });
 
     document.body.prepend(dropdown);
   }

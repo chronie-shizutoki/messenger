@@ -195,6 +195,28 @@
         #send-button:hover {
             background-color: #0055aa;
         }
+
+        .version-info {
+            position: fixed;
+            z-index: 10000;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            /* 在1行里面显示 */
+            white-space: nowrap;
+            font-size: 0.8em;
+            color: #b1afaf;
+            /* 添加文字黑色阴影 */
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+            /* 文字居中 */
+            text-align: center;
+            /* 文字垂直居中 */
+            line-height: 1;
+            a {
+                color: #b1afaf;
+                text-decoration: none;
+            }
+        }
     </style>
 </head>
 <body>
@@ -391,5 +413,11 @@
             this.textContent = chatContainer.classList.contains('collapsed') ? '+' : '−';
         })
     </script>
+    <div class="version-info">
+        v1.5.0 | Jul 23, 2025 |
+        <a href="https://github.com/quiettimejsg/image-viewer">by quiettime</a>
+        |
+        <a href="https://github.com/quiettimejsg/image-viewer/issues">Report issue</a>
+    </div>
 </body>
 </html>
