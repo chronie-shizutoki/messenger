@@ -6,7 +6,7 @@ const sendBtn = document.getElementById('send-button');
 
 // 状态更新函数
 function updateStatus(text, isError = false) {
-  statusEl.textContent = `状态: ${text} (${new Date().toLocaleTimeString()})`;
+  statusEl.textContent = ` ${text} (${new Date().toLocaleTimeString()})`;
   statusEl.style.color = isError ? 'red' : 'green';
 }
 
@@ -40,7 +40,7 @@ function initSocket() {
 
   // 事件处理
   socket.on('connect', () => {
-    updateStatus('已连接到服务器');
+    updateStatus('Connected');
     if (!historyLoaded) {
       socket.emit('get history', (err, messages) => {
         if (!err) {
@@ -51,8 +51,8 @@ function initSocket() {
     }
   });
 
-  socket.on('disconnect', () => updateStatus('已断开连接', true));
-  socket.on('connect_error', err => updateStatus(`连接错误: ${err.message}`, true));
+  socket.on('disconnect', () => updateStatus('Disconnected', true));
+  socket.on('connect_error', err => updateStatus(`Connection error: ${err.message}`, true));
   socket.on('chat message', addMessageToDOM);
 
   // 发送消息处理

@@ -369,19 +369,20 @@
     </script>
     <div class="chat-container">
         <div class="chat-header">
-    聊天
+    <span data-i18n="chat.title"></span>
     <button class="toggle-chat" style="float: right; background: none; border: none; color: white; cursor: pointer;">−</button>
 </div>
         <div id="status-indicator"></div>
         <div id="chat-container"></div>
         <div id="input-area">
-            <input type="text" id="message-input" placeholder="输入消息...">
-            <button id="send-button">发送</button>
+            <input type="text" id="message-input" data-i18n-placeholder="chat.placeholder">
+            <button id="send-button" data-i18n="chat.send"></button>
         </div>
     </div>
 
     <script src="lib/socket.io.js"></script>
     <script src="chat-client.js"></script>
+    <script src="js/i18n.js"></script>
     <script>
         // 聊天框折叠功能
         document.querySelector('.toggle-chat').addEventListener('click', function() {

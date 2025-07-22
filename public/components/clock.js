@@ -46,9 +46,35 @@ document.addEventListener('DOMContentLoaded', () => {
     // 设置外层容器的文本居中
     clockContainer.style.textAlign = 'center';
     // 将创建好的时钟添加到外层容器中
-    // 根据浏览器语言自动设置时钟本地化
-const userLanguage = navigator.language || 'en-US';
-clockContainer.appendChild(createClock(userLanguage));
+    let currentClockElement = null;
+
+    // 更新时钟语言的函数
+    function updateClockLanguage(locale) {
+      // 移除旧时钟
+      if (currentClockElement) {
+        clockContainer.removeChild(currentClockElement);
+      }
+      // 创建新时钟
+      currentClockElement = createClock(locale);
+      clockContainer.appendChild(currentClockElement);
+    }
+
+    // 等待i18n初始化完成后再设置时钟语言
+    document.addEventListener('i18nInitialized', () => {
+      // 检查 i18n 是否存在，避免引用错误
+      const userLanguage = typeof i18n !== 'undefined' ? (i18n.locale || navigator.language || 'en-US') : navigator.language || 'en-US';
+      updateClockLanguage(userLanguage);
+    });
+
+    // 监听语言变化事件
+    document.addEventListener('i18nLanguageChanged', (e) => {
+      updateClockLanguage(e.detail.locale);
+    });
+
+    // 初始加载时如果i18n已经初始化完成
+    if (typeof i18n !== 'undefined' && i18n.locale) {
+      updateClockLanguage(i18n.locale);
+    }
     // 将外层容器插入到 body 元素的第一个子元素之前
     document.body.insertBefore(clockContainer, document.body.firstChild);
 });
