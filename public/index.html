@@ -21,6 +21,29 @@
             margin: 0;
             background-color: #000000;
         }
+        .admin-button {
+            position: absolute;
+            top: 70px;
+            right: 30px;
+            width: 40px; /* 设置宽度 */
+            height: 40px; /* 设置高度 */
+            padding: 0; /* 重置内边距 */
+            background-color: #333333;
+            color: white;
+            border: none;
+            border-radius: 50%; /* 设置圆角为50%实现圆形 */
+            cursor: pointer;
+            z-index: 100;
+            text-decoration: none;
+            display: flex; /* 使用flex布局使内容居中 */
+            justify-content: center;
+            align-items: center;
+        }
+
+        .admin-button:hover {
+            background-color: #555555;
+        }
+
         .image-container {
             position: relative;
             margin-top: 200px;
@@ -175,6 +198,7 @@
     </style>
 </head>
 <body>
+    <a href="/admin.html" class="admin-button">+</a>
     <div class="image-container">
         <script src="components/clock.js"></script>
     </div>
