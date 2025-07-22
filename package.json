@@ -13,14 +13,10 @@
   "dependencies": {
     "socket.io": "^4.8.1",
     "sqlite3": "^5.1.7",
-    "@simplewebauthn/browser": "^13.1.2",
-    "@simplewebauthn/server": "^13.1.2",
     "cors": "^2.8.5",
     "dotenv": "^17.2.0",
     "express": "^5.1.0",
-    "express-session": "^1.18.1",
     "multer": "^2.0.1",
-    "qrcode": "^1.5.4",
     "sharp": "^0.34.3"
   }
 }
