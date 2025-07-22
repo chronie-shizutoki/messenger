@@ -102,4 +102,41 @@ socket.on('connect', () => {
 })
 }
 
+// 弹窗控制逻辑
+const modal = document.getElementById('notification-modal');
+const openBtn = document.getElementById('open-notification-settings');
+const closeBtn = document.getElementById('close-modal');
+
+// 打开弹窗
+function openNotificationModal() {
+  modal.style.display = 'flex';
+  // 触发重排后应用动画
+  setTimeout(() => {
+      modal.style.opacity = '1';
+      modal.style.transform = 'scale(1)';
+      modal.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+  }, 10);
+}
+openBtn.addEventListener('click', openNotificationModal);
+
+// 关闭弹窗
+function closeModal() {
+  modal.style.opacity = '0';
+  modal.style.transform = 'scale(0.9)';
+  modal.style.backgroundColor = 'rgba(0, 0, 0, 0)';
+  // 等待动画完成后隐藏
+  setTimeout(() => {
+      modal.style.display = 'none';
+  }, 300);
+}
+
+closeBtn.addEventListener('click', closeModal);
+
+// 点击外部区域关闭弹窗
+modal.addEventListener('click', (e) => {
+  if (e.target === modal) {
+    closeModal();
+  }
+});
+
 document.addEventListener('DOMContentLoaded', initSocket);
