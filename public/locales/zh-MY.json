@@ -1,0 +1,18 @@
+{
+  "upload": {
+    "title": "Image Upload",  
+    "heading": "Upload 图片",
+    "select_file": "Select File", 
+    "button": "Upload",
+    "back_link": "< Back", 
+    "success": "Upload berjaya!", 
+    "error": "Upload failed. Sila cuba lagi.", 
+    "network_error": "Network error. Sila check connection.", 
+    "select_error": "Sila select image file." 
+  },
+  "chat": {
+    "title": "Chat", 
+    "send": "Send" 
+  },
+  "chat.placeholder": "Type message..." 
+}

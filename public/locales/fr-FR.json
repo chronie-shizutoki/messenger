@@ -1,0 +1,18 @@
+{
+  "upload": {
+    "title": "Téléversement d'images",
+    "heading": "Téléverser une image",
+    "select_file": "Sélectionner un fichier",
+    "button": "Téléverser",
+    "back_link": "< Retour à la galerie",
+    "success": "Téléversement réussi !",
+    "error": "Échec du téléversement. Veuillez réessayer",
+    "network_error": "Erreur réseau. Vérifiez votre connexion",
+    "select_error": "Veuillez sélectionner un fichier image"
+  },
+  "chat": {
+    "title": "Discussion",
+    "send": "Envoyer"
+  },
+  "chat.placeholder": "Écrivez un message..."
+}

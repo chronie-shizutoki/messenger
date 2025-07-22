@@ -1,0 +1,18 @@
+{
+  "upload": {
+    "title": "Muat Naik Imej", 
+    "heading": "Muat Naik Imej", 
+    "select_file": "Pilih Fail", 
+    "button": "Muat Naik", 
+    "back_link": "< Kembali", 
+    "success": "Berjaya dimuat naik!", 
+    "error": "Muat naik gagal. Sila cuba lagi.", 
+    "network_error": "Ralat rangkaian. Sila semak sambungan.", 
+    "select_error": "Sila pilih fail imej." 
+  },
+  "chat": {
+    "title": "Sembang", 
+    "send": "Hantar" 
+  },
+  "chat.placeholder": "Taip mesej..." 
+}

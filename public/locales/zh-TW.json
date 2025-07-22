@@ -1,0 +1,18 @@
+{
+  "upload": {
+    "title": "圖片上傳",
+    "heading": "上傳圖片",
+    "select_file": "選取檔案", 
+    "button": "上傳",
+    "back_link": "< 返回",
+    "success": "上傳成功",
+    "error": "上傳失敗，請重試",
+    "network_error": "網路錯誤，請檢查連線", 
+    "select_error": "請選取圖片檔案" 
+  },
+  "chat": {
+    "title": "聊天",
+    "send": "傳送" 
+  },
+  "chat.placeholder": "輸入訊息..." 
+}

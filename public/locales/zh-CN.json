@@ -1,14 +1,15 @@
 {
   "upload": {
     "title": "图片上传",
-    "heading": "图片上传",
-    "select_file": "选择图片文件:",
-    "button": "上传图片",
-    "back_link": "返回图片查看页",
-    "success": "图片上传成功！",
-    "error": "图片上传失败，请重试。",
-    "network_error": "上传发生错误，请检查网络连接。",
-    "select_error": "请选择要上传的图片文件"},
+    "heading": "上传图片",
+    "select_file": "选择文件",
+    "button": "上传",
+    "back_link": "< 返回",
+    "success": "上传成功",
+    "error": "上传失败，请重试",
+    "network_error": "网络错误，请检查连接",
+    "select_error": "请选择图片文件"
+  },
   "chat": {
     "title": "聊天",
     "send": "发送"

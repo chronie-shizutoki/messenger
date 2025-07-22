@@ -1,0 +1,18 @@
+{
+  "upload": {
+    "title": "Upload 相", 
+    "heading": "Upload 相", 
+    "select_file": "Select File / 揀檔案", 
+    "button": "Upload", 
+    "back_link": "< Back",
+    "success": "Upload 成功！ / 搞掂！", 
+    "error": "Upload fail 咗！再試過？", 
+    "network_error": "Network Error！Check 吓連線", 
+    "select_error": "喂，揀幅圖先啦！" 
+  },
+  "chat": {
+    "title": "Chat / 傾偈", 
+    "send": "Send" 
+  },
+  "chat.placeholder": "打啲嘢啦..." 
+}

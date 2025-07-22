@@ -1,0 +1,18 @@
+{
+  "upload": {
+    "title": "Subida de imágenes",
+    "heading": "Subir imagen",
+    "select_file": "Seleccionar archivo",
+    "button": "Subir",
+    "back_link": "< Volver a la galería",
+    "success": "¡Subida exitosa!",
+    "error": "Error al subir. Inténtalo de nuevo",
+    "network_error": "Error de red. Comprueba tu conexión",
+    "select_error": "Selecciona un archivo de imagen"
+  },
+  "chat": {
+    "title": "Chat",
+    "send": "Enviar"
+  },
+  "chat.placeholder": "Escribe un mensaje..."
+}
