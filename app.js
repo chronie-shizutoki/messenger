@@ -259,6 +259,56 @@ global.pushUrls.forEach(pushUrl => {
           'Content-Type': 'text/plain'
         }
       }).catch(err => console.error('ntfy推送错误:', err));
+    } else if (pushUrl.includes('notifyme-server.521933.xyz')) {
+      // NotifyMe格式: 使用GET请求并添加参数
+      const urlObj = new URL(pushUrl);
+      // 保留URL中已有的参数（如uuid）并添加必要参数
+      // 仅在参数不存在时设置默认值，保留URL中已有的参数
+      if (!urlObj.searchParams.has('title')) {
+        urlObj.searchParams.set('title', 'Image Viewer Notification');
+      }
+      urlObj.searchParams.set('body', savedMsg.content);
+      if (!urlObj.searchParams.has('bigText')) {
+        urlObj.searchParams.set('bigText', 'false');
+      }
+      // 可选：仅在没有group参数时设置默认值
+      if (!urlObj.searchParams.has('group')) {
+        urlObj.searchParams.set('group', 'image-viewer');
+      }
+      
+      // 检查是否包含必要的uuid参数
+      if (!urlObj.searchParams.has('uuid')) {
+        console.error('NotifyMe推送失败: URL中缺少必要的uuid参数');
+        return;
+      }
+      
+      // 输出完整URL用于调试
+      console.log('NotifyMe推送URL:', urlObj.toString());
+      
+      // 发送请求并处理响应
+      // 发送请求并处理响应
+      console.log('发送NotifyMe推送请求:', urlObj.toString());
+      fetch(urlObj.toString())
+        .then(response => {
+          console.log('NotifyMe推送响应状态:', response.status);
+          if (!response.ok) {
+            return response.text().then(text => {
+              throw new Error(`HTTP错误: ${response.status}, 响应内容: ${text}`);
+            });
+          }
+          // 尝试解析JSON，如果失败则返回文本
+          return response.json().catch(() => response.text());
+        })
+        .then(data => {
+          console.log('NotifyMe推送响应内容:', data);
+          // 检查响应是否表示成功
+          if (typeof data === 'object' && !data.isSuccess) {
+            console.error('NotifyMe推送失败:', data);
+          } else if (typeof data === 'string' && data.includes('error')) {
+            console.error('NotifyMe推送失败:', data);
+          }
+        })
+        .catch(err => console.error('NotifyMe推送错误:', err));
     } else {
       // 普通URL格式: 使用原有GET请求方式
       const encodedContent = encodeURIComponent(savedMsg.content);
