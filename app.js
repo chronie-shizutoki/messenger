@@ -171,6 +171,87 @@ db.all('SELECT push_url FROM push_subscriptions', (err, urls) => {
   global.pushUrls = err ? [] : urls.map(row => row.push_url);
 });
 
+// 获取所有贴图列表
+app.get('/get-stickers', async (req, res) => {
+  try {
+    const stickerRoot = path.join(__dirname, 'public', 'sticker');
+    const categories = [];
+    
+    // 读取主分类目录
+    const mainCategories = await fs.promises.readdir(stickerRoot, { withFileTypes: true });
+    
+    for (const mainCat of mainCategories) {
+      if (mainCat.isDirectory()) {
+        const mainCatPath = path.join(stickerRoot, mainCat.name);
+        // 读取主分类目录下的所有项目（文件和子目录）
+        const mainCatItems = await fs.promises.readdir(mainCatPath, { withFileTypes: true });
+        
+        const subCatList = [];
+        // 处理主分类目录下的直接文件
+        const directFiles = [];
+        for (const item of mainCatItems) {
+          if (item.isFile()) {
+            directFiles.push(item.name);
+          } else if (item.isDirectory()) {
+            // 处理子分类目录
+            const subCatPath = path.join(mainCatPath, item.name);
+            const stickerFiles = await fs.promises.readdir(subCatPath);
+            
+            // 过滤图片文件
+            const stickers = stickerFiles.filter(file => {
+              const ext = path.extname(file).toLowerCase();
+              return ['.png', '.jpg', '.jpeg', '.gif', '.svg'].includes(ext);
+            });
+            
+            subCatList.push({
+              name: item.name,
+              stickers: stickers.map(file => ({
+                filename: file,
+                url: `/sticker/${mainCat.name}/${item.name}/${file}`
+              }))
+            });
+          }
+        }
+        
+        // 处理主分类目录下的直接图片文件
+        if (directFiles.length > 0) {
+          // 过滤图片文件
+          const stickers = directFiles.filter(file => {
+            const ext = path.extname(file).toLowerCase();
+            return ['.png', '.jpg', '.jpeg', '.gif', '.svg'].includes(ext);
+          });
+          
+          subCatList.push({
+            name: '直接文件',
+            stickers: stickers.map(file => ({
+              filename: file,
+              url: `/sticker/${mainCat.name}/${file}`
+            }))
+          });
+        }
+        
+        // 展平子分类，将所有子分类的贴图合并到主分类下
+const allStickers = subCatList.flatMap(subCat => 
+  subCat.stickers.map(sticker => ({
+    ...sticker,
+    category: subCat.name
+  }))
+);
+
+categories.push({
+  name: mainCat.name,
+  stickers: allStickers
+});
+      }
+    }
+    
+    res.json(categories);
+  } catch (err) {
+    console.error('获取贴图列表错误:', err);
+    res.status(500).send('获取贴图列表失败');
+  }
+});
+
 // 处理Socket连接
 io.on('connection', (socket) => {
   console.log('emit connection:', socket.id);

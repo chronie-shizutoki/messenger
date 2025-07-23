@@ -106,7 +106,6 @@ class I18n {
     dropdown.style.top = '20%';
     dropdown.style.left = '50%';
     dropdown.style.transform = 'translateX(-50%)';
-    dropdown.style.zIndex = '1000';
     dropdown.style.padding = '12px 24px';
     dropdown.style.border = '2px solid #4f46e5';
     dropdown.style.borderRadius = '12px';

@@ -1,4 +1,4 @@
-        body {
+body {
             display: flex;
             justify-content: center;
             align-items: center;
@@ -18,7 +18,6 @@
             border: none;
             border-radius: 50%; /* 设置圆角为50%实现圆形 */
             cursor: pointer;
-            z-index: 100;
             text-decoration: none;
             display: flex; /* 使用flex布局使内容居中 */
             justify-content: center;
@@ -154,6 +153,13 @@
         .message .content {
             color: white;
         }
+        .chat-sticker {
+            max-width: 100px;
+            height: auto;
+            margin: 5px;
+            border-radius: 4px;
+            vertical-align: middle;
+        }
         #input-area {
             display: flex;
             padding: 10px;
@@ -167,7 +173,7 @@
             color: white;
             border-radius: 4px 0 0 4px;
             outline: none;
-            max-width: 70%;
+            max-width: 59%;
         }
         #send-button {
             padding: 8px 15px;
@@ -183,7 +189,6 @@
 
         .version-info {
             position: fixed;
-            z-index: 10000;
             bottom: 10px;
             left: 50%;
             transform: translateX(-50%);
