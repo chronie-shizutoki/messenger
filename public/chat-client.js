@@ -15,7 +15,7 @@ function addMessageToDOM(message, isHistorical = false) {
   const div = document.createElement('div');
   div.className = 'message';
   div.innerHTML = `
-    <div class="meta">${new Date(message.timestamp).toLocaleTimeString()}</div>
+    <div class="meta">${new Date(message.timestamp).toLocaleString()}</div>
     <div class="content">${parseMessageContent(message.content)}</div>
   `;
   chatContainer.appendChild(div);
