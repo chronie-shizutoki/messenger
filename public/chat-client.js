@@ -3,6 +3,7 @@ const statusEl = document.getElementById('status-indicator');
 const chatContainer = document.getElementById('chat-container');
 const inputEl = document.getElementById('message-input');
 const sendBtn = document.getElementById('send-button');
+let allMessages = [];
 
 // 状态更新函数
 function updateStatus(text, isError = false) {
@@ -11,27 +12,45 @@ function updateStatus(text, isError = false) {
 }
 
 // 消息渲染函数
-function addMessageToDOM(message, isHistorical = false) {
+function addMessageToDOM(message, isHistorical = false, searchTerm = '') {
+  // 仅在历史加载或新消息时添加到数组，避免重复
+  if (!allMessages.some(m => m.timestamp === message.timestamp)) {
+    allMessages.push(message);
+  }
   const div = document.createElement('div');
   div.className = 'message';
   div.innerHTML = `
     <div class="meta">${new Date(message.timestamp).toLocaleString()}</div>
-    <div class="content">${parseMessageContent(message.content)}</div>
+    <div class="content">${parseMessageContent(message.content, searchTerm)}</div>
   `;
   chatContainer.appendChild(div);
-  chatContainer.scrollTop = chatContainer.scrollHeight;
-
+  if (!isHistorical) {
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+  }
 }
 
 // Markdown图片解析与XSS防护
-function parseMessageContent(text) {
+function parseMessageContent(text, searchTerm = '') {
   // 基础XSS过滤
   const safeText = text.replace(/[&<>'"]/g, c => {
     const entities = { '&':'&amp;', '<':'&lt;', '>':'&gt;', '\'':'&#39;', '"':'&quot;' };
     return entities[c];
   });
+
+  let result = safeText;
+  // 搜索词高亮处理
+  if (searchTerm && searchTerm.length > 0) {
+    try {
+      const escapedTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp(`(${escapedTerm})`, 'gi');
+      result = result.replace(regex, '<span class="highlight">$1</span>');
+    } catch (e) {
+      console.error('Error in search regex:', e);
+    }
+  }
+
   // 解析Markdown图片语法 ![alt](url)
-  return safeText.replace(/!\[(.*?)\]\((.*?)\)/g, (match, alt, url) => {
+  return result.replace(/!\[(.*?)\]\((.*?)\)/g, (match, alt, url) => {
     // 验证URL格式
     if (url && (url.startsWith('/') || url.startsWith('http'))) {
       return `<a href="${url}?t=${new Date().getTime()}" data-lightbox="chat-images" data-title="${alt || 'Image'}"><img src="${url}?t=${new Date().getTime()}" alt="${alt || 'sticker'}" class="chat-image"></a>`;
@@ -170,6 +189,26 @@ modal.addEventListener('click', (e) => {
 });
 
 document.addEventListener('DOMContentLoaded', function() {
+    // 搜索功能初始化
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+            const searchTerm = e.target.value.trim().toLowerCase();
+            filterMessages(searchTerm);
+        });
+    }
+
+    function filterMessages(searchTerm) {
+        chatContainer.innerHTML = '';
+        const filteredMessages = searchTerm 
+            ? allMessages.filter(msg => msg.content.toLowerCase().includes(searchTerm))
+            : allMessages;
+        
+        filteredMessages.forEach(msg => {
+            addMessageToDOM(msg, true, searchTerm);
+        });
+    }
+
     // 贴图选择功能
     const stickerButton = document.getElementById('sticker-button');
     const stickerModal = document.getElementById('sticker-modal');
