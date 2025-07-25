@@ -1,15 +1,4 @@
 {
-  "upload": {
-    "title": "画像アップロード",
-    "heading": "画像をアップロード",
-    "select_file": "ファイルを選択",
-    "button": "アップロード",
-    "back_link": "< ギャラリーに戻る",
-    "success": "アップロード成功",
-    "error": "アップロード失敗。再試行してください",
-    "network_error": "ネットワークエラー。接続を確認",
-    "select_error": "画像ファイルを選択"
-  },
   "chat": {
     "title": "チャット",
     "send": "送信"

@@ -1,15 +1,4 @@
 {
-  "upload": {
-    "title": "Image Upload",
-    "heading": "Upload Image",
-    "select_file": "Select File",
-    "button": "Upload",
-    "back_link": "< Back",
-    "success": "Upload successful!",
-    "error": "Upload failed. Please try again.",
-    "network_error": "Network error. Check your connection.",
-    "select_error": "Please select an image file"
-  },
   "chat": {
     "title": "Chat",
     "send": "Send"

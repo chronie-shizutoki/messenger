@@ -244,7 +244,7 @@ document.addEventListener('DOMContentLoaded', function() {
         xhr.upload.addEventListener('progress', (e) => {
             if (e.lengthComputable) {
                 const percent = Math.round((e.loaded / e.total) * 100);
-                updateStatus(`正在上传: ${percent}%`);
+                updateStatus(`uploading: ${percent}%`);
             }
         });
         
@@ -257,21 +257,21 @@ document.addEventListener('DOMContentLoaded', function() {
                         // 将图片URL插入到消息输入框
                         const messageInput = document.getElementById('message-input');
                         messageInput.value += `![${file.name}](${response.imageUrl})`;
-                        updateStatus('图片上传成功');
+                        updateStatus('image uploaded');
                     } else {
-                        updateStatus('上传失败: 未返回图片URL', true);
+                        updateStatus('upload failed: no image url', true);
                     }
                 } catch (error) {
-                    updateStatus('上传失败: 服务器响应格式错误', true);
+                    updateStatus('upload failed: server response format error', true);
                 }
             } else {
-                updateStatus(`上传失败: ${xhr.statusText}`, true);
+                updateStatus(`upload failed: ${xhr.statusText}`, true);
             }
         });
         
         // 错误处理
         xhr.addEventListener('error', () => {
-            updateStatus('网络错误，上传失败', true);
+            updateStatus('network error, upload failed', true);
         });
         
         xhr.send(formData);
