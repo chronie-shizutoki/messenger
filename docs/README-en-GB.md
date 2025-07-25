@@ -1,22 +1,6 @@
 # Messenger
 
-A real-time chat application with WebSocket support, featuring a modern UI and internationalization capabilities.
-
-## Languages
-This documentation is available in the following languages:
-- [English (US)](README.md)
-- [English (UK)](docs/README-en-GB.md)
-- [Spanish](docs/README-es.md)
-- [French](docs/README-fr.md)
-- [Japanese](docs/README-ja.md)
-- [Korean](docs/README-ko.md)
-- [Malay](docs/README-ms.md)
-- [Chinese (Simplified)](docs/README-zh-CN.md)
-- [Chinese (Hong Kong)](docs/README-zh-HK.md)
-- [Chinese (Taiwan)](docs/README-zh-TW.md)
-
-## Localization Files
-Localization JSON files are available in the [public/locales](public/locales/) directory.
+A real-time chat application with WebSocket support, featuring a modern UI and internationalisation capabilities.
 
 ## Features
 
