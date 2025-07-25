@@ -63,9 +63,6 @@ const upload = multer({
 // 提供静态文件访问
 app.use(express.static(path.join(__dirname, 'public')));
 
-// 提供静态文件访问
-app.use(express.static(path.join(__dirname, 'public')));
-
 // 根路由返回HTML页面
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
