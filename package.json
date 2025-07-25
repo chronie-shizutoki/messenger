@@ -1,6 +1,6 @@
 {
   "name": "messenger",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -12,12 +12,14 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "socket.io": "^4.8.1",
-    "sqlite3": "^5.1.7",
     "cors": "^2.8.5",
     "dotenv": "^17.2.0",
     "express": "^5.1.0",
+    "jquery": "^3.7.1",
+    "lightbox2": "^2.11.5",
     "multer": "^2.0.1",
-    "sharp": "^0.34.3"
+    "sharp": "^0.34.3",
+    "socket.io": "^4.8.1",
+    "sqlite3": "^5.1.7"
   }
 }

@@ -34,7 +34,7 @@ function parseMessageContent(text) {
   return safeText.replace(/!\[(.*?)\]\((.*?)\)/g, (match, alt, url) => {
     // 验证URL格式
     if (url && (url.startsWith('/') || url.startsWith('http'))) {
-      return `<img src="${url}?t=${new Date().getTime()}" alt="${alt || 'sticker'}" class="chat-image">`;
+      return `<a href="${url}?t=${new Date().getTime()}" data-lightbox="chat-images" data-title="${alt || 'Image'}"><img src="${url}?t=${new Date().getTime()}" alt="${alt || 'sticker'}" class="chat-image"></a>`;
     }
     return match; // 无效URL保持原样
   });
