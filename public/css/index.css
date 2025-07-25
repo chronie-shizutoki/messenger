@@ -88,8 +88,17 @@
         }
 
         .sticker-modal {
-            background-color: rgba(15, 23, 42, 0.8);
+            background-color: rgba(15, 23, 42, 0);
+            opacity: 0;
+            transform: scale(0.9);
             backdrop-filter: blur(8px);
+            transition: opacity 0.3s ease, transform 0.3s ease, background-color 0.3s ease;
+        }
+
+        .sticker-modal.active {
+            background-color: rgba(15, 23, 42, 0.8);
+            opacity: 1;
+            transform: scale(1);
         }
 
         .modal-content {

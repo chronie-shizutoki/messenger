@@ -181,12 +181,20 @@ document.addEventListener('DOMContentLoaded', function() {
     // 显示贴图模态框
     stickerButton.addEventListener('click', async () => {
         stickerModal.style.display = 'flex';
+        // 触发重排后添加active类以启动动画
+        setTimeout(() => {
+            stickerModal.classList.add('active');
+        }, 10);
         await loadStickers();
     });
 
     // 关闭贴图模态框
     closeStickerModal.addEventListener('click', () => {
-        stickerModal.style.display = 'none';
+        stickerModal.classList.remove('active');
+        // 过渡结束后隐藏模态框
+        stickerModal.addEventListener('transitionend', () => {
+            stickerModal.style.display = 'none';
+        }, { once: true });
     });
 
     // 点击模态框外部关闭
