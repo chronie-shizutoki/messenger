@@ -321,7 +321,7 @@ global.pushUrls.forEach(pushUrl => {
       }
       // 可选：仅在没有group参数时设置默认值
       if (!urlObj.searchParams.has('group')) {
-        urlObj.searchParams.set('group', 'image-viewer');
+        urlObj.searchParams.set('group', 'messenger');
       }
       
       // 检查是否包含必要的uuid参数

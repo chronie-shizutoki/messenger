@@ -1,7 +1,7 @@
 class I18n {
   constructor() {
     const userLanguage = navigator.language || 'en-US';
-    this.supportedLanguages = ['en-GB', 'en-US', 'es-ES', 'fr-FR', 'ja-JP', 'ko-KR', 'ms-MY', 'zh-CN', 'zh-HK', 'zh-SG', 'zh-TW']; // 支持的语言列表
+    this.supportedLanguages = ['en-GB', 'en-US', 'es-ES', 'fr-FR', 'ja-JP', 'ko-KR', 'ms-MY', 'zh-CN', 'zh-HK', 'zh-TW']; // 支持的语言列表
     this.locale = this.getBestMatchingLanguage(userLanguage);
     this.translations = {};
     this.init();
@@ -77,7 +77,6 @@ class I18n {
       'ms-MY': 'Bahasa Melayu (Malaysia)',
       'zh-CN': '简体中文（中国大陆）',
       'zh-HK': '繁體中文（香港）',
-      'zh-SG': '简体中文（新加坡）',
       'zh-TW': '正體中文（台灣）'
     };
 
