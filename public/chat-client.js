@@ -34,7 +34,7 @@ function parseMessageContent(text) {
   return safeText.replace(/!\[(.*?)\]\((.*?)\)/g, (match, alt, url) => {
     // 验证URL格式
     if (url && (url.startsWith('/') || url.startsWith('http'))) {
-      return `<img src="${url}?t=${new Date().getTime()}" alt="${alt || 'sticker'}" class="chat-sticker">`;
+      return `<img src="${url}?t=${new Date().getTime()}" alt="${alt || 'sticker'}" class="chat-image">`;
     }
     return match; // 无效URL保持原样
   });
@@ -195,6 +195,79 @@ document.addEventListener('DOMContentLoaded', function() {
             stickerModal.style.display = 'none';
         }
     });
+
+    // 图片上传功能
+    const uploadButton = document.getElementById('upload-image-button');
+    if (uploadButton) {
+        uploadButton.addEventListener('click', () => {
+            // 创建隐藏的文件输入元素
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = '.jpg,.jpeg,.png,.gif,.svg';
+            fileInput.style.display = 'none';
+            
+            // 监听文件选择事件
+            fileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    uploadImageFile(file);
+                }
+            });
+            
+            // 添加到文档并触发点击
+            document.body.appendChild(fileInput);
+            fileInput.click();
+            
+            // 清理
+            setTimeout(() => document.body.removeChild(fileInput), 0);
+        });
+    }
+
+    // 上传图片到服务器
+    function uploadImageFile(file) {
+        const formData = new FormData();
+        formData.append('image', file);
+        
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/chat/upload-image');
+        xhr.setRequestHeader('Accept', 'application/json');
+        
+        // 上传进度处理
+        xhr.upload.addEventListener('progress', (e) => {
+            if (e.lengthComputable) {
+                const percent = Math.round((e.loaded / e.total) * 100);
+                updateStatus(`正在上传: ${percent}%`);
+            }
+        });
+        
+        // 上传完成处理
+        xhr.addEventListener('load', () => {
+            if (xhr.status >= 200 && xhr.status < 300) {
+                try {
+                    const response = JSON.parse(xhr.responseText);
+                    if (response.imageUrl) {
+                        // 将图片URL插入到消息输入框
+                        const messageInput = document.getElementById('message-input');
+                        messageInput.value += `![${file.name}](${response.imageUrl})`;
+                        updateStatus('图片上传成功');
+                    } else {
+                        updateStatus('上传失败: 未返回图片URL', true);
+                    }
+                } catch (error) {
+                    updateStatus('上传失败: 服务器响应格式错误', true);
+                }
+            } else {
+                updateStatus(`上传失败: ${xhr.statusText}`, true);
+            }
+        });
+        
+        // 错误处理
+        xhr.addEventListener('error', () => {
+            updateStatus('网络错误，上传失败', true);
+        });
+        
+        xhr.send(formData);
+    }
 
     // 加载贴图数据
     async function loadStickers() {

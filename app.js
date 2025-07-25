@@ -12,33 +12,16 @@ const cors = require('cors');
 app.use(cors({ origin: '*' }));
 
 const PORT = process.env.PORT || 3000;
-const IMAGE_PATH = path.join(__dirname, 'public', 'images', 'sample.svg');
 const sharp = require('sharp');
-const ERROR_FETCHING_IMAGES = 'Error fetching images';
-const THUMBNAIL_DIRECTORY = path.join(__dirname, 'public', 'thumbnails');
+const CHAT_IMAGE_DIRECTORY = path.join(__dirname, 'public', 'chat-images');
 
-// 确保缩略图目录存在
-if (!fs.existsSync(THUMBNAIL_DIRECTORY)) {
-  fs.mkdirSync(THUMBNAIL_DIRECTORY, { recursive: true });
+// 确保聊天图片目录存在
+if (!fs.existsSync(CHAT_IMAGE_DIRECTORY)) {
+  fs.mkdirSync(CHAT_IMAGE_DIRECTORY, { recursive: true });
 }
-const IMAGE_DIRECTORY = path.join(__dirname, 'public', 'images');
 
 // 引入multer处理文件上传
 const multer = require('multer');
-
-// 配置multer存储
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, IMAGE_DIRECTORY);
-  },
-  filename: function (req, file, cb) {
-    // 保留原始文件名并添加时间戳防止冲突
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
-    const ext = path.extname(file.originalname);
-    const filename = path.basename(file.originalname, ext) + '-' + uniqueSuffix + ext;
-    cb(null, filename);
-  }
-});
 
 // 配置文件过滤
 const fileFilter = (req, file, cb) => {
@@ -52,8 +35,19 @@ const fileFilter = (req, file, cb) => {
 };
 
 // 初始化multer上传中间件
-const upload = multer({
-  storage: storage,
+// 聊天图片上传配置
+const chatUpload = multer({
+  storage: multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, CHAT_IMAGE_DIRECTORY);
+    },
+    filename: function (req, file, cb) {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+      const ext = path.extname(file.originalname);
+      const filename = path.basename(file.originalname, ext) + '-' + uniqueSuffix + ext;
+      cb(null, filename);
+    }
+  }),
   fileFilter: fileFilter,
   limits: {
     fileSize: 15 * 1024 * 1024, // 限制15MB
@@ -68,68 +62,44 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// 获取所有图片列表
-app.get('/get-all-images', async (req, res) => {
-  try {
-    const files = await fs.promises.readdir(IMAGE_DIRECTORY);
-    const imageFiles = files.filter(file => {
-      const ext = path.extname(file).toLowerCase();
-      return ['.jpg', '.jpeg', '.png', '.gif', '.svg'].includes(ext);
-    });
-    const imageData = imageFiles.map(file => ({
-      filename: file,
-      imageUrl: `/get-image/${file}`,
-      thumbnailUrl: `/get-thumbnail/${file}`
-    }));
-    res.json(imageData);
-  } catch (err) {
-    res.status(500).send(ERROR_FETCHING_IMAGES);
-  }
-});
 
-// 获取单个图片
-app.get('/get-image/:filename', (req, res) => {
-  const imagePath = path.join(IMAGE_DIRECTORY, req.params.filename);
+
+// 获取聊天图片
+app.get('/get-chat-image/:filename', (req, res) => {
+  const imagePath = path.join(CHAT_IMAGE_DIRECTORY, req.params.filename);
   if (fs.existsSync(imagePath)) {
     res.sendFile(imagePath);
   } else {
-    res.status(404).send('Image not found');
+    res.status(404).json({ error: '聊天图片不存在' });
   }
 })
 
-// 获取缩略图
-app.get('/get-thumbnail/:filename', (req, res) => {
-  const thumbnailPath = path.join(THUMBNAIL_DIRECTORY, req.params.filename);
-  if (fs.existsSync(thumbnailPath)) {
-    res.sendFile(thumbnailPath);
-  } else {
-    res.status(404).send('Thumbnail not found');
-  }
-});
 
-// 管理员图片上传接口
-app.post('/upload/upload-image', upload.single('image'), async (req, res) => {
+// 聊天图片上传接口
+app.post('/chat/upload-image', chatUpload.single('image'), async (req, res) => {
   if (!req.file) {
-    return res.status(400).send('not select image file');
+    return res.status(400).json({ error: '未选择图片文件' });
   }
 
   try {
-    // 生成缩略图
-    const thumbnailPath = path.join(THUMBNAIL_DIRECTORY, req.file.filename);
+    // 创建聊天缩略图目录
+    const chatThumbDir = path.join(__dirname, 'public', 'chat-thumbnails');
+    if (!fs.existsSync(chatThumbDir)) {
+      fs.mkdirSync(chatThumbDir, { recursive: true });
+    }
+
+    // 生成聊天图片缩略图
+    const thumbnailPath = path.join(chatThumbDir, req.file.filename);
     await sharp(req.file.path)
       .resize(200, 200, { fit: 'inside', withoutEnlargement: true })
       .toFile(thumbnailPath);
   } catch (error) {
-    console.error('create thumbnail error:', error);
+    console.error('创建聊天缩略图错误:', error);
   }
 
-  res.redirect('/upload.html?upload=success');
+  res.json({ imageUrl: `/get-chat-image/${req.file.filename}` });
 });
 
-// 管理员页面路由
-app.get('/upload.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'upload.html'));
-})
 
 // 启动服务器，允许局域网访问
 const server = http.createServer(app);
