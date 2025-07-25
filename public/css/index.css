@@ -25,7 +25,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif; line-height: 1.5; letter-spacing: 0.01em;
+            font-family: sans-serif; line-height: 1.5; letter-spacing: 0.01em;
         }
 
         body {
@@ -49,10 +49,12 @@
             position: relative;
             width: 90%;
             max-width: 1200px;
-            margin: 200px auto 70px;
+            --top-margin: calc(20vh);
+            --bottom-margin: calc(20vh);
+            margin: var(--top-margin) auto var(--bottom-margin);
             top: 0;
-            height: calc(100vh - 360px);
-            max-height: calc(100vh - 360px);
+            height: calc(100vh - calc(var(--top-margin) + var(--bottom-margin)));
+            max-height: calc(100vh - calc(var(--top-margin) + var(--bottom-margin)));
             background-color: var(--surface);
             border-radius: var(--radius-lg);
             box-shadow: var(--shadow-lg);
@@ -513,7 +515,10 @@
 
     @media (max-width: 768px) {
       .chat-container {
-        height: 50vh;
+        --top-margin: 25vh;
+        --bottom-margin: 15vh;
+        margin: var(--top-margin) auto var(--bottom-margin);
+        height: calc(100vh - calc(var(--top-margin) + var(--bottom-margin)));
         max-height: none;
         border-radius: 0;
         border: none;

@@ -119,6 +119,12 @@ class I18n {
     dropdown.style.textAlign = 'left';
     dropdown.style.minWidth = '180px';
 
+    if (window.matchMedia('(min-width: 768px)').matches) {
+      dropdown.style.left = ''; // Reset left value to default
+      dropdown.style.right = '5%'; // Simplify the calculation
+      dropdown.style.top = '10%';
+    }
+
     // 添加悬停效果
     dropdown.addEventListener('mouseenter', () => {
       dropdown.style.borderColor = '#2563eb';

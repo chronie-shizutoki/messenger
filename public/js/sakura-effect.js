@@ -53,7 +53,7 @@ class SakuraEffect {
     this.canvas.style.top = '0';
     this.canvas.style.left = '0';
     this.canvas.style.pointerEvents = 'none';
-    this.canvas.style.zIndex = '1';
+    this.canvas.style.zIndex = '-1';
     document.body.appendChild(this.canvas);
     this.resizeCanvas();
     window.addEventListener('resize', () => this.resizeCanvas());

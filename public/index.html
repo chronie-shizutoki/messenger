@@ -72,14 +72,24 @@
     <script src="js/i18n.js"></script>
     <script src="js/sakura-effect.js"></script>
     <script>
-        // 樱花效果控制
+        // Sakura effect control
         document.addEventListener('DOMContentLoaded', function() {
-                new window.SakuraEffect();
+            // Use requestIdleCallback to run the effect asynchronously
+            if ('requestIdleCallback' in window) {
+                window.requestIdleCallback(() => {
+                    new window.SakuraEffect();
+                });
+            } else {
+                // Fallback for browsers that don't support requestIdleCallback
+                setTimeout(() => {
+                    new window.SakuraEffect();
+                }, 0);
+            }
         });
     </script>
 
     <div class="version-info">
-        v2.0.1 | Jul 26, 2025 
+        v2.1.0 | Jul 26, 2025 
         <br>
         <a href="https://github.com/quiettimejsg/messenger">quiettime</a>
         |
