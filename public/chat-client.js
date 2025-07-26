@@ -18,45 +18,161 @@ function addMessageToDOM(message, isHistorical = false, searchTerm = '') {
     allMessages.push(message);
   }
   const div = document.createElement('div');
-  div.className = 'message';
-  div.innerHTML = `
+div.className = 'message';
+div.dataset.timestamp = message.timestamp;
+div.innerHTML = `
+  <div class="message-header">
     <div class="meta">${new Date(message.timestamp).toLocaleString()}</div>
-    <div class="content">${parseMessageContent(message.content, searchTerm)}</div>
-  `;
+    <button class="quote-btn" data-i18n-title="chat.quote_reply">↩️</button>
+  </div>
+  ${message.quote ? `<div class="quote-content">
+    <div class="quote-meta">${new Date(message.quote.timestamp).toLocaleString()}</div>
+    <div class="quote-text">${parseMessageContent(message.quote.content)}</div>
+  </div>` : ''}
+  <div class="content">${parseMessageContent(message.content, searchTerm)}</div>
+`;
+
+// 添加引用按钮事件
+const quoteBtn = div.querySelector('.quote-btn');
+quoteBtn.addEventListener('click', () => {
+  const quotedContent = message.content;
+  const quotedTimestamp = message.timestamp;
+  inputEl.value = `[quote=${quotedTimestamp}]${quotedContent}[/quote]
+`;
+  inputEl.focus();
+});
   chatContainer.appendChild(div);
   if (!isHistorical) {
     chatContainer.scrollTop = chatContainer.scrollHeight;
   }
 }
 
-// Markdown图片解析与XSS防护
+/**
+ * 辅助函数：转义HTML特殊字符以防止XSS
+ * @param {string} str - 需要转义的字符串
+ * @returns {string} - 转义后的安全字符串
+ */
+function escapeHtml(str) {
+  if (!str) return '';
+  const entities = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;',
+    '/': '&#x2F;' // 防止HTML标签闭合
+  };
+  return str.replace(/[&<>"'/]/g, c => entities[c]);
+}
+
+/**
+ * 主解析函数：将包含自定义格式的文本转换为安全的HTML
+ * @param {string} text - 原始输入文本
+ * @param {string} [searchTerm] - (可选) 需要高亮的搜索词
+ * @returns {string} - 解析后的HTML字符串
+ */
+function decodeHtmlEntities(str) {
+  return str.replace(/&#(?:x([0-9A-Fa-f]+)|([0-9]+));/gi, (match, hex, dec) => {
+    return String.fromCharCode(hex ? parseInt(hex, 16) : parseInt(dec, 10));
+  });
+}
+
 function parseMessageContent(text, searchTerm = '') {
-  // 基础XSS过滤
-  const safeText = text.replace(/[&<>'"]/g, c => {
-    const entities = { '&':'&amp;', '<':'&lt;', '>':'&gt;', '\'':'&#39;', '"':'&quot;' };
-    return entities[c];
+  let result = text;
+
+  // ====================================================================
+  // 步骤 1: 递归解析 [quote] 块 (从内到外)
+  // 这是结构性最强的元素，应最先处理。
+  // ====================================================================
+  const quoteRegex = /\[quote=([\d\-T:.Z]+)\]((?:(?!\[quote)[\s\S])*?)\[\/quote\]/gi;
+  let replaced;
+  do {
+    replaced = false;
+    result = result.replace(quoteRegex, (match, timestamp, quotedContent) => {
+      replaced = true;
+      // 重要的递归：对引用内部的内容应用【同样的解析规则】
+      // 这会确保内部的图片、高亮等也能被正确处理。
+      const quotedContentHtml = parseMessageContent(quotedContent, searchTerm);
+      
+      // 使用 new Date() 可能是安全的，但最好也对 timestamp 进行校验
+      // 移除时间戳前的美元符号并解码HTML实体
+const decodedTimestamp = decodeHtmlEntities(timestamp).replace(/^\$/, '').trim();
+const safeTimestamp = new Date(decodedTimestamp).toLocaleString();
+      
+      return `<div class="quote-content">
+        <div class="quote-meta">${i18n.t('chat.quote_from', {safeTimestamp})}</div>
+        <div class="quote-text">${quotedContentHtml}</div>
+      </div>`;
+    });
+  } while (replaced);
+
+  // ====================================================================
+  // 步骤 2: 解析Markdown图片 ![alt](url)
+  // 此时，引用块已被替换为HTML，我们处理剩余内容中的图片。
+  // ====================================================================
+  const imageRegex = /!\[(.*?)\]\((.*?)\)/g;
+  result = result.replace(imageRegex, (match, alt, url) => {
+    // **安全关键点**: 对URL进行严格白名单校验
+    const trimmedUrl = url.trim();
+    const urlRegex = /^(https?:\/\/|\/)/; // 只允许 http, https 或相对路径开头
+    
+    if (urlRegex.test(trimmedUrl)) {
+      // **安全关键点**: 在将alt文本放入HTML属性前，必须进行转义！
+      const safeAlt = escapeHtml(alt);
+      const safeUrl = escapeHtml(trimmedUrl); // 也转义URL，防止URL中包含"等字符破坏属性
+      const timestamp = new Date().getTime();
+
+      return `<a href="${safeUrl}?t=${timestamp}" data-lightbox="chat-images" data-title="${safeAlt || 'Image'}">
+        <img src="${safeUrl}?t=${timestamp}" alt="${safeAlt || 'sticker'}" class="chat-image">
+      </a>`;
+    }
+    // 如果URL无效，则将整个Markdown语法转义后显示，而不是保持原样或隐藏
+    return escapeHtml(match);
   });
 
-  let result = safeText;
-  // 搜索词高亮处理
-  if (searchTerm && searchTerm.length > 0) {
-    try {
+  // ====================================================================
+  // 步骤 3: 转义剩余的纯文本中的HTML字符
+  // 这一步非常重要，它处理所有不是由我们生成的HTML。
+  // 为了避免破坏我们已经生成的HTML标签（如<div>, <img>），我们使用一种
+  // 更聪明的方法：只转义那些不在标签内部的特殊字符。
+  // 一个简单但有效的技巧是：先转义&，然后是<和>。
+  // ====================================================================
+  let finalHtml = '';
+  let lastIndex = 0;
+  const tagRegex = /(<[^>]+>)/g; // 匹配我们已经生成的HTML标签
+
+  // 遍历字符串，只对标签之外的部分进行转义
+  let match;
+  while ((match = tagRegex.exec(result)) !== null) {
+    // Do not escape the text between the last tag and the current tag
+    finalHtml += result.substring(lastIndex, match.index);
+    // 添加标签本身（不转义）
+    finalHtml += match[0];
+    lastIndex = tagRegex.lastIndex;
+  }
+  // 转义最后一个标签之后剩余的文本
+  finalHtml += escapeHtml(result.substring(lastIndex));
+  
+  result = finalHtml;
+  
+  // ====================================================================
+  // 步骤 4: 处理搜索词高亮
+  // 这是最后一步，在所有HTML结构都已生成并且内容都已安全转义后进行。
+  // 这样可以避免破坏之前的解析步骤。
+  // 注意：这个高亮操作可能会在HTML属性中添加<span>，需要谨慎。
+  // 更安全的高亮应该只在文本节点上操作，但对于简单应用，以下方法可以接受。
+  // ====================================================================
+ if (searchTerm && searchTerm.length > 0) {
+   try {
       const escapedTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const regex = new RegExp(`(${escapedTerm})`, 'gi');
       result = result.replace(regex, '<span class="highlight">$1</span>');
-    } catch (e) {
-      console.error('Error in search regex:', e);
-    }
-  }
+      } catch (e) {
+        console.error('Error in search regex:', e);
+      }
+ }
 
-  // 解析Markdown图片语法 ![alt](url)
-  return result.replace(/!\[(.*?)\]\((.*?)\)/g, (match, alt, url) => {
-    // 验证URL格式
-    if (url && (url.startsWith('/') || url.startsWith('http'))) {
-      return `<a href="${url}?t=${new Date().getTime()}" data-lightbox="chat-images" data-title="${alt || 'Image'}"><img src="${url}?t=${new Date().getTime()}" alt="${alt || 'sticker'}" class="chat-image"></a>`;
-    }
-    return match; // 无效URL保持原样
-  });
+  return result;
 }
 
 // 初始化Socket
@@ -89,13 +205,35 @@ function initSocket() {
 
   // 发送消息处理
   window.sendMessage = () => {
-    const message = inputEl.value.trim();
-    if (!message || !socket.connected) return;
-    socket.emit('chat message', {content: message}, err => {
-      if (!err) inputEl.value = '';
-      else updateStatus(`send message error: ${err}`, true);
-    });
-  };
+  const message = inputEl.value.trim();
+  if (!message || !socket.connected) return;
+
+  // 解析引用格式 [quote=timestamp]content[/quote]
+  const quoteRegex = /\[quote=(\d+)\]([\s\S]*?)\[\/quote\]\n?/i;
+  const match = message.match(quoteRegex);
+  let content = message;
+  let quote = null;
+
+  if (match) {
+    const quotedTimestamp = match[1];
+    const quotedContent = match[2];
+    content = message.replace(quoteRegex, '');
+
+    // 查找被引用的消息
+    const quotedMessage = allMessages.find(m => m.timestamp === quotedTimestamp);
+    if (quotedMessage) {
+      quote = {
+        timestamp: quotedTimestamp,
+        content: quotedMessage.content
+      };
+    }
+  }
+
+  socket.emit('chat message', {content, quote}, err => {
+    if (!err) inputEl.value = '';
+    else updateStatus(`send message error: ${err}`, true);
+  });
+};
 
   sendBtn.addEventListener('click', window.sendMessage);
 inputEl.addEventListener('keypress', e => e.key === 'Enter' && window.sendMessage());

@@ -1,11 +1,10 @@
 {
-  "chat": {
-    "title": "Chat / 傾偈", 
-    "send": "Send" 
-  },
+  "chat.title": "Chat / 傾偈", 
+  "chat.send": "Send",
   "chat.placeholder": "打啲嘢啦...", 
   "notification.push_url_placeholder": "輸入推送通知連結",
   "notification": {
     "save_button": "儲存"
-  }
+  },
+  "chat.quote_from": "引用自 {safeTimestamp}"
 }

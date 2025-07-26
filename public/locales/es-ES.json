@@ -1,11 +1,10 @@
 {
-  "chat": {
-    "title": "Chat",
-    "send": "Enviar"
-  },
+  "chat.title": "Chat",
+  "chat.send": "Enviar",
   "chat.placeholder": "Escribe un mensaje...",
   "notification.push_url_placeholder": "Introduce la URL de notificación push",
   "notification": {
     "save_button": "Guardar"
-  }
+  },
+  "chat.quote_from": "Cita de {safeTimestamp}"
 }

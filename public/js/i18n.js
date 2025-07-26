@@ -139,20 +139,10 @@ class I18n {
     document.body.prepend(dropdown);
   }
   applyTranslations() {
-        // 支持嵌套键的翻译文本替换
+        // Support translation text replacement
         document.querySelectorAll('[data-i18n]').forEach(element => {
             const key = element.getAttribute('data-i18n');
-            const keys = key.split('.');
-            let value = this.translations;
-            for (const k of keys) {
-                if (value && typeof value === 'object' && k in value) {
-                    value = value[k];
-                } else {
-                    value = key;
-                    break;
-                }
-            }
-            element.textContent = value;
+            element.textContent = this.translations[key] || key;
         });
 
     // 翻译占位符
@@ -160,7 +150,25 @@ class I18n {
       const key = element.getAttribute('data-i18n-placeholder');
       element.placeholder = this.translations[key] || key;
     });
+
+    // 翻译title属性
+    document.querySelectorAll('[data-i18n-title]').forEach(element => {
+      const key = element.getAttribute('data-i18n-title');
+      element.title = this.translations[key] || key;
+    });
   }
+  // 支持i18n.t('chat.quote_from', {safeTimestamp})
+  t(key, params) {
+    let text = this.translations[key] || key;
+    if (params) {
+      Object.keys(params).forEach(param => {
+        text = text.replace(new RegExp(`\\{${param}\\}`, 'g'), params[param]);
+      });
+    }
+    return text;
+  }
+  // 支持data-i18n-args="${safeTimestamp}"
+ 
 
   // 设置页面语言
   setDocumentLanguage() {

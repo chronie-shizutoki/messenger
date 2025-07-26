@@ -1,11 +1,10 @@
 {
-  "chat": {
-    "title": "채팅",
-    "send": "보내기"
-  },
+  "chat.title": "채팅",
+  "chat.send": "보내기",
   "chat.placeholder": "메시지를 입력하세요...",
   "notification.push_url_placeholder": "푸시 알림 URL을 입력하세요",
   "notification": {
     "save_button": "저장"
-  }
+  },
+  "chat.quote_from": "인용 출처 {safeTimestamp}"
 }

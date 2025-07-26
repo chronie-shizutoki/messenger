@@ -1,11 +1,10 @@
 {
-  "chat": {
-    "title": "チャット",
-    "send": "送信"
-  },
+  "chat.title": "チャット",
+  "chat.send": "送信",
   "chat.placeholder": "メッセージを入力...",
   "notification.push_url_placeholder": "プッシュ通知URLを入力",
   "notification": {
     "save_button": "保存"
-  }
+  },
+  "chat.quote_from": "引用元 {safeTimestamp}"
 }

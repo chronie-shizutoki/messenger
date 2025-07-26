@@ -337,6 +337,49 @@
             font-weight: bold;
         }
 
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4px;
+        }
+
+        .quote-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            color: var(--text-secondary);
+            transition: color 0.2s;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+
+        .quote-btn:hover {
+            color: var(--primary);
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .quote-content {
+            border-left: 2px solid var(--primary);
+            padding: 5px 10px;
+            margin-bottom: 8px;
+            font-size: 0.9em;
+            background-color: rgba(99, 102, 241, 0.05);
+            border-radius: 0 4px 4px 0;
+        }
+
+        .quote-meta {
+            font-size: 0.8em;
+            color: var(--text-secondary);
+            margin-bottom: 3px;
+        }
+
+        .quote-text {
+            color: var(--text-secondary);
+            word-break: break-word;
+        }
+
         .chat-container.collapsed {
             max-height: 60px;
             opacity: 0.95;

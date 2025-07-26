@@ -1,11 +1,10 @@
 {
-  "chat": {
-    "title": "Sembang", 
-    "send": "Hantar" 
-  },
+  "chat.title": "Sembang", 
+  "chat.send": "Hantar",
   "chat.placeholder": "Taip mesej...",
   "notification.push_url_placeholder": "Masukkan URL pemberitahuan push",
   "notification": {
     "save_button": "Simpan"
-  }
+  },
+  "chat.quote_from": "Cita dari {safeTimestamp}"
 }
