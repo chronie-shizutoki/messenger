@@ -194,8 +194,10 @@ function initSocket() {
         if (!err) {
           messages.forEach(msg => addMessageToDOM(msg, true));
         historyLoaded = true;
-        // 滚动到最新消息
-        chatContainer.scrollTop = chatContainer.scrollHeight;
+        // Scroll to the latest message after a short delay to ensure all messages are rendered
+        setTimeout(() => {
+          chatContainer.scrollTop = chatContainer.scrollHeight;
+        }, 1000);
         }
       });
     }
