@@ -193,7 +193,9 @@ function initSocket() {
       socket.emit('get history', (err, messages) => {
         if (!err) {
           messages.forEach(msg => addMessageToDOM(msg, true));
-          historyLoaded = true;
+        historyLoaded = true;
+        // 滚动到最新消息
+        chatContainer.scrollTop = chatContainer.scrollHeight;
         }
       });
     }
