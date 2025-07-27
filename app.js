@@ -138,6 +138,53 @@ db.all('SELECT push_url FROM push_subscriptions', (err, urls) => {
   global.pushUrls = err ? [] : urls.map(row => row.push_url);
 });
 
+// 敏感内容过滤配置
+const sensitiveDirPath = path.join(__dirname, 'config', 'sensitive');
+let sensitiveWords = [];
+try {
+  // 检查敏感词目录是否存在
+  if (fs.existsSync(sensitiveDirPath)) {
+    // 读取目录中的所有文件
+    const files = fs.readdirSync(sensitiveDirPath);
+    // 筛选出所有txt文件
+    const txtFiles = files.filter(file => path.extname(file).toLowerCase() === '.txt');
+    
+    // 读取每个txt文件并提取敏感词
+    txtFiles.forEach(file => {
+      const filePath = path.join(sensitiveDirPath, file);
+      const content = fs.readFileSync(filePath, 'utf8');
+      // 支持换行和逗号分隔的敏感词，去除空白和空字符串
+      const words = content.split(/[\n,]+/).map(word => word.trim()).filter(word => word);
+      sensitiveWords.push(...words);
+    });
+    
+    // 去重处理
+    sensitiveWords = [...new Set(sensitiveWords)];
+  } else {
+    console.warn('敏感词目录不存在:', sensitiveDirPath);
+    sensitiveWords = [];
+  }
+} catch (err) {
+  console.error('读取敏感词文件错误:', err);
+  sensitiveWords = [];
+}
+
+// 过滤敏感内容
+// 转义正则表达式特殊字符
+function escapeRegExp(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+function filterSensitiveContent(content) {
+  let filtered = content;
+  sensitiveWords.forEach(word => {
+    const escapedWord = escapeRegExp(word);
+    const regex = new RegExp(escapedWord, 'gi');
+    filtered = filtered.replace(regex, '***');
+  });
+  return filtered; 
+}
+
 // 获取所有贴图列表
 app.get('/get-stickers', async (req, res) => {
   try {
@@ -287,7 +334,8 @@ socket.on('get push urls', (callback) => {
 // 接收并广播消息
 socket.on('chat message', (msg, callback) => {
     console.log('emit chat message:', msg);
-    saveMessage(msg.content, (err, savedMsg) => {
+    const filteredContent = filterSensitiveContent(msg.content);
+    saveMessage(filteredContent, (err, savedMsg) => {
       if (err) {
         console.error('emit chat message error:', err);
         return callback(err);
