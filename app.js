@@ -175,14 +175,35 @@ function escapeRegExp(str) {
   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+const BANNED_MESSAGE = 'The content violates the rules and has been blocked.内容违反规则，已被屏蔽。';
+
 function filterSensitiveContent(content) {
+  let sensitiveWordCount = 0;
+  const tempContent = content;
+  
+  // 统计所有敏感词出现的总次数
+  sensitiveWords.forEach(word => {
+      const escapedWord = escapeRegExp(word);
+      const regex = new RegExp(escapedWord, 'gi');
+      const matches = tempContent.match(regex);
+      if (matches) {
+        sensitiveWordCount += matches.length;
+      }
+    });
+  
+  // 如果敏感词数量达到3个或以上，返回完整屏蔽消息
+  if (sensitiveWordCount >= 3) {
+    return BANNED_MESSAGE;
+  }
+  
+  // 否则，逐个替换敏感词
   let filtered = content;
   sensitiveWords.forEach(word => {
     const escapedWord = escapeRegExp(word);
     const regex = new RegExp(escapedWord, 'gi');
     filtered = filtered.replace(regex, '***');
   });
-  return filtered; 
+  return filtered;
 }
 
 // 获取所有贴图列表
