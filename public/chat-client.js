@@ -18,9 +18,9 @@ function addMessageToDOM(message, isHistorical = false, searchTerm = '') {
     allMessages.push(message);
   }
   const div = document.createElement('div');
-div.className = 'message';
+  div.className = 'message';
 div.dataset.timestamp = message.timestamp;
-div.innerHTML = `
+  div.innerHTML = `
   <div class="message-header">
     <div class="meta">${new Date(message.timestamp).toLocaleString()}</div>
     <button class="quote-btn" data-i18n-title="chat.quote_reply">↩️</button>
@@ -43,7 +43,7 @@ quoteBtn.addEventListener('click', () => {
 });
   chatContainer.appendChild(div);
   if (!isHistorical) {
-    chatContainer.scrollTop = chatContainer.scrollHeight;
+  chatContainer.scrollTop = chatContainer.scrollHeight;
   }
 }
 
@@ -205,8 +205,8 @@ function initSocket() {
 
   // 发送消息处理
   window.sendMessage = () => {
-  const message = inputEl.value.trim();
-  if (!message || !socket.connected) return;
+    const message = inputEl.value.trim();
+    if (!message || !socket.connected) return;
 
   // 解析引用格式 [quote=timestamp]content[/quote]
   const quoteRegex = /\[quote=(\d+)\]([\s\S]*?)\[\/quote\]\n?/i;
@@ -230,10 +230,10 @@ function initSocket() {
   }
 
   socket.emit('chat message', {content, quote}, err => {
-    if (!err) inputEl.value = '';
-    else updateStatus(`send message error: ${err}`, true);
-  });
-};
+      if (!err) inputEl.value = '';
+      else updateStatus(`send message error: ${err}`, true);
+    });
+  };
 
   sendBtn.addEventListener('click', window.sendMessage);
 inputEl.addEventListener('keypress', e => e.key === 'Enter' && window.sendMessage());
