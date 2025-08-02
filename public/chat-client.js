@@ -320,7 +320,7 @@ function createMessageElement(message, isHistorical = false, searchTerm = '') {
   div.innerHTML = `
   <div class="message-header">
     <div class="meta">${new Date(message.timestamp).toLocaleString()}</div>
-    <button class="quote-btn" data-i18n-title="chat.quote_reply">↩️</button>
+    <button class="quote-btn" data-i18n-title="chat.quote_reply"><i class="fas fa-quote-right"></i></button>
   </div>
   ${message.quote ? `<div class="quote-content">
     <div class="quote-meta">${new Date(message.quote.timestamp).toLocaleString()}</div>
@@ -612,7 +612,7 @@ document.addEventListener('DOMContentLoaded', function() {
             div.innerHTML = `
             <div class="message-header">
                 <div class="meta">${new Date(msg.timestamp).toLocaleString()}</div>
-                <button class="quote-btn" data-i18n-title="chat.quote_reply">↩️</button>
+                <button class="quote-btn" data-i18n-title="chat.quote_reply"><i class="fas fa-quote-right"></i></button>
             </div>
             ${msg.quote ? `<div class="quote-content">
                 <div class="quote-meta">${new Date(msg.quote.timestamp).toLocaleString()}</div>

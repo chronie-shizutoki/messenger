@@ -21,7 +21,7 @@
         overflow: hidden;
         background-image: url('background.jpg');
         background-size: cover;
-        background-position: center;
+        background-position: center top 10%;
         background-attachment: fixed;
         background-repeat: no-repeat;
     }
@@ -33,9 +33,9 @@
     <div class="chat-container">
     <div class="chat-header">
     <div class="search-container">
-      <input type="text" id="search-input" placeholder="🔍" class="search-input">
+      <input type="text" id="search-input" placeholder="" class="search-input"><i class="fas fa-search" style="margin-left: 12px;"></i>
     </div>
-    <button id="open-notification-settings" class="notification-settings-btn">⚙️</button>
+    <button id="open-notification-settings" class="notification-settings-btn"><i class="fas fa-cog"></i></button>
 </div>
 
   <!-- 通知设置弹窗 -->
@@ -43,7 +43,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h3 class="modal-title"></h3>
-        <button id="close-modal" class="modal-close-btn">×</button>
+        <button id="close-modal" class="modal-close-btn"><i class="fas fa-times"></i></button>
       </div>
       <div id="push-url-list" class="push-url-list"></div>
       <div class="input-group">
@@ -57,8 +57,8 @@
   <div id="sticker-modal" class="modal sticker-modal">
     <div class="modal-content sticker-modal-content">
       <div class="modal-header">
-        <h3 class="modal-title">🗃️</h3>
-        <button id="close-sticker-modal" class="modal-close-btn">×</button>
+        <h3 class="modal-title"><i class="fas fa-box-open"></i></h3>
+        <button id="close-sticker-modal" class="modal-close-btn"><i class="fas fa-times"></i></button>
       </div>
       <div id="sticker-categories" style="margin-bottom: 15px;"></div>
       <div id="sticker-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 10px;"></div>
@@ -71,8 +71,8 @@
         </div>
         <div id="input-area">
             <input type="text" id="message-input" data-i18n-placeholder="chat.placeholder">
-            <button id="sticker-button" class="chat-action-btn sticker-btn">😊</button>
-            <button id="upload-image-button" class="chat-action-btn upload-image-btn">🖼️</button>
+            <button id="sticker-button" class="chat-action-btn sticker-btn"><i class="far fa-smile"></i></button>
+            <button id="upload-image-button" class="chat-action-btn upload-image-btn"><i class="fas fa-image"></i></button>
             <button id="send-button" data-i18n="chat.send"></button>
         </div>
     </div>
