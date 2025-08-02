@@ -12,7 +12,6 @@ This documentation is available in the following languages:
 - [Korean](docs/README-ko.md)
 - [Malay](docs/README-ms.md)
 - [Chinese (Simplified)](docs/README-zh-CN.md)
-- [Chinese (Hong Kong)](docs/README-zh-HK.md)
 - [Chinese (Taiwan)](docs/README-zh-TW.md)
 
 ## Localization Files
