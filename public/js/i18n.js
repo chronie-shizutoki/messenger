@@ -90,9 +90,9 @@ class I18n {
     button.style.width = '40px';
     button.style.height = '40px';
     button.style.borderRadius = '50%';
-    button.style.backgroundColor = 'rgba(30, 41, 59, 0.95)';
+    button.style.backgroundColor = 'transparent';
     button.style.color = 'rgba(255, 255, 255, 0.9)';
-    button.style.border = '2px solid #4f46e5';
+    button.style.border = '2px solid transparent';
     button.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)';
     button.style.cursor = 'pointer';
     button.style.display = 'flex';
@@ -104,7 +104,7 @@ class I18n {
 
     // 添加悬停效果
     button.addEventListener('mouseenter', () => {
-      button.style.borderColor = '#2563eb';
+      button.style.borderColor = 'transparent';
       button.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.18)';
       button.style.transform = 'scale(1.05)';
     });
@@ -122,8 +122,11 @@ class I18n {
     languageList.style.bottom = '60px';
     languageList.style.right = '0';
     languageList.style.width = '200px';
-    languageList.style.backgroundColor = 'rgba(30, 41, 59, 0.95)';
-    languageList.style.border = '2px solid #4f46e5';
+languageList.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+languageList.style.backdropFilter = 'blur(10px)';
+languageList.style.webkitBackdropFilter = 'blur(10px)';
+languageList.style.borderColor = 'rgba(255, 255, 255, 0.18)';
+    languageList.style.border = '2px solid transparent';
     languageList.style.borderRadius = '12px';
     languageList.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)';
     languageList.style.padding = '10px 0';

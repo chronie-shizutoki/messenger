@@ -779,9 +779,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const button = document.createElement('button');
             button.textContent = category.name || 'Unnamed Category';
             button.className = 'sticker-category-btn';
-            button.style.backgroundColor = '#333';
+            button.style.background = 'rgba(148, 145, 145, 0.3)';
+            button.style.backdropFilter = 'blur(10px)';
+            button.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+            button.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
             button.style.color = 'white';
-            button.style.border = '1px solid #444';
+            button.style.border = 'transparent';
             button.style.borderRadius = '4px';
             button.style.padding = '5px 10px';
             button.style.margin = '0 5px 5px 0';
