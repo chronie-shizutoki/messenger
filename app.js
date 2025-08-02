@@ -385,11 +385,42 @@ callback(null);
     });
   });
 
-  // 获取历史消息
-  socket.on('get history', (callback) => {
-    db.all('SELECT * FROM messages ORDER BY timestamp DESC LIMIT 100', (err, rows) => {
+  // 获取历史消息 - 支持分页
+  socket.on('get history', (params, callback) => {
+    // 如果没有传递参数，使用默认值
+    if (typeof params === 'function') {
+      callback = params;
+      params = {};
+    }
+    
+    const page = params.page || 1;
+    const limit = params.limit || 20; // 每页20条消息
+    const offset = (page - 1) * limit;
+    
+    // 获取总消息数
+    db.get('SELECT COUNT(*) as total FROM messages', (err, countResult) => {
       if (err) return callback(err);
-      callback(null, rows.reverse());
+      
+      const totalMessages = countResult.total;
+      const totalPages = Math.ceil(totalMessages / limit);
+      
+      // 获取分页消息
+      db.all(
+        'SELECT * FROM messages ORDER BY timestamp DESC LIMIT ? OFFSET ?', 
+        [limit, offset], 
+        (err, rows) => {
+          if (err) return callback(err);
+          callback(null, {
+            messages: rows.reverse(), // 保持时间顺序
+            pagination: {
+              currentPage: page,
+              totalPages: totalPages,
+              totalMessages: totalMessages,
+              hasMore: page < totalPages
+            }
+          });
+        }
+      );
     });
   });
 

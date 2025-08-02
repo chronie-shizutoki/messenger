@@ -4,6 +4,13 @@ const chatContainer = document.getElementById('chat-container');
 const inputEl = document.getElementById('message-input');
 const sendBtn = document.getElementById('send-button');
 let allMessages = [];
+let currentPage = 1;
+let totalPages = 1;
+let isLoadingHistory = false;
+let virtualScrollEnabled = false;
+let pullToLoadIndicator = null;
+const VIRTUAL_SCROLL_THRESHOLD = 100; // 当消息超过100条时启用虚拟滚动
+const MAX_MESSAGES_IN_MEMORY = 200; // 内存中最多保存200条消息
 
 // 状态更新函数
 function updateStatus(text, isError = false) {
@@ -11,39 +18,49 @@ function updateStatus(text, isError = false) {
   statusEl.style.color = isError ? 'red' : 'green';
 }
 
+// 内存管理函数
+function manageMemory() {
+  if (allMessages.length > MAX_MESSAGES_IN_MEMORY) {
+    // 保留最新的消息，移除最旧的消息
+    const messagesToRemove = allMessages.length - MAX_MESSAGES_IN_MEMORY;
+    const removedMessages = allMessages.splice(0, messagesToRemove);
+    
+    // 同时移除对应的DOM元素
+    removedMessages.forEach(msg => {
+      const element = chatContainer.querySelector(`[data-timestamp="${msg.timestamp}"]`);
+      if (element) {
+        element.remove();
+      }
+    });
+    
+    console.log(`Memory cleanup: removed ${messagesToRemove} old messages`);
+  }
+}
+
 // 消息渲染函数
-function addMessageToDOM(message, isHistorical = false, searchTerm = '') {
+function addMessageToDOM(message, isHistorical = false, searchTerm = '', prepend = false) {
   // 仅在历史加载或新消息时添加到数组，避免重复
   if (!allMessages.some(m => m.timestamp === message.timestamp)) {
-    allMessages.push(message);
+    if (prepend) {
+      allMessages.unshift(message); // 历史消息添加到开头
+    } else {
+      allMessages.push(message); // 新消息添加到末尾
+      // 新消息时进行内存管理
+      if (!isHistorical) {
+        manageMemory();
+      }
+    }
   }
-  const div = document.createElement('div');
-  div.className = 'message';
-div.dataset.timestamp = message.timestamp;
-  div.innerHTML = `
-  <div class="message-header">
-    <div class="meta">${new Date(message.timestamp).toLocaleString()}</div>
-    <button class="quote-btn" data-i18n-title="chat.quote_reply">↩️</button>
-  </div>
-  ${message.quote ? `<div class="quote-content">
-    <div class="quote-meta">${new Date(message.quote.timestamp).toLocaleString()}</div>
-    <div class="quote-text">${parseMessageContent(message.quote.content)}</div>
-  </div>` : ''}
-  <div class="content">${parseMessageContent(message.content, searchTerm)}</div>
-`;
+  
+  const div = createMessageElement(message, isHistorical, searchTerm);
 
-// 添加引用按钮事件
-const quoteBtn = div.querySelector('.quote-btn');
-quoteBtn.addEventListener('click', () => {
-  const quotedContent = message.content;
-  const quotedTimestamp = message.timestamp;
-  inputEl.value = `[quote=${quotedTimestamp}]${quotedContent}[/quote]
-`;
-  inputEl.focus();
-});
-  chatContainer.appendChild(div);
-  if (!isHistorical) {
-  chatContainer.scrollTop = chatContainer.scrollHeight;
+  if (prepend) {
+    chatContainer.insertBefore(div, chatContainer.firstChild);
+  } else {
+    chatContainer.appendChild(div);
+    if (!isHistorical) {
+      chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
   }
 }
 
@@ -175,6 +192,156 @@ const safeTimestamp = new Date(decodedTimestamp).toLocaleString();
   return result;
 }
 
+// 显示/隐藏加载指示器
+function showLoadingIndicator(show = true) {
+  let indicator = document.getElementById('loading-indicator');
+  
+  if (!indicator) {
+    indicator = document.createElement('div');
+    indicator.id = 'loading-indicator';
+    indicator.innerHTML = `
+      <div style="
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
+        background: rgba(0,0,0,0.8);
+        color: white;
+        border-radius: 4px;
+        margin: 10px;
+        font-size: 14px;
+      ">
+        <div style="
+          width: 16px;
+          height: 16px;
+          border: 2px solid #333;
+          border-top: 2px solid #fff;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+          margin-right: 8px;
+        "></div>
+        Loading messages...
+      </div>
+    `;
+    
+    // 添加CSS动画
+    if (!document.getElementById('loading-animation-style')) {
+      const style = document.createElement('style');
+      style.id = 'loading-animation-style';
+      style.textContent = `
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
+      `;
+      document.head.appendChild(style);
+    }
+    
+    chatContainer.parentNode.insertBefore(indicator, chatContainer);
+  }
+  
+  indicator.style.display = show ? 'block' : 'none';
+}
+
+// 加载历史消息函数
+function loadHistory(page = 1, prepend = false) {
+  if (isLoadingHistory) return;
+  isLoadingHistory = true;
+  
+  showLoadingIndicator(true);
+  // 隐藏上拉提示
+  if (pullToLoadIndicator) {
+    pullToLoadIndicator.style.display = 'none';
+  }
+  updateStatus(`Loading messages (page ${page})...`);
+  
+  window.socket.emit('get history', { page, limit: 20 }, (err, result) => {
+    isLoadingHistory = false;
+    showLoadingIndicator(false);
+    
+    if (err) {
+      updateStatus('Failed to load history', true);
+      return;
+    }
+    
+    const { messages, pagination } = result;
+    currentPage = pagination.currentPage;
+    totalPages = pagination.totalPages;
+    
+    // 记录当前滚动位置（用于加载更多历史消息时保持位置）
+    const scrollHeight = chatContainer.scrollHeight;
+    const scrollTop = chatContainer.scrollTop;
+    
+    // 使用批量DOM操作提高性能
+    const fragment = document.createDocumentFragment();
+    messages.forEach(msg => {
+      if (!allMessages.some(m => m.timestamp === msg.timestamp)) {
+        if (prepend) {
+          allMessages.unshift(msg);
+        } else {
+          allMessages.push(msg);
+        }
+        
+        const div = createMessageElement(msg, true, '');
+        if (prepend) {
+          fragment.insertBefore(div, fragment.firstChild);
+        } else {
+          fragment.appendChild(div);
+        }
+      }
+    });
+    
+    if (prepend) {
+      chatContainer.insertBefore(fragment, chatContainer.firstChild);
+    } else {
+      chatContainer.appendChild(fragment);
+    }
+    
+    if (prepend && messages.length > 0) {
+      // 加载更多历史消息时，保持滚动位置
+      const newScrollHeight = chatContainer.scrollHeight;
+      chatContainer.scrollTop = scrollTop + (newScrollHeight - scrollHeight);
+    } else if (page === 1) {
+      // 首次加载时滚动到底部
+      setTimeout(() => {
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }, 100);
+    }
+    
+    updateStatus(`Loaded ${messages.length} messages (${pagination.currentPage}/${pagination.totalPages})`);
+  });
+}
+
+// 创建消息元素的辅助函数
+function createMessageElement(message, isHistorical = false, searchTerm = '') {
+  const div = document.createElement('div');
+  div.className = 'message';
+  div.dataset.timestamp = message.timestamp;
+  div.innerHTML = `
+  <div class="message-header">
+    <div class="meta">${new Date(message.timestamp).toLocaleString()}</div>
+    <button class="quote-btn" data-i18n-title="chat.quote_reply">↩️</button>
+  </div>
+  ${message.quote ? `<div class="quote-content">
+    <div class="quote-meta">${new Date(message.quote.timestamp).toLocaleString()}</div>
+    <div class="quote-text">${parseMessageContent(message.quote.content)}</div>
+  </div>` : ''}
+  <div class="content">${parseMessageContent(message.content, searchTerm)}</div>
+`;
+
+  // 添加引用按钮事件
+  const quoteBtn = div.querySelector('.quote-btn');
+  quoteBtn.addEventListener('click', () => {
+    const quotedContent = message.content;
+    const quotedTimestamp = message.timestamp;
+    inputEl.value = `[quote=${quotedTimestamp}]${quotedContent}[/quote]
+`;
+    inputEl.focus();
+  });
+  
+  return div;
+}
+
 // 初始化Socket
 let socketInitialized = false;
 let historyLoaded = false;
@@ -185,21 +352,16 @@ function initSocket() {
     transports: ['websocket'],
     reconnectionAttempts: 3
   });
+  
+  // 将socket设为全局变量以便其他函数使用
+  window.socket = socket;
 
   // 事件处理
   socket.on('connect', () => {
     updateStatus('Connected');
     if (!historyLoaded) {
-      socket.emit('get history', (err, messages) => {
-        if (!err) {
-          messages.forEach(msg => addMessageToDOM(msg, true));
-        historyLoaded = true;
-        // Scroll to the latest message after a short delay to ensure all messages are rendered
-        setTimeout(() => {
-          chatContainer.scrollTop = chatContainer.scrollHeight;
-        }, 1000);
-        }
-      });
+      loadHistory(1);
+      historyLoaded = true;
     }
   });
 
@@ -340,15 +502,146 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
+    // 添加滚动监听器实现自动加载更多历史消息和DOM优化
+    let scrollTimeout;
+    
+    chatContainer.addEventListener('scroll', () => {
+        // 防抖处理，避免频繁触发
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(() => {
+            const scrollTop = chatContainer.scrollTop;
+            
+            // 显示/隐藏上拉加载提示
+            if (scrollTop < 50 && currentPage < totalPages && !isLoadingHistory) {
+                showPullToLoadIndicator(true);
+            } else {
+                showPullToLoadIndicator(false);
+            }
+            
+            // 当滚动到顶部附近时自动加载更多历史消息
+            if (scrollTop < 20 && currentPage < totalPages && !isLoadingHistory) {
+                loadHistory(currentPage + 1, true);
+            }
+            
+            // DOM优化：当消息过多时，移除不可见的消息元素
+            optimizeVisibleMessages();
+        }, 100);
+    });
+
+    // 显示/隐藏上拉加载提示
+    function showPullToLoadIndicator(show) {
+        if (!pullToLoadIndicator) {
+            pullToLoadIndicator = document.createElement('div');
+            pullToLoadIndicator.id = 'pull-to-load-indicator';
+            pullToLoadIndicator.innerHTML = `
+                <div style="
+                    text-align: center;
+                    padding: 10px;
+                    color: #888;
+                    font-size: 12px;
+                    background: rgba(0,0,0,0.1);
+                    border-radius: 4px;
+                    margin: 5px;
+                    transition: opacity 0.3s ease;
+                ">
+                    ↑ get more
+                </div>
+            `;
+            chatContainer.parentNode.insertBefore(pullToLoadIndicator, chatContainer);
+        }
+        
+        pullToLoadIndicator.style.display = show ? 'block' : 'none';
+        pullToLoadIndicator.style.opacity = show ? '1' : '0';
+    }
+
+    // DOM优化函数
+    function optimizeVisibleMessages() {
+        const messages = chatContainer.querySelectorAll('.message');
+        if (messages.length <= VIRTUAL_SCROLL_THRESHOLD) return;
+        
+        const containerRect = chatContainer.getBoundingClientRect();
+        const containerTop = containerRect.top;
+        const containerBottom = containerRect.bottom;
+        const buffer = 200; // 缓冲区域
+        
+        messages.forEach((messageEl, index) => {
+            const messageRect = messageEl.getBoundingClientRect();
+            const isVisible = messageRect.bottom >= (containerTop - buffer) && 
+                             messageRect.top <= (containerBottom + buffer);
+            
+            // 保留最近的50条消息始终可见
+            const isRecent = index >= messages.length - 50;
+            
+            if (!isVisible && !isRecent) {
+                // 创建占位符元素保持滚动位置
+                if (!messageEl.dataset.placeholder) {
+                    const placeholder = document.createElement('div');
+                    placeholder.style.height = messageEl.offsetHeight + 'px';
+                    placeholder.className = 'message-placeholder';
+                    placeholder.dataset.timestamp = messageEl.dataset.timestamp;
+                    messageEl.parentNode.insertBefore(placeholder, messageEl);
+                    messageEl.style.display = 'none';
+                    messageEl.dataset.placeholder = 'true';
+                }
+            } else if (messageEl.dataset.placeholder) {
+                // 恢复显示消息
+                const placeholder = messageEl.previousElementSibling;
+                if (placeholder && placeholder.className === 'message-placeholder') {
+                    placeholder.remove();
+                }
+                messageEl.style.display = 'block';
+                delete messageEl.dataset.placeholder;
+            }
+        });
+    }
+
     function filterMessages(searchTerm) {
         chatContainer.innerHTML = '';
         const filteredMessages = searchTerm 
             ? allMessages.filter(msg => msg.content.toLowerCase().includes(searchTerm))
             : allMessages;
         
+        // 使用文档片段来批量添加DOM元素，提高性能
+        const fragment = document.createDocumentFragment();
+        const tempContainer = document.createElement('div');
+        
         filteredMessages.forEach(msg => {
-            addMessageToDOM(msg, true, searchTerm);
+            const div = document.createElement('div');
+            div.className = 'message';
+            div.dataset.timestamp = msg.timestamp;
+            div.innerHTML = `
+            <div class="message-header">
+                <div class="meta">${new Date(msg.timestamp).toLocaleString()}</div>
+                <button class="quote-btn" data-i18n-title="chat.quote_reply">↩️</button>
+            </div>
+            ${msg.quote ? `<div class="quote-content">
+                <div class="quote-meta">${new Date(msg.quote.timestamp).toLocaleString()}</div>
+                <div class="quote-text">${parseMessageContent(msg.quote.content)}</div>
+            </div>` : ''}
+            <div class="content">${parseMessageContent(msg.content, searchTerm)}</div>
+            `;
+            
+            // 添加引用按钮事件
+            const quoteBtn = div.querySelector('.quote-btn');
+            quoteBtn.addEventListener('click', () => {
+                const quotedContent = msg.content;
+                const quotedTimestamp = msg.timestamp;
+                inputEl.value = `[quote=${quotedTimestamp}]${quotedContent}[/quote]
+`;
+                inputEl.focus();
+            });
+            
+            fragment.appendChild(div);
         });
+        
+        chatContainer.appendChild(fragment);
+        
+        // 如果没有搜索词，滚动到底部
+        if (!searchTerm) {
+            setTimeout(() => {
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }, 50);
+        }
     }
 
     // 贴图选择功能
