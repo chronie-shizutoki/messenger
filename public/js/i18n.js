@@ -62,10 +62,6 @@ class I18n {
   }
 
   createLanguageDropdown() {
-    // 创建下拉菜单元素
-    const dropdown = document.createElement('select');
-    dropdown.className = 'language-selector';
-
     // 语言代码到显示名称的映射
     const languageNames = {
       'en-GB': 'English (UK)',
@@ -79,63 +75,132 @@ class I18n {
       'zh-TW': '繁體中文（台灣）'
     };
 
-    // 为每种支持的语言创建选项
-    this.supportedLanguages.forEach(lang => {
-      const option = document.createElement('option');
-      option.value = lang;
-      option.textContent = languageNames[lang] || lang.toUpperCase();
-      option.selected = lang === this.locale;
-      dropdown.appendChild(option);
-    });
+    // 创建语言选择器容器
+    const container = document.createElement('div');
+    container.className = 'language-selector-container';
+    container.style.position = 'fixed';
+    container.style.bottom = '20px';
+    container.style.right = '40px';
+    container.style.zIndex = '1000';
 
-    // 添加语言切换事件监听
-    dropdown.addEventListener('change', async (e) => {
-      this.locale = e.target.value;
-      await this.loadTranslations();
-      this.applyTranslations();
-      // 触发语言变更事件
-      const event = new Event('i18nLanguageChanged');
-      event.detail = { locale: this.locale };
-      document.dispatchEvent(event);
-    });
-
-    // 美化并将下拉菜单添加到页面
-    dropdown.style.position = 'absolute';
-    dropdown.style.top = '20%';
-    dropdown.style.left = '50%';
-    dropdown.style.transform = 'translateX(-50%)';
-    dropdown.style.padding = '12px 24px';
-    dropdown.style.border = '2px solid #4f46e5';
-    dropdown.style.borderRadius = '12px';
-    dropdown.style.backgroundColor = 'rgba(30, 41, 59, 0.95)';
-    dropdown.style.color = 'rgba(255, 255, 255, 0.9)';
-    dropdown.style.fontSize = '16px';
-    dropdown.style.fontWeight = '500';
-    dropdown.style.cursor = 'pointer';
-    dropdown.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)';
-    dropdown.style.transition = 'all 0.2s ease-in-out';
-    dropdown.style.outline = 'none';
-    dropdown.style.textAlign = 'left';
-    dropdown.style.minWidth = '180px';
-
-    if (window.matchMedia('(min-width: 768px)').matches) {
-      dropdown.style.left = ''; // Reset left value to default
-      dropdown.style.right = '5%'; // Simplify the calculation
-      dropdown.style.top = '10%';
-    }
+    // 创建图标按钮
+    const button = document.createElement('button');
+    button.className = 'language-button';
+    button.innerHTML = '<i class="fa fa-globe"></i>';
+    button.style.width = '40px';
+    button.style.height = '40px';
+    button.style.borderRadius = '50%';
+    button.style.backgroundColor = 'rgba(30, 41, 59, 0.95)';
+    button.style.color = 'rgba(255, 255, 255, 0.9)';
+    button.style.border = '2px solid #4f46e5';
+    button.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)';
+    button.style.cursor = 'pointer';
+    button.style.display = 'flex';
+    button.style.alignItems = 'center';
+    button.style.justifyContent = 'center';
+    button.style.fontSize = '20px';
+    button.style.transition = 'all 0.2s ease-in-out';
+    button.style.outline = 'none';
 
     // 添加悬停效果
-    dropdown.addEventListener('mouseenter', () => {
-      dropdown.style.borderColor = '#2563eb';
-      dropdown.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.18)';
+    button.addEventListener('mouseenter', () => {
+      button.style.borderColor = '#2563eb';
+      button.style.boxShadow = '0 6px 16px rgba(0, 0, 0, 0.18)';
+      button.style.transform = 'scale(1.05)';
     });
 
-    dropdown.addEventListener('mouseleave', () => {
-      dropdown.style.borderColor = '#3b82f6';
-      dropdown.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+    button.addEventListener('mouseleave', () => {
+      button.style.borderColor = '#4f46e5';
+      button.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)';
+      button.style.transform = 'scale(1)';
     });
 
-    document.body.prepend(dropdown);
+    // 创建语言列表
+    const languageList = document.createElement('ul');
+    languageList.className = 'language-list';
+    languageList.style.position = 'absolute';
+    languageList.style.bottom = '60px';
+    languageList.style.right = '0';
+    languageList.style.width = '200px';
+    languageList.style.backgroundColor = 'rgba(30, 41, 59, 0.95)';
+    languageList.style.border = '2px solid #4f46e5';
+    languageList.style.borderRadius = '12px';
+    languageList.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)';
+    languageList.style.padding = '10px 0';
+    languageList.style.margin = '0';
+    languageList.style.listStyle = 'none';
+    languageList.style.display = 'none';
+    languageList.style.maxHeight = '300px';
+    languageList.style.overflowY = 'auto';
+
+    // 为每种支持的语言创建列表项
+    this.supportedLanguages.forEach(lang => {
+      const li = document.createElement('li');
+      li.textContent = languageNames[lang] || lang.toUpperCase();
+      li.style.padding = '10px 15px';
+      li.style.color = 'rgba(255, 255, 255, 0.9)';
+      li.style.cursor = 'pointer';
+      li.style.transition = 'background-color 0.2s ease-in-out';
+      li.setAttribute('data-lang', lang);
+
+      if (lang === this.locale) {
+        li.style.backgroundColor = 'rgba(79, 70, 229, 0.2)';
+        li.style.fontWeight = 'bold';
+      }
+
+      li.addEventListener('mouseenter', () => {
+        li.style.backgroundColor = 'rgba(79, 70, 229, 0.2)';
+      });
+
+      li.addEventListener('mouseleave', () => {
+        if (lang !== this.locale) {
+          li.style.backgroundColor = 'transparent';
+        }
+      });
+
+      li.addEventListener('click', async () => {
+        this.locale = lang;
+        await this.loadTranslations();
+        this.applyTranslations();
+        // 更新选中项样式
+        languageList.querySelectorAll('li').forEach(item => {
+          if (item.getAttribute('data-lang') === lang) {
+            item.style.backgroundColor = 'rgba(79, 70, 229, 0.2)';
+            item.style.fontWeight = 'bold';
+          } else {
+            item.style.backgroundColor = 'transparent';
+            item.style.fontWeight = 'normal';
+          }
+        });
+        // 触发语言变更事件
+        const event = new Event('i18nLanguageChanged');
+        event.detail = { locale: this.locale };
+        document.dispatchEvent(event);
+        // 关闭列表
+        languageList.style.display = 'none';
+      });
+
+      languageList.appendChild(li);
+    });
+
+    // 点击按钮切换列表显示/隐藏
+    button.addEventListener('click', () => {
+      languageList.style.display = languageList.style.display === 'none' ? 'block' : 'none';
+    });
+
+    // 点击页面其他地方关闭列表
+    document.addEventListener('click', (e) => {
+      if (!container.contains(e.target)) {
+        languageList.style.display = 'none';
+      }
+    });
+
+    // 将按钮和列表添加到容器
+    container.appendChild(button);
+    container.appendChild(languageList);
+
+    // 将容器添加到页面
+    document.body.appendChild(container);
   }
   applyTranslations() {
         // Support translation text replacement

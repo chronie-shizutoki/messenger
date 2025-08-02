@@ -596,7 +596,7 @@
 
     @media (max-width: 768px) {
       .chat-container {
-        --top-margin: 30vh;
+        --top-margin: 20vh;
         --bottom-margin: 15vh;
         margin: var(--top-margin) auto var(--bottom-margin);
         height: calc(100vh - calc(var(--top-margin) + var(--bottom-margin)));
