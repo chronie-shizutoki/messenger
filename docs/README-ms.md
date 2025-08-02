@@ -8,7 +8,6 @@ Aplikasi chat masa nyata dengan sokongan WebSocket, yang menampilkan UI moden da
 - Fungsi muat naik fail dan imej
 - Sokongan notifikasi push
 - Antaramuka berbilang bahasa
-- Reka bentuk responsif dengan kesan animasi sakura
 - Integrasi pangkalan data SQLite
 
 ## Pemasangan

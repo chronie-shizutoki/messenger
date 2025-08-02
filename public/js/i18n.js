@@ -76,7 +76,7 @@ class I18n {
       'ko-KR': '한국어 (대한민국)',
       'ms-MY': 'Bahasa Melayu (Malaysia)',
       'zh-CN': '简体中文（中国大陆）',
-      'zh-TW': '正體中文（台灣）'
+      'zh-TW': '繁體中文（台灣）'
     };
 
     // 为每种支持的语言创建选项

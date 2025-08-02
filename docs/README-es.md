@@ -8,7 +8,6 @@ Una aplicación de chat en tiempo real con soporte WebSocket, que presenta una i
 - Funcionalidad de carga de archivos e imágenes
 - Soporte de notificaciones push
 - Interfaz multilingüe
-- Diseño responsive con efectos de animación de sakura
 - Integración de base de datos SQLite
 
 ## Instalación

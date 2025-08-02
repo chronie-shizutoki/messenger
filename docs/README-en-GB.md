@@ -8,7 +8,6 @@ A real-time chat application with WebSocket support, featuring a modern UI and i
 - File and image upload functionality
 - Push notification support
 - Multi-language interface
-- Responsive design with sakura animation effects
 - SQLite database integration
 
 ## Installation
