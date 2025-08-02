@@ -58,19 +58,8 @@ const chatUpload = multer({
   }
 });
 
-// 提供静态文件访问，并设置缓存策略
-const oneYear = 31536000000;
-app.use(express.static(path.join(__dirname, 'public'), {
-  maxAge: oneYear,
-  setHeaders: (res, path) => {
-    // 对于HTML文件，不设置长期缓存
-    if (path.endsWith('.html')) {
-      res.setHeader('Cache-Control', 'no-cache');
-    } else {
-      res.setHeader('Cache-Control', 'public, max-age=31536000');
-    }
-  }
-}));
+// 提供静态文件访问
+app.use(express.static(path.join(__dirname, 'public')));
 
 // 根路由返回HTML页面
 app.get('/', (req, res) => {

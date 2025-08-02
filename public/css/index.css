@@ -50,7 +50,7 @@
             width: 90%;
             max-width: 1200px;
             --top-margin: calc(20vh);
-            --bottom-margin: calc(20vh);
+            --bottom-margin: calc(12vh);
             margin: var(--top-margin) auto var(--bottom-margin);
             top: 0;
             height: calc(100vh - calc(var(--top-margin) + var(--bottom-margin)));
@@ -596,7 +596,7 @@
 
     @media (max-width: 768px) {
       .chat-container {
-        --top-margin: 25vh;
+        --top-margin: 30vh;
         --bottom-margin: 15vh;
         margin: var(--top-margin) auto var(--bottom-margin);
         height: calc(100vh - calc(var(--top-margin) + var(--bottom-margin)));
