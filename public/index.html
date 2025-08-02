@@ -76,23 +76,6 @@
     <script src="lib/lightbox2/js/lightbox.min.js"></script>
     <script src="chat-client.js"></script>
     <script src="js/i18n.js"></script>
-    <script src="js/sakura-effect.js"></script>
-    <script>
-        // Sakura effect control
-        document.addEventListener('DOMContentLoaded', function() {
-            // Use requestIdleCallback to run the effect asynchronously
-            if ('requestIdleCallback' in window) {
-                window.requestIdleCallback(() => {
-                    new window.SakuraEffect();
-                });
-            } else {
-                // Fallback for browsers that don't support requestIdleCallback
-                setTimeout(() => {
-                    new window.SakuraEffect();
-                }, 0);
-            }
-        });
-    </script>
 
     <div class="version-info">
         v2.6.0 | Aug 1, 2025 
