@@ -11,7 +11,7 @@ const path = require('path');
 const cors = require('cors');
 app.use(cors({ origin: '*' }));
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 const sharp = require('sharp');
 const CHAT_IMAGE_DIRECTORY = path.join(__dirname, 'public', 'chat-images');
 
@@ -62,8 +62,6 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-
-
 // 获取聊天图片
 app.get('/get-chat-image/:filename', (req, res) => {
   const imagePath = path.join(CHAT_IMAGE_DIRECTORY, req.params.filename);
@@ -73,7 +71,6 @@ app.get('/get-chat-image/:filename', (req, res) => {
     res.status(404).json({ error: '聊天图片不存在' });
   }
 })
-
 
 // 聊天图片上传接口
 app.post('/chat/upload-image', chatUpload.single('image'), async (req, res) => {
@@ -137,74 +134,6 @@ db.run(`CREATE TABLE IF NOT EXISTS push_subscriptions (
 db.all('SELECT push_url FROM push_subscriptions', (err, urls) => {
   global.pushUrls = err ? [] : urls.map(row => row.push_url);
 });
-
-// 敏感内容过滤配置
-const sensitiveDirPath = path.join(__dirname, 'config', 'sensitive');
-let sensitiveWords = [];
-try {
-  // 检查敏感词目录是否存在
-  if (fs.existsSync(sensitiveDirPath)) {
-    // 读取目录中的所有文件
-    const files = fs.readdirSync(sensitiveDirPath);
-    // 筛选出所有txt文件
-    const txtFiles = files.filter(file => path.extname(file).toLowerCase() === '.txt');
-    
-    // 读取每个txt文件并提取敏感词
-    txtFiles.forEach(file => {
-      const filePath = path.join(sensitiveDirPath, file);
-      const content = fs.readFileSync(filePath, 'utf8');
-      // 支持换行和逗号分隔的敏感词，去除空白和空字符串
-      const words = content.split(/[\n,]+/).map(word => word.trim()).filter(word => word);
-      sensitiveWords.push(...words);
-    });
-    
-    // 去重处理
-    sensitiveWords = [...new Set(sensitiveWords)];
-  } else {
-    console.warn('敏感词目录不存在:', sensitiveDirPath);
-    sensitiveWords = [];
-  }
-} catch (err) {
-  console.error('读取敏感词文件错误:', err);
-  sensitiveWords = [];
-}
-
-// 过滤敏感内容
-// 转义正则表达式特殊字符
-function escapeRegExp(str) {
-  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-}
-
-const BANNED_MESSAGE = 'The content violates the rules and has been blocked.内容违反规则，已被屏蔽。';
-
-function filterSensitiveContent(content) {
-  let sensitiveWordCount = 0;
-  const tempContent = content;
-  
-  // 统计所有敏感词出现的总次数
-  sensitiveWords.forEach(word => {
-      const escapedWord = escapeRegExp(word);
-      const regex = new RegExp(escapedWord, 'gi');
-      const matches = tempContent.match(regex);
-      if (matches) {
-        sensitiveWordCount += matches.length;
-      }
-    });
-  
-  // 如果敏感词数量达到3个或以上，返回完整屏蔽消息
-  if (sensitiveWordCount >= 3) {
-    return BANNED_MESSAGE;
-  }
-  
-  // 否则，逐个替换敏感词
-  let filtered = content;
-  sensitiveWords.forEach(word => {
-    const escapedWord = escapeRegExp(word);
-    const regex = new RegExp(escapedWord, 'gi');
-    filtered = filtered.replace(regex, '***');
-  });
-  return filtered;
-}
 
 // 获取所有贴图列表
 app.get('/get-stickers', async (req, res) => {
@@ -355,7 +284,7 @@ socket.on('get push urls', (callback) => {
 // 接收并广播消息
 socket.on('chat message', (msg, callback) => {
     console.log('emit chat message:', msg);
-    const filteredContent = filterSensitiveContent(msg.content);
+    const filteredContent = (msg.content);
     saveMessage(filteredContent, (err, savedMsg) => {
       if (err) {
         console.error('emit chat message error:', err);

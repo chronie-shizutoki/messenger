@@ -47,7 +47,7 @@ Localization JSON files are available in the [public/locales](public/locales/) d
 
 3. Create a `.env` file (optional) for configuration:
    ```
-   PORT=3000
+   PORT=3001
    ```
 
 ## Usage
@@ -63,7 +63,7 @@ start.bat
 ```
 
 ### Accessing the Application
-Open your browser and navigate to `http://localhost:3000`
+Open your browser and navigate to `http://localhost:3001`
 
 ## Configuration
 - **Push Notifications**: Add push notification URLs in the application settings
