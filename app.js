@@ -15,7 +15,7 @@ app.use(cors({ origin: '*' }));
 // 添加压缩中间件
 app.use(compression());
 
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3000;
 const sharp = require('sharp');
 const CHAT_IMAGE_DIRECTORY = path.join(__dirname, 'public', 'chat-images');
 
