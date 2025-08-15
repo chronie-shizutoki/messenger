@@ -43,6 +43,31 @@
             padding: 1rem;
         }
 
+/* Styles for code blocks */
+pre.code-block {
+    background-color: var(--surface);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    margin: 1rem 0;
+    overflow-x: auto;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+}
+code.code-content {
+    font-family: 'Courier New', Courier, monospace;
+    color: #f8fafc;
+    background-color: transparent;
+    white-space: pre;
+    font-size: 0.9rem;
+}
+
+/* Optional: Add hover effect for better UX */
+pre.code-block:hover {
+    box-shadow: var(--shadow-md);
+    border-color: var(--border-light);
+    transition: all var(--transition-normal);
+}
+
         img {
             max-width: 100px;
             max-height: auto;

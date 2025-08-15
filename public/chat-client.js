@@ -65,21 +65,13 @@ function addMessageToDOM(message, isHistorical = false, searchTerm = '', prepend
 }
 
 /**
- * 辅助函数：转义HTML特殊字符以防止XSS
- * @param {string} str - 需要转义的字符串
- * @returns {string} - 转义后的安全字符串
+ * Helper function: Return the input string directly without escaping HTML special characters
+ * @param {string} str - The string to be processed
+ * @returns {string} - The original string
  */
 function escapeHtml(str) {
   if (!str) return '';
-  const entities = {
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#39;',
-    '/': '&#x2F;' // 防止HTML标签闭合
-  };
-  return str.replace(/[&<>"'/]/g, c => entities[c]);
+  return str;
 }
 
 /**
@@ -148,7 +140,38 @@ const safeTimestamp = new Date(decodedTimestamp).toLocaleString();
   });
 
   // ====================================================================
-  // 步骤 3: 转义剩余的纯文本中的HTML字符
+  // 步骤 3: 解析其他Markdown格式
+  // 标题、加粗、斜体、行内代码
+  // ====================================================================
+  // 标题 (# 到 ######)
+  const headingRegex = /^(#{1,6})\s+([^\n]+)/gm;
+  result = result.replace(headingRegex, (match, hashes, content) => {
+    const level = hashes.length;
+    return `<h${level}>${content}</h${level}>`;
+  });
+  // 加粗 (**text** 或 __text__)
+  const boldRegex = /\*\*(.+?)\*\*|__(.+?)__/g;
+  result = result.replace(boldRegex, '<strong>$1$2</strong>');
+
+  // 斜体 (*text* 或 _text_)
+  const italicRegex = /\*(.+?)\*|_(.+?)_/g;
+  result = result.replace(italicRegex, '<em>$1$2</em>');
+
+  // Parse line breaks and ---
+  result = result.replace(/(\n|\s{2})/g, '<br>');
+  result = result.replace(/---/g, '<hr>'); // Parse ---
+  // Step 3.1: Parse code blocks (```code```)
+  const codeBlockRegex = /```([\s\S]*?)```/g;
+  result = result.replace(codeBlockRegex, (match, code) => {
+    if (code.trim().startsWith('mermaid')) {
+      // Add mermaid initialization attributes to ensure correct rendering
+      // Remove the data-processed attribute to let mermaid process the graph
+      return `<div class="mermaid">${code.trim()}</div>`;
+    }
+    return `<pre class="code-block"><code class="code-content">${code}</code></pre>`;
+  });
+  // ====================================================================
+  // 步骤 4: 转义剩余的纯文本中的HTML字符
   // 这一步非常重要，它处理所有不是由我们生成的HTML。
   // 为了避免破坏我们已经生成的HTML标签（如<div>, <img>），我们使用一种
   // 更聪明的方法：只转义那些不在标签内部的特殊字符。
@@ -173,7 +196,7 @@ const safeTimestamp = new Date(decodedTimestamp).toLocaleString();
   result = finalHtml;
   
   // ====================================================================
-  // 步骤 4: 处理搜索词高亮
+  // 步骤 5: 处理搜索词高亮
   // 这是最后一步，在所有HTML结构都已生成并且内容都已安全转义后进行。
   // 这样可以避免破坏之前的解析步骤。
   // 注意：这个高亮操作可能会在HTML属性中添加<span>，需要谨慎。
