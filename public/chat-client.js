@@ -354,7 +354,69 @@ function initSocket() {
   });
   
   // 将socket设为全局变量以便其他函数使用
-  window.socket = socket;
+    window.socket = socket;
+
+    // 引用块预览功能
+    const messageInput = document.getElementById('message-input');
+    const messagePreview = document.getElementById('message-preview');
+    const quoteButton = document.querySelector('.quote-btn');
+
+    // 预览更新函数
+    function updatePreview() {
+      if (!messageInput || !messagePreview) return;
+
+      const content = messageInput.value;
+      const quoteRegex = /\[quote=(.*?)\]([\s\S]*?)\[\/quote\]/g;
+      const hasQuote = quoteRegex.test(content);
+
+      if (hasQuote) {
+          // 替换引用块为格式化的HTML
+          let previewHTML = content.replace(quoteRegex, (match, timestamp, quoteContent) => {
+              // 尝试格式化时间戳
+              let displayTime = timestamp;
+              try {
+                  // 移除可能的美元符号并解码
+                  const decodedTimestamp = decodeHtmlEntities(timestamp).replace(/^\$/, '').trim();
+                  displayTime = new Date(decodedTimestamp).toLocaleString();
+              } catch (e) {
+                  // 如果解析失败，使用原始时间戳
+              }
+
+              return `
+              <div class="message quote-message">
+                  <div class="quote-header">
+                      <span class="quote-time">${escapeHtml(displayTime)}</span>
+                  </div>
+                  <div class="quote-content">${parseMessageContent(quoteContent.trim())}</div>
+              </div>
+              `;
+          });
+
+          // 处理剩余文本
+          const remainingText = content.replace(quoteRegex, '').trim();
+          if (remainingText) {
+              previewHTML += `<p>${escapeHtml(remainingText)}</p>`;
+          }
+
+          messagePreview.innerHTML = previewHTML;
+          messagePreview.classList.add('active');
+      } else {
+          messagePreview.classList.remove('active');
+      }
+    }
+
+    // 监听输入事件
+    if (messageInput) {
+      messageInput.addEventListener('input', updatePreview);
+    }
+
+    // 监听引用按钮点击事件
+    if (quoteButton) {
+      quoteButton.addEventListener('click', () => {
+          // 延迟一点时间，确保引用标签已插入
+          setTimeout(updatePreview, 100);
+      });
+    }
 
   // 事件处理
   socket.on('connect', () => {
