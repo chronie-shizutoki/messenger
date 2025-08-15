@@ -77,31 +77,13 @@ pre.code-block:hover {
             position: relative;
             width: 90%;
             max-width: 1200px;
-            --top-margin: 20vh;
-            --bottom-margin: 10vh;
-            margin: var(--top-margin) auto var(--bottom-margin);
+            margin: 0 auto 0;
             top: 0;
-            height: calc(100vh - calc(var(--top-margin) + var(--bottom-margin)));
-            max-height: calc(100vh - calc(var(--top-margin) + var(--bottom-margin)));
-            background: linear-gradient(135deg, rgba(30, 41, 59, 0.1) 0%, rgba(30, 41, 59, 0.2) 100%);
-            backdrop-filter: blur(36px) saturate(180%); /* Stronger blur for glass effect */
-            -webkit-backdrop-filter: blur(36px) saturate(180%); /* For Safari compatibility */
-            border-radius: var(--radius-lg);
-            box-shadow: 
-                var(--shadow-glass),
-                0 0 30px rgba(99, 102, 241, 0.08),
-                0 0 60px rgba(236, 72, 153, 0.05);
+            height: auto;
+            max-height: 89vh; 
             display: flex;
             flex-direction: column;
             overflow: hidden;
-        }
-
-            .chat-container:hover {
-            box-shadow: 
-                0 20px 25px -5px rgba(99, 102, 241, 0.25), 
-                0 10px 10px -5px rgba(236, 72, 153, 0.15),
-                0 0 40px rgba(99, 102, 241, 0.15);
-            border-color: rgba(255, 255, 255, 0.12);
         }
 
         /* 新添加的模态框样式 */
@@ -776,10 +758,8 @@ pre.code-block:hover {
 
     @media (max-width: 768px) {
       .chat-container {
-        --top-margin: 20vh;
-        --bottom-margin: 15vh;
-        margin: var(--top-margin) auto var(--bottom-margin);
-        height: calc(100vh - calc(var(--top-margin) + var(--bottom-margin)));
+        margin: 0 auto 0;
+        height: 80vh;
         max-height: none;
         border-radius: 0;
         border: none;
@@ -797,4 +777,16 @@ pre.code-block:hover {
         white-space: nowrap;
         border-radius: var(--radius-full);
       }
+    }
+
+    @media (max-width: 480px) {
+        #upload-image-button {
+            display: none;
+        }
+        #open-notification-settings {
+            display: none;
+        }
+        .search-container {
+            max-width: 95%;
+    }
     }

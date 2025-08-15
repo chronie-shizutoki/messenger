@@ -4,16 +4,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Version 3.0 Update</title>
+    <title>Version 4.0 Update</title>
     <div id="version-modal" class="modal version-modal">
         <div class="modal-content version-modal-content">
             <div class="modal-header version-modal-header">
-                <h3 class="modal-title version-modal-title">Version 3.0 Update</h3>
+                <h3 class="modal-title version-modal-title">Version 4.0 Update</h3>
                 <button id="close-version-modal" class="modal-close-btn version-modal-close-btn">×</button>
             </div>
             <div class="version-content">
-                <p>Version 3.0 has been updated. The interface has been reconstructed with a glass effect, and the performance on some devices has been optimized.</p>
-                <p>3.0版本已更新，界面重构采用玻璃效果，部分机型性能得到优化。</p>
+                <p>Version 4.0 has been updated. The interface has been reconstructed, and the performance on some devices has been optimized.</p>
+
+                <p>4.0版本已更新，界面重构，部分机型性能得到优化。</p>
             </div>
             <div class="version-footer">
                 <button id="got-it-version" class="version-got-it-btn">Got It!</button>
@@ -258,6 +259,9 @@
                 versionModal.style.opacity = '0';
                 setTimeout(() => {
                     versionModal.style.display = 'none';
+                    setTimeout(() => {
+                        window.history.back(); // Go back to the previous page
+                    }, 150);
                 }, 300);
             }
 
