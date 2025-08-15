@@ -205,8 +205,7 @@ function showLoadingIndicator(show = true) {
         align-items: center;
         justify-content: center;
         padding: 10px;
-        background: rgba(0,0,0,0.8);
-        color: white;
+        color: black;
         border-radius: 4px;
         margin: 10px;
         font-size: 14px;
@@ -529,7 +528,6 @@ function openNotificationModal() {
   setTimeout(() => {
       modal.style.opacity = '1';
       modal.style.transform = 'scale(1)';
-      modal.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
   }, 10);
 }
 openBtn.addEventListener('click', openNotificationModal);

@@ -91,7 +91,7 @@ class I18n {
     button.style.height = '40px';
     button.style.borderRadius = '50%';
     button.style.backgroundColor = 'transparent';
-    button.style.color = 'rgba(255, 255, 255, 0.9)';
+    button.style.color = 'rgba(0, 0, 0, 0.9)';
     button.style.border = '2px solid transparent';
     button.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.3)';
     button.style.cursor = 'pointer';
@@ -141,7 +141,7 @@ languageList.style.borderColor = 'rgba(255, 255, 255, 0.18)';
       const li = document.createElement('li');
       li.textContent = languageNames[lang] || lang.toUpperCase();
       li.style.padding = '10px 15px';
-      li.style.color = 'rgba(255, 255, 255, 0.9)';
+      li.style.color = 'rgba(0, 0, 0, 0.9)';
       li.style.cursor = 'pointer';
       li.style.transition = 'background-color 0.2s ease-in-out';
       li.setAttribute('data-lang', lang);
