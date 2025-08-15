@@ -12,19 +12,26 @@
                 <button id="close-version-modal" class="modal-close-btn version-modal-close-btn">×</button>
             </div>
             <div class="version-content">
-                <p>Version 4.0 has been updated. The interface has been reconstructed, and the performance on some devices has been optimized.</p>
-
-                <p>4.0版本已更新，界面重构，部分机型性能得到优化。</p>
+                <p>Version 4.0 enhances your experience.</p>
+                <p>Interface rebuilt for better usability. Smoother navigation with key features accessible.</p>
+                <p>Optimized performance across devices. Faster load times and better responsiveness.</p>
             </div>
             <div class="version-footer">
                 <button id="got-it-version" class="version-got-it-btn">Got It!</button>
-                <button id="got-it-version-zh" class="version-got-it-btn-zh">知道了!</button>
             </div>
             <!-- Decorative elements -->
 <div class="decorative-blob blob-1"></div>
               <div class="decorative-blob blob-2"></div>
               <style>
-                /* Decorative Blobs */
+                @font-face {
+                    font-family: 'LXGWWenKaiGB-Regular';
+                    src: url('public\LXGWWenKaiGB-Regular.woff2');
+                    font-display: swap;
+                }
+                * {
+                    font-family: 'LXGWWenKaiGB-Regular';
+                }
+
                 .decorative-blob {
                     position: absolute;
                     border-radius: 50%;
@@ -191,7 +198,7 @@
             gap: 15px;
         }
 
-        .version-got-it-btn, .version-got-it-btn-zh {
+        .version-got-it-btn {
             padding: 12px 28px;
             background: rgba(255, 255, 255, 0.15);
             border: 1px solid rgba(255, 255, 255, 0.18);
@@ -206,7 +213,7 @@
             overflow: hidden;
         }
 
-        .version-got-it-btn::before, .version-got-it-btn-zh::before {
+        .version-got-it-btn::before {
             content: '';
             position: absolute;
             top: 0;
@@ -217,11 +224,11 @@
             transition: all 0.5s ease;
         }
 
-        .version-got-it-btn:hover::before, .version-got-it-btn-zh:hover::before {
+        .version-got-it-btn:hover::before {
             left: 100%;
         }
 
-        .version-got-it-btn:hover, .version-got-it-btn-zh:hover {
+        .version-got-it-btn:hover {
             background: rgba(255, 255, 255, 0.25);
             transform: translateY(-3px);
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
@@ -240,6 +247,44 @@
                 box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
             }
         }
+
+        @media (max-width: 768px) {
+            .version-modal-content {
+                width: 90%;
+                margin: 15% auto;
+                padding: 15px;
+            }
+
+            .version-modal-title {
+                font-size: 18px;
+            }
+
+            .version-content p {
+                line-height: 1.6;
+                margin: 10px 0;
+                font-size: 14px;
+            }
+
+            .version-footer {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .version-got-it-btn {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+
+            .decorative-blob.blob-1 {
+                width: 150px;
+                height: 150px;
+            }
+
+            .decorative-blob.blob-2 {
+                width: 200px;
+                height: 200px;
+            }
+        }
     </style>
 
     <!-- JavaScript for Version Modal -->
@@ -248,7 +293,6 @@
             const versionModal = document.getElementById('version-modal');
             const closeVersionModalBtn = document.getElementById('close-version-modal');
             const gotItBtn = document.getElementById('got-it-version');
-            const gotItBtnZh = document.getElementById('got-it-version-zh');
 
             // Add subtle animation to modal on load
             setTimeout(() => {
@@ -267,7 +311,6 @@
 
             closeVersionModalBtn.addEventListener('click', closeModal);
             gotItBtn.addEventListener('click', closeModal);
-            gotItBtnZh.addEventListener('click', closeModal);
 
             window.addEventListener('click', function(event) {
                 if (event.target === versionModal) {
@@ -276,7 +319,7 @@
             });
 
             // Add hover effect to buttons
-            const buttons = [closeVersionModalBtn, gotItBtn, gotItBtnZh];
+            const buttons = [closeVersionModalBtn, gotItBtn];
             buttons.forEach(button => {
                 button.addEventListener('mouseenter', function() {
                     this.style.transform = 'scale(1.05)';
