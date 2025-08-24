@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Messenger</title>
+    <title data-i18n="app.title"></title>
     <link rel="stylesheet" href="css/index.css">
     <link rel="stylesheet" href="lib/lightbox2/css/lightbox.min.css">
     <link rel="stylesheet" href="lib/font-awesome/all.min.css">
@@ -68,7 +68,7 @@
   <div id="notification-modal" class="modal notification-modal">
     <div class="modal-content">
       <div class="modal-header">
-        <h3 class="modal-title"></h3>
+        <h3 class="modal-title" data-i18n="notification.settings_title"></h3>
         <button id="close-modal" class="modal-close-btn"><i class="fas fa-times"></i></button>
       </div>
       <div id="push-url-list" class="push-url-list"></div>
@@ -83,7 +83,7 @@
   <div id="sticker-modal" class="modal sticker-modal">
     <div class="modal-content sticker-modal-content">
       <div class="modal-header">
-        <h3 class="modal-title"><i class="fas fa-box-open"></i></h3>
+        <h3 class="modal-title" data-i18n="sticker.modal_title"><i class="fas fa-box-open"></i></h3>
         <button id="close-sticker-modal" class="modal-close-btn"><i class="fas fa-times"></i></button>
       </div>
       <div id="sticker-categories" style="margin-bottom: 15px;"></div>
@@ -113,7 +113,7 @@
     <script src="chat-client.js" defer></script>
 
     <div class="version-info">
-        <a href="new-feather.html" target="_blank">v5.0.0 | Aug 24, 2025 </a>
+        <a href="new-feather.html" target="_blank" data-i18n="version.info"></a>
     </div>
 </body>
 </html>

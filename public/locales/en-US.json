@@ -1,8 +1,20 @@
 {
+  "app.title": "Messenger",
   "chat.title": "Chat",
   "chat.send": "Send",
   "chat.placeholder": "Message...",
   "notification.push_url_placeholder": "Enter push notification URL",
   "notification.save_button": "Save",
-  "chat.quote_from": "Quoted from {safeTimestamp}"
+  "chat.quote_from": "Quoted from {safeTimestamp}",
+  "chat.quote_reply": "Reply with quote",
+  "status.loading_messages": "Loading messages (page {page})...",
+  "status.loaded_messages": "Loaded {count} messages ({currentPage}/{totalPages})",
+  "status.failed_load_history": "Failed to load history",
+  "loading_indicator.text": "Loading messages...",
+  "audio_player.not_supported": "Your browser does not support audio playback.",
+  "video_player.not_supported": "Your browser does not support video playback.",
+  "file.download_title": "Download file: {fileName}",
+  "notification.settings_title": "Notification Settings",
+  "sticker.modal_title": "Sticker Selection",
+  "version.info": "v5.0.0 | Aug 24, 2025"
 }

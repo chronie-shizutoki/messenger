@@ -1,8 +1,20 @@
 {
+  "app.title": "信使",
   "chat.title": "聊天",
   "chat.send": "发送",
   "chat.placeholder": "输入消息...",
   "notification.push_url_placeholder": "输入推送通知链接",
   "notification.save_button": "保存",
-  "chat.quote_from": "引用自 {safeTimestamp}"
+  "chat.quote_from": "引用自 {safeTimestamp}",
+  "chat.quote_reply": "引用回复",
+  "status.loading_messages": "加载消息中 (第 {page} 页)...",
+  "status.loaded_messages": "已加载 {count} 条消息 ({currentPage}/{totalPages})",
+  "status.failed_load_history": "加载历史消息失败",
+  "loading_indicator.text": "加载消息中...",
+  "audio_player.not_supported": "您的浏览器不支持音频播放。",
+  "video_player.not_supported": "您的浏览器不支持视频播放。",
+  "file.download_title": "下载文件: {fileName}",
+  "notification.settings_title": "通知设置",
+  "sticker.modal_title": "选择贴图",
+  "version.info": "v5.0.0 | 2025年8月24日"
 }

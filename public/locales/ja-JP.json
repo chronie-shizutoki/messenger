@@ -4,5 +4,16 @@
   "chat.placeholder": "メッセージを入力...",
   "notification.push_url_placeholder": "プッシュ通知URLを入力",
   "notification.save_button": "保存",
-  "chat.quote_from": "引用元 {safeTimestamp}"
+  "chat.quote_from": "引用元 {safeTimestamp}",
+  "chat.quote_reply": "引用付き返信",
+  "status.loading_messages": "メッセージを読み込んでいます (ページ {page})...",
+  "status.loaded_messages": "{count} 件のメッセージを読み込みました ({currentPage}/{totalPages})",
+  "status.failed_load_history": "履歴の読み込みに失敗しました",
+  "loading_indicator.text": "メッセージを読み込んでいます...",
+  "audio_player.not_supported": "あなたのブラウザはオーディオ再生をサポートしていません。",
+  "video_player.not_supported": "あなたのブラウザはビデオ再生をサポートしていません。",
+  "file.download_title": "ファイルをダウンロード: {fileName}",
+  "notification.settings_title": "通知設定",
+  "sticker.modal_title": "スタンプ選択",
+  "version.info": "v5.0.0 | 2025年8月24日"
 }

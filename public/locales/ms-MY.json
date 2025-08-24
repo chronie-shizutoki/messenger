@@ -4,5 +4,16 @@
   "chat.placeholder": "Taip mesej...",
   "notification.push_url_placeholder": "Masukkan URL pemberitahuan push",
   "notification.save_button": "Simpan",
-  "chat.quote_from": "Cita dari {safeTimestamp}"
+  "chat.quote_from": "Cita dari {safeTimestamp}",
+  "chat.quote_reply": "Balas dengan petikan",
+  "status.loading_messages": "Memuat mesej (halaman {page})...",
+  "status.loaded_messages": "Memuatkan {count} mesej ({currentPage}/{totalPages})",
+  "status.failed_load_history": "Gagal memuat sejarah",
+  "loading_indicator.text": "Memuat mesej...",
+  "audio_player.not_supported": "Pelayar anda tidak menyokong main semula audio.",
+  "video_player.not_supported": "Pelayar anda tidak menyokong main semula video.",
+  "file.download_title": "Muat turun fail: {fileName}",
+  "notification.settings_title": "Tetapan Pemberitahuan",
+  "sticker.modal_title": "Pilihan Stiker",
+  "version.info": "v5.0.0 | 24 Ogos 2025"
 }

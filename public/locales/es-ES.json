@@ -4,5 +4,16 @@
   "chat.placeholder": "Escribe un mensaje...",
   "notification.push_url_placeholder": "Introduce la URL de notificación push",
   "notification.save_button": "Guardar",
-  "chat.quote_from": "Cita de {safeTimestamp}"
+  "chat.quote_from": "Cita de {safeTimestamp}",
+  "chat.quote_reply": "Responder con cita",
+  "status.loading_messages": "Cargando mensajes (página {page})...",
+  "status.loaded_messages": "Cargados {count} mensajes ({currentPage}/{totalPages})",
+  "status.failed_load_history": "No se pudo cargar el historial",
+  "loading_indicator.text": "Cargando mensajes...",
+  "audio_player.not_supported": "Su navegador no admite la reproducción de audio.",
+  "video_player.not_supported": "Su navegador no admite la reproducción de vídeo.",
+  "file.download_title": "Descargar archivo: {fileName}",
+  "notification.settings_title": "Configuración de notificaciones",
+  "sticker.modal_title": "Selección de stickers",
+  "version.info": "v5.0.0 | 24 de agosto de 2025"
 }

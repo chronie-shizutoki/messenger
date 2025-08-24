@@ -13,8 +13,8 @@ const VIRTUAL_SCROLL_THRESHOLD = 100; // 当消息超过100条时启用虚拟滚
 const MAX_MESSAGES_IN_MEMORY = 200; // 内存中最多保存200条消息
 
 // 状态更新函数
-function updateStatus(text, isError = false) {
-  statusEl.textContent = ` ${text} (${new Date().toLocaleTimeString()})`;
+function updateStatus(text, params = {}, isError = false) {
+  statusEl.textContent = ` ${i18n.t(text, params || {})} (${new Date().toLocaleTimeString()})`;
   statusEl.style.color = isError ? 'red' : 'green';
 }
 
@@ -189,7 +189,7 @@ result = result.replace(fileLinkRegex, (match, fileName, url) => {
       // 添加音频播放器
       mediaContent = `<audio controls class="media-player">
         <source src="${safeUrl}" type="audio/${fileExtension}">
-        您的浏览器不支持音频播放。
+        ${i18n.t('audio_player.not_supported')}
       </audio>`;
     } else if (['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv'].includes(fileExtension)) {
       fileIcon = 'fa-file-video-o';
@@ -197,12 +197,12 @@ result = result.replace(fileLinkRegex, (match, fileName, url) => {
       const videoType = fileExtension === 'mov' ? 'quicktime' : fileExtension;
       mediaContent = `<video controls class="media-player" width="100%">
         <source src="${safeUrl}" type="video/${videoType}">
-        您的浏览器不支持视频播放。
+        ${i18n.t('video_player.not_supported')}
       </video>`;
     }
     
     return `<div class="file-item">
-      <a href="${safeUrl}" download class="file-link" title="下载文件: ${safeFileName}">
+      <a href="${safeUrl}" download class="file-link" title="${i18n.t('file.download_title', { fileName: safeFileName })}">
         <i class="fas ${fileIcon}"></i> ${safeFileName}
         <i class="fas fa-download download-icon"></i>
       </a>
@@ -326,7 +326,7 @@ function showLoadingIndicator(show = true) {
           animation: spin 1s linear infinite;
           margin-right: 8px;
         "></div>
-        Loading messages...
+        ${i18n.t('loading_indicator.text')}
       </div>
     `;
     
@@ -359,14 +359,14 @@ function loadHistory(page = 1, prepend = false) {
   if (pullToLoadIndicator) {
     pullToLoadIndicator.style.display = 'none';
   }
-  updateStatus(`Loading messages (page ${page})...`);
+  updateStatus('status.loading_messages', { page });
   
   window.socket.emit('get history', { page, limit: 20 }, (err, result) => {
     isLoadingHistory = false;
     showLoadingIndicator(false);
     
     if (err) {
-      updateStatus('Failed to load history', true);
+      updateStatus('status.failed_load_history', {}, true);
       return;
     }
     
@@ -414,7 +414,7 @@ function loadHistory(page = 1, prepend = false) {
       }, 100);
     }
     
-    updateStatus(`Loaded ${messages.length} messages (${pagination.currentPage}/${pagination.totalPages})`);
+    updateStatus('status.loaded_messages', { count: messages.length, currentPage: pagination.currentPage, totalPages: pagination.totalPages });
   });
 }
 

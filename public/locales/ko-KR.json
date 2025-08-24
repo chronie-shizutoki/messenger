@@ -4,5 +4,16 @@
   "chat.placeholder": "메시지를 입력하세요...",
   "notification.push_url_placeholder": "푸시 알림 URL을 입력하세요",
   "notification.save_button": "저장",
-  "chat.quote_from": "인용 출처 {safeTimestamp}"
+  "chat.quote_from": "인용 출처 {safeTimestamp}",
+  "chat.quote_reply": "인용하여 답장",
+  "status.loading_messages": "메시지 로딩 중 (페이지 {page})...",
+  "status.loaded_messages": "{count}개의 메시지 로딩 완료 ({currentPage}/{totalPages})",
+  "status.failed_load_history": "대화 기록 로딩에 실패했습니다",
+  "loading_indicator.text": "메시지 로딩 중...",
+  "audio_player.not_supported": "사용 중인 브라우저에서는 오디오 재생을 지원하지 않습니다.",
+  "video_player.not_supported": "사용 중인 브라우저에서는 비디오 재생을 지원하지 않습니다.",
+  "file.download_title": "파일 다운로드: {fileName}",
+  "notification.settings_title": "알림 설정",
+  "sticker.modal_title": "스티커 선택",
+  "version.info": "v5.0.0 | 2025년 8월 24일"
 }
