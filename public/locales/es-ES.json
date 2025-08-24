@@ -17,8 +17,8 @@
   "file.download_title": "Descargar archivo: {fileName}",
   "notification.settings_title": "Configuración de notificaciones",
   "sticker.modal_title": "Selección de stickers",
-  "version.info": "v5.1.0 | 24 de agosto de 2025",
-  "version.update_title": "Actualización de Versión 5.0",
+  "version.info": "v5.2.0 | 24 de agosto de 2025",
+  "version.update_title": "Actualización de Versión",
   "version.update_content": "Esta actualización ha optimizado por completo el rendimiento del sistema y la interacción de la interfaz, mejorando aún más su experiencia de uso. Hemos realizado ajustes detallados en varios flujos de operación, que responden más rápido y brindan retroalimentación más natural, con la esperanza de que cada clic sea fluido y cómodo.\nAdemás, la nueva versión amplía el soporte para la carga y vista previa de varios formatos de archivo. Ya sea documentos, imágenes o archivos comprimidos, ahora puede ver y administrar los archivos en línea de manera más conveniente, olvidándose por completo de los problemas de compatibilidad de formatos.\nComo siempre, nos preocupamos por mejorar cada detalle, con el objetivo de brindarle una herramienta más práctica y confiable. Agradecemos su apoyo constante y seguiremos esforzándonos para ofrecerle más funciones útiles.",
   "version.got_it": "¡Entendido!"
 }
