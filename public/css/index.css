@@ -853,9 +853,6 @@ pre.code-block:hover {
     }
 
     @media (max-width: 480px) {
-        #upload-image-button {
-            display: none;
-        }
         #open-notification-settings {
             display: none;
         }
