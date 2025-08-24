@@ -97,7 +97,7 @@ const chatUpload = multer({
   // 移除文件类型限制
   // fileFilter: fileFilter,
   limits: {
-    fileSize: 15 * 1024 * 1024, // 限制15MB
+    fileSize: 100 * 1024 * 1024, // 限制100MB
   }
 });
 
@@ -141,7 +141,7 @@ const commonUpload = multer({
   // 移除文件类型限制
   // fileFilter: fileFilter,
   limits: {
-    fileSize: 50 * 1024 * 1024, // 限制50MB
+    fileSize: 100 * 1024 * 1024, // 限制100MB
   }
 });
 
@@ -213,7 +213,9 @@ app.post('/upload-file', commonUpload.single('file'), (req, res) => {
 
 // 获取通用上传文件
 app.get('/uploads/:subdir/:filename', (req, res) => {
-  const { subdir, filename } = req.params;
+  // 对参数进行解码，确保中文文件名正确
+  const subdir = decodeURIComponent(req.params.subdir);
+  const filename = decodeURIComponent(req.params.filename);
   const filePath = path.join(COMMON_FILE_DIRECTORY, subdir, filename);
 
   if (fs.existsSync(filePath)) {
@@ -228,7 +230,9 @@ app.get('/uploads/:subdir/:filename', (req, res) => {
     else if (ext === '.svg') contentType = 'image/svg+xml';
     else if (['.js', '.ts', '.css', '.html', '.php', '.py', '.txt'].includes(ext)) contentType = 'text/plain';
     
+    // 设置Content-Disposition头，支持中文文件名下载
     res.setHeader('Content-Type', contentType);
+    res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${encodeURIComponent(filename)}`);
     res.sendFile(filePath);
   } else {
     res.status(404).json({ error: '文件不存在' });
@@ -237,9 +241,14 @@ app.get('/uploads/:subdir/:filename', (req, res) => {
 
 // 处理其他可能的文件路径结构
 app.get('/uploads/*', (req, res) => {
-  const filePath = path.join(COMMON_FILE_DIRECTORY, req.params[0]);
+  // 对路径进行解码，确保中文文件名正确
+  const decodedPath = decodeURIComponent(req.params[0]);
+  const filePath = path.join(COMMON_FILE_DIRECTORY, decodedPath);
   
   if (fs.existsSync(filePath)) {
+    // 设置Content-Disposition头，支持中文文件名下载
+    const filename = path.basename(filePath);
+    res.setHeader('Content-Disposition', `attachment; filename*=UTF-8''${encodeURIComponent(filename)}`);
     res.sendFile(filePath);
   } else {
     res.status(404).json({ error: '文件不存在' });
