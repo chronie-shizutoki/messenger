@@ -1,6 +1,8 @@
 class I18n {
   constructor() {
-    const userLanguage = navigator.language || 'en-US';
+    // 首先尝试从localStorage读取保存的语言
+    const savedLanguage = localStorage.getItem('preferredLanguage');
+    const userLanguage = savedLanguage || navigator.language || 'en-US';
     this.supportedLanguages = ['en-GB', 'en-US', 'es-ES', 'fr-FR', 'ja-JP', 'ko-KR', 'ms-MY', 'zh-CN', 'zh-TW']; // 支持的语言列表
     this.locale = this.getBestMatchingLanguage(userLanguage);
     this.translations = {};
@@ -163,6 +165,8 @@ languageList.style.borderColor = 'rgba(255, 255, 255, 0.18)';
 
       li.addEventListener('click', async () => {
         this.locale = lang;
+        // 保存语言选择到localStorage
+        localStorage.setItem('preferredLanguage', lang);
         await this.loadTranslations();
         this.applyTranslations();
         // 更新选中项样式
