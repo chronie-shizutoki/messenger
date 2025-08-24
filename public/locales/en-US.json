@@ -1,4 +1,5 @@
 {
+  "scroll_text.default": "Welcome to Messenger! Stay connected with your friends and family. You can customize the scrolling text through the scroll-text.txt file.",
   "app.title": "Messenger",
   "chat.title": "Chat",
   "chat.send": "Send",

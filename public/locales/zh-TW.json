@@ -1,4 +1,5 @@
 {
+  "scroll_text.default": "歡迎使用Messenger！與您的朋友和家人保持聯繫。您可以透過scroll-text.txt檔案自訂滾動文字。",
   "app.title": "訊息信使",
   "chat.title": "聊天",
   "chat.send": "傳送",
