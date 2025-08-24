@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Version 5.0 Update</title>
+    <script src="js/i18n.js"></script>
     <div id="version-modal" class="modal version-modal">
         <div class="modal-content version-modal-content">
             <div class="modal-header version-modal-header">
@@ -279,6 +280,17 @@
     <!-- JavaScript for Version Modal -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // 等待i18n初始化完成后应用翻译
+            document.addEventListener('i18nInitialized', function() {
+                if (window.i18n) {
+                    window.i18n.applyTranslations();
+                }
+            });
+
+            // 如果i18n已经初始化，则立即应用翻译
+            if (window.i18n) {
+                window.i18n.applyTranslations();
+            }
             const versionModal = document.getElementById('version-modal');
             const closeVersionModalBtn = document.getElementById('close-version-modal');
             const gotItBtn = document.getElementById('got-it-version');
