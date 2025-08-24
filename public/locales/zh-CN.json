@@ -16,5 +16,9 @@
   "file.download_title": "下载文件: {fileName}",
   "notification.settings_title": "通知设置",
   "sticker.modal_title": "选择贴图",
-  "version.info": "v5.0.0 | 2025年8月24日"
+  "version.info": "v5.0.0 | 2025年8月24日",
+  "version.update_title": "5.0版本更新",
+  "version.enhance_experience": "5.0版本提升了您的使用体验。",
+  "version.file_format_support": "支持上传/预览多种文件格式，提升用户体验。",
+  "version.got_it": "明白了!"
 }

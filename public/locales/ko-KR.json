@@ -1,4 +1,5 @@
 {
+  "app.title": "메신저",
   "chat.title": "채팅",
   "chat.send": "보내기",
   "chat.placeholder": "메시지를 입력하세요...",
@@ -15,5 +16,9 @@
   "file.download_title": "파일 다운로드: {fileName}",
   "notification.settings_title": "알림 설정",
   "sticker.modal_title": "스티커 선택",
-  "version.info": "v5.0.0 | 2025년 8월 24일"
+  "version.info": "v5.0.0 | 2025년 8월 24일",
+  "version.update_title": "버전 5.0 업데이트",
+  "version.enhance_experience": "버전 5.0은 사용자 경험을 향상시킵니다.",
+  "version.file_format_support": "여러 파일 형식의 업로드/미리 보기를 지원하여 사용자 경험을 향상시킵니다.",
+  "version.got_it": "알겠어요!"
 }
