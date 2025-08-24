@@ -141,7 +141,7 @@ const safeTimestamp = new Date(decodedTimestamp).toLocaleString();
 
   // ====================================================================
 // 步骤 2.1: 解析文件链接 [fileName](url)
-// 为文件链接添加下载功能和适当的图标
+// 为文件链接添加下载功能和适当的图标，以及音频/视频预览
 // ====================================================================
 const fileLinkRegex = /\[(.*?)\]\((.*?)\)/g;
 result = result.replace(fileLinkRegex, (match, fileName, url) => {
@@ -162,10 +162,14 @@ result = result.replace(fileLinkRegex, (match, fileName, url) => {
     // 尝试获取文件扩展名
     const fileExtension = fileName.split('.').pop().toLowerCase();
     
-    // 根据文件类型决定显示图标
+    // 根据文件类型决定显示图标和处理方式
     let fileIcon = 'fa-file';
+    let mediaContent = '';
+    
     if (['jpg', 'jpeg', 'png', 'gif', 'svg'].includes(fileExtension)) {
       fileIcon = 'fa-file-image-o';
+      // 图片处理逻辑已在步骤2中完成
+      return match;
     } else if (fileExtension === 'pdf') {
       fileIcon = 'fa-file-pdf-o';
     } else if (['doc', 'docx'].includes(fileExtension)) {
@@ -180,18 +184,53 @@ result = result.replace(fileLinkRegex, (match, fileName, url) => {
       fileIcon = 'fa-file-archive-o';
     } else if (['js', 'ts', 'css', 'html', 'php', 'py'].includes(fileExtension)) {
       fileIcon = 'fa-file-code-o';
+    } else if (['mp3', 'flac', 'wav', 'ogg', 'aac', 'm4a'].includes(fileExtension)) {
+      fileIcon = 'fa-file-audio-o';
+      // 添加音频播放器
+      mediaContent = `<audio controls class="media-player">
+        <source src="${safeUrl}" type="audio/${fileExtension}">
+        您的浏览器不支持音频播放。
+      </audio>`;
+    } else if (['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv'].includes(fileExtension)) {
+      fileIcon = 'fa-file-video-o';
+      // 添加视频播放器
+      const videoType = fileExtension === 'mov' ? 'quicktime' : fileExtension;
+      mediaContent = `<video controls class="media-player" width="100%">
+        <source src="${safeUrl}" type="video/${videoType}">
+        您的浏览器不支持视频播放。
+      </video>`;
     }
     
-    return `<a href="${safeUrl}" download class="file-link" title="下载文件: ${safeFileName}">
-      <i class="fas ${fileIcon}"></i> ${safeFileName}
-      <i class="fas fa-download download-icon"></i>
-    </a>`;
+    return `<div class="file-item">
+      <a href="${safeUrl}" download class="file-link" title="下载文件: ${safeFileName}">
+        <i class="fas ${fileIcon}"></i> ${safeFileName}
+        <i class="fas fa-download download-icon"></i>
+      </a>
+      ${mediaContent}
+    </div>`;
   }
   // 如果URL无效，则将整个链接语法转义后显示
   return escapeHtml(match);
 });
 
 // ====================================================================
+// 添加媒体播放器样式
+const style = document.createElement('style');
+style.textContent = `
+  .media-player {
+    margin-top: 8px;
+    max-width: 100%;
+    border-radius: 4px;
+  }
+  .file-item {
+    margin: 8px 0;
+    padding: 8px;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+  }
+`;
+document.head.appendChild(style);
+
 // 步骤 3: 解析其他Markdown格式
 // 标题、加粗、斜体、行内代码
 // ====================================================================
