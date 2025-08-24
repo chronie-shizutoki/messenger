@@ -28,15 +28,53 @@ if (!fs.existsSync(CHAT_IMAGE_DIRECTORY)) {
 const multer = require('multer');
 
 // 配置文件过滤
+// 配置文件过滤，允许所有文件类型
 const fileFilter = (req, file, cb) => {
-  const allowedTypes = ['.jpg', '.jpeg', '.png', '.gif', '.svg'];
-  const ext = path.extname(file.originalname).toLowerCase();
-  if (allowedTypes.includes(ext)) {
-    cb(null, true);
-  } else {
-    cb(new Error('only allow upload image file: ' + allowedTypes.join(', ')), false);
-  }
+  // 允许所有文件类型
+  cb(null, true);
 };
+
+// 根据文件类型获取对应的图标
+const getFileTypeIcon = (fileExtension) => {
+  const ext = fileExtension.toLowerCase();
+  // 简化图标映射，对未知类型也提供有意义的图标
+  const iconMap = {
+    '.jpg': 'fa-file-image-o',
+    '.jpeg': 'fa-file-image-o',
+    '.png': 'fa-file-image-o',
+    '.gif': 'fa-file-image-o',
+    '.svg': 'fa-file-image-o',
+    '.pdf': 'fa-file-pdf-o',
+    '.doc': 'fa-file-word-o',
+    '.docx': 'fa-file-word-o',
+    '.xls': 'fa-file-excel-o',
+    '.xlsx': 'fa-file-excel-o',
+    '.ppt': 'fa-file-powerpoint-o',
+    '.pptx': 'fa-file-powerpoint-o',
+    '.txt': 'fa-file-text-o',
+    '.zip': 'fa-file-archive-o',
+    '.rar': 'fa-file-archive-o',
+    '.7z': 'fa-file-archive-o',
+    '.js': 'fa-file-code-o',
+    '.ts': 'fa-file-code-o',
+    '.css': 'fa-file-code-o',
+    '.html': 'fa-file-code-o',
+    '.php': 'fa-file-code-o',
+    '.py': 'fa-file-code-o'
+  };
+  return iconMap[ext] || 'fa-file-o';
+};
+
+// 保留原有函数，仅修改注释以反映新的文件类型政策
+// 注意：虽然我们移除了上传限制，但仍保留图标映射以提供更好的用户体验
+
+// 通用文件存储目录
+const COMMON_FILE_DIRECTORY = path.join(__dirname, 'public', 'uploads');
+
+// 确保通用文件目录存在
+if (!fs.existsSync(COMMON_FILE_DIRECTORY)) {
+  fs.mkdirSync(COMMON_FILE_DIRECTORY, { recursive: true });
+}
 
 // 初始化multer上传中间件
 // 聊天图片上传配置
@@ -48,13 +86,62 @@ const chatUpload = multer({
     filename: function (req, file, cb) {
       const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
       const ext = path.extname(file.originalname);
-      const filename = path.basename(file.originalname, ext) + '-' + uniqueSuffix + ext;
+      // 确保文件名正确处理UTF-8编码
+      const baseName = path.basename(file.originalname, ext);
+      // 对文件名进行编码处理，确保中文字符正确显示
+      const safeBaseName = encodeURIComponent(baseName).replace(/%20/g, '-');
+      const filename = safeBaseName + '-' + uniqueSuffix + ext;
       cb(null, filename);
     }
   }),
-  fileFilter: fileFilter,
+  // 移除文件类型限制
+  // fileFilter: fileFilter,
   limits: {
     fileSize: 15 * 1024 * 1024, // 限制15MB
+  }
+});
+
+// 通用文件上传配置
+const commonUpload = multer({
+  storage: multer.diskStorage({
+    destination: function (req, file, cb) {
+      // 根据文件类型创建子目录
+      const ext = path.extname(file.originalname).toLowerCase();
+      let subDir = 'others';
+      
+      if (['.jpg', '.jpeg', '.png', '.gif', '.svg'].includes(ext)) {
+        subDir = 'images';
+      } else if (['.pdf', '.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx', '.txt'].includes(ext)) {
+        subDir = 'documents';
+      } else if (['.zip', '.rar', '.7z'].includes(ext)) {
+        subDir = 'archives';
+      } else if (['.js', '.ts', '.css', '.html', '.php', '.py'].includes(ext)) {
+        subDir = 'code';
+      }
+      
+      const uploadDir = path.join(COMMON_FILE_DIRECTORY, subDir);
+      // 确保子目录存在
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+      }
+      
+      cb(null, uploadDir);
+    },
+    filename: function (req, file, cb) {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+      const ext = path.extname(file.originalname);
+      // 确保文件名正确处理UTF-8编码
+      const baseName = path.basename(file.originalname, ext);
+      // 对文件名进行编码处理，确保中文字符正确显示
+      const safeBaseName = encodeURIComponent(baseName).replace(/%20/g, '-');
+      const filename = safeBaseName + '-' + uniqueSuffix + ext;
+      cb(null, filename);
+    }
+  }),
+  // 移除文件类型限制
+  // fileFilter: fileFilter,
+  limits: {
+    fileSize: 50 * 1024 * 1024, // 限制50MB
   }
 });
 
@@ -99,6 +186,64 @@ app.post('/chat/upload-image', chatUpload.single('image'), async (req, res) => {
   }
 
   res.json({ imageUrl: `/get-chat-image/${req.file.filename}` });
+});
+
+// 通用文件上传接口
+app.post('/upload-file', commonUpload.single('file'), (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ error: '未选择文件' });
+  }
+
+  // 获取文件相对路径，并确保使用正斜杠作为分隔符
+  const relativePath = path.relative(COMMON_FILE_DIRECTORY, req.file.path).replace(/\\/g, '/');
+  // 对路径进行编码处理，确保中文字符正确显示
+  const encodedRelativePath = encodeURIComponent(relativePath).replace(/%2F/g, '/');
+  const fileUrl = `/uploads/${encodedRelativePath}`;
+  const fileExtension = path.extname(req.file.originalname).toLowerCase();
+  const fileTypeIcon = getFileTypeIcon(fileExtension);
+
+  res.json({
+    fileUrl: fileUrl,
+    fileName: req.file.originalname,
+    fileSize: req.file.size,
+    fileType: fileExtension,
+    fileIcon: fileTypeIcon
+  });
+});
+
+// 获取通用上传文件
+app.get('/uploads/:subdir/:filename', (req, res) => {
+  const { subdir, filename } = req.params;
+  const filePath = path.join(COMMON_FILE_DIRECTORY, subdir, filename);
+
+  if (fs.existsSync(filePath)) {
+    // 设置适当的Content-Type
+    const ext = path.extname(filename).toLowerCase();
+    let contentType = 'application/octet-stream';
+    
+    if (ext === '.pdf') contentType = 'application/pdf';
+    else if (['.jpg', '.jpeg'].includes(ext)) contentType = 'image/jpeg';
+    else if (ext === '.png') contentType = 'image/png';
+    else if (ext === '.gif') contentType = 'image/gif';
+    else if (ext === '.svg') contentType = 'image/svg+xml';
+    else if (['.js', '.ts', '.css', '.html', '.php', '.py', '.txt'].includes(ext)) contentType = 'text/plain';
+    
+    res.setHeader('Content-Type', contentType);
+    res.sendFile(filePath);
+  } else {
+    res.status(404).json({ error: '文件不存在' });
+  }
+});
+
+// 处理其他可能的文件路径结构
+app.get('/uploads/*', (req, res) => {
+  const filePath = path.join(COMMON_FILE_DIRECTORY, req.params[0]);
+  
+  if (fs.existsSync(filePath)) {
+    res.sendFile(filePath);
+  } else {
+    res.status(404).json({ error: '文件不存在' });
+  }
 });
 
 

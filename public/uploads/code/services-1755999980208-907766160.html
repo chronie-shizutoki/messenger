@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网站服务</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+        header {
+            font-size: 28px;
+            margin-bottom: 30px;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            font-weight: 600;
+        }
+        .services-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 25px;
+            margin-top: 30px;
+        }
+        .service-item {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            padding: 20px;
+            width: 220px;
+            box-shadow: 
+                0 8px 32px rgba(0, 0, 0, 0.1),
+                0 4px 16px rgba(0, 0, 0, 0.08);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            transition: all 0.3s ease;
+            transform-style: preserve-3d;
+        }
+        .service-item:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 
+                0 12px 40px rgba(0, 0, 0, 0.15),
+                0 6px 20px rgba(0, 0, 0, 0.1);
+        }
+        .service-title {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .qrcode-container {
+            margin: 15px auto;
+            width: 150px;
+            height: 150px;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            background: white;
+            padding: 8px;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            margin: 12px 0;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+        .services-list {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            padding: 25px;
+            margin: 0 auto 30px;
+            max-width: 600px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+        .service-entry {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            padding: 15px;
+            margin: 15px 0;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .service-entry h2 {
+            margin-top: 0;
+            color: #2c3e50;
+        }
+        a {
+            color: #3498db;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 8px 16px;
+            border-radius: 6px;
+            background: rgba(52, 152, 219, 0.1);
+            transition: all 0.3s ease;
+        }
+        a:hover {
+            background: rgba(52, 152, 219, 0.2);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        多个项目正在运行中!
+    </header>
+    <main>
+        <div class="services-list">
+            <div class="service-entry">
+                <h2>3000 聊天系统</h2>
+                <p>立刻访问：<a href="http://192.168.0.197:3000">聊天系统</a></p>
+            </div>
+            <div class="service-entry">
+                <h2>3010 家庭消费系统</h2>
+                <p>立刻访问：<a href="http://192.168.0.197:3010">家庭消费系统</a></p>
+            </div>
+            <div>
+                <h2>5000 库存管理系统</h2>
+                <p>立刻访问：<a href="http://192.168.0.197:5000">库存管理系统</a></p>
+            </div>
+        </div>
+    </main>
+        
+        <div class="services-container" id="servicesContainer">
+            <!-- 二维码将通过JavaScript动态生成 -->
+        </div>
+    </main>
+
+    <!-- 引入qrcode.js库 -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@latest/build/qrcode.min.js"></script>
+    <script>
+        // 服务列表
+        const services = [
+            { port: 3000, name: "聊天系统" },
+            { port: 3010, name: "家庭消费系统" },
+            { port: 5000, name: "库存管理系统" }
+        ];
+
+        const baseUrl = "http://192.168.0.197";
+
+        // 为每个服务生成二维码
+        services.forEach(service => {
+            const serviceElement = document.createElement("div");
+            serviceElement.className = "service-item";
+            
+            const titleElement = document.createElement("div");
+            titleElement.className = "service-title";
+            titleElement.textContent = `${service.port} ${service.name}`;
+            
+            const qrContainer = document.createElement("div");
+            qrContainer.className = "qrcode-container";
+            qrContainer.id = `qrcode-${service.port}`;
+            
+            const url = `${baseUrl}:${service.port}`;
+            
+            serviceElement.appendChild(titleElement);
+            serviceElement.appendChild(qrContainer);
+            document.getElementById("servicesContainer").appendChild(serviceElement);
+            
+            // 生成二维码
+            const canvas = document.createElement('canvas');
+            qrContainer.appendChild(canvas);
+            
+            QRCode.toCanvas(canvas, url, {
+                width: 150,
+                height: 150,
+                margin: 2
+            }, function (error) {
+                if (error) console.error(error);
+            });
+        });
+    </script>
+</body>
+</html>

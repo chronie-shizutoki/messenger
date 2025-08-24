@@ -140,9 +140,61 @@ const safeTimestamp = new Date(decodedTimestamp).toLocaleString();
   });
 
   // ====================================================================
-  // 步骤 3: 解析其他Markdown格式
-  // 标题、加粗、斜体、行内代码
-  // ====================================================================
+// 步骤 2.1: 解析文件链接 [fileName](url)
+// 为文件链接添加下载功能和适当的图标
+// ====================================================================
+const fileLinkRegex = /\[(.*?)\]\((.*?)\)/g;
+result = result.replace(fileLinkRegex, (match, fileName, url) => {
+  // 跳过已经是图片的链接
+  if (match.startsWith('![')) {
+    return match;
+  }
+  
+  // **安全关键点**: 对URL进行严格白名单校验
+  const trimmedUrl = url.trim();
+  const urlRegex = /^(https?:\/\/|\/)/; // 只允许 http, https 或相对路径开头
+  
+  if (urlRegex.test(trimmedUrl)) {
+    // **安全关键点**: 在将文件名和URL放入HTML属性前，必须进行转义！
+    const safeFileName = escapeHtml(fileName);
+    const safeUrl = escapeHtml(trimmedUrl);
+    
+    // 尝试获取文件扩展名
+    const fileExtension = fileName.split('.').pop().toLowerCase();
+    
+    // 根据文件类型决定显示图标
+    let fileIcon = 'fa-file';
+    if (['jpg', 'jpeg', 'png', 'gif', 'svg'].includes(fileExtension)) {
+      fileIcon = 'fa-file-image-o';
+    } else if (fileExtension === 'pdf') {
+      fileIcon = 'fa-file-pdf-o';
+    } else if (['doc', 'docx'].includes(fileExtension)) {
+      fileIcon = 'fa-file-word-o';
+    } else if (['xls', 'xlsx'].includes(fileExtension)) {
+      fileIcon = 'fa-file-excel-o';
+    } else if (['ppt', 'pptx'].includes(fileExtension)) {
+      fileIcon = 'fa-file-powerpoint-o';
+    } else if (fileExtension === 'txt') {
+      fileIcon = 'fa-file-text-o';
+    } else if (['zip', 'rar', '7z'].includes(fileExtension)) {
+      fileIcon = 'fa-file-archive-o';
+    } else if (['js', 'ts', 'css', 'html', 'php', 'py'].includes(fileExtension)) {
+      fileIcon = 'fa-file-code-o';
+    }
+    
+    return `<a href="${safeUrl}" download class="file-link" title="下载文件: ${safeFileName}">
+      <i class="fas ${fileIcon}"></i> ${safeFileName}
+      <i class="fas fa-download download-icon"></i>
+    </a>`;
+  }
+  // 如果URL无效，则将整个链接语法转义后显示
+  return escapeHtml(match);
+});
+
+// ====================================================================
+// 步骤 3: 解析其他Markdown格式
+// 标题、加粗、斜体、行内代码
+// ====================================================================
   // 标题 (# 到 ######)
   const headingRegex = /^(#{1,6})\s+([^\n]+)/gm;
   result = result.replace(headingRegex, (match, hashes, content) => {
@@ -153,13 +205,6 @@ const safeTimestamp = new Date(decodedTimestamp).toLocaleString();
   const boldRegex = /\*\*(.+?)\*\*|__(.+?)__/g;
   result = result.replace(boldRegex, '<strong>$1$2</strong>');
 
-  // 斜体 (*text* 或 _text_)
-  const italicRegex = /\*(.+?)\*|_(.+?)_/g;
-  result = result.replace(italicRegex, '<em>$1$2</em>');
-
-  // Parse line breaks and ---
-  result = result.replace(/(\n|\s{2})/g, '<br>');
-  result = result.replace(/---/g, '<hr>'); // Parse ---
   // Step 3.1: Parse code blocks (```code```)
   const codeBlockRegex = /```([\s\S]*?)```/g;
   result = result.replace(codeBlockRegex, (match, code) => {
@@ -184,8 +229,8 @@ const safeTimestamp = new Date(decodedTimestamp).toLocaleString();
   // 遍历字符串，只对标签之外的部分进行转义
   let match;
   while ((match = tagRegex.exec(result)) !== null) {
-    // Do not escape the text between the last tag and the current tag
-    finalHtml += result.substring(lastIndex, match.index);
+    // 转义最后一个标签和当前标签之间的文本
+    finalHtml += escapeHtml(result.substring(lastIndex, match.index));
     // 添加标签本身（不转义）
     finalHtml += match[0];
     lastIndex = tagRegex.lastIndex;
@@ -761,21 +806,25 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    // 图片上传功能
+    // 文件上传功能
     const uploadButton = document.getElementById('upload-image-button');
     if (uploadButton) {
+        // 更新按钮文本以反映支持多种文件类型
+        uploadButton.innerHTML = '<i class="fas fa-paperclip"></i>';
+        uploadButton.title = 'Upload file';
+        
         uploadButton.addEventListener('click', () => {
             // 创建隐藏的文件输入元素
             const fileInput = document.createElement('input');
             fileInput.type = 'file';
-            fileInput.accept = '.jpg,.jpeg,.png,.gif,.svg';
+            // 扩大文件类型支持范围
             fileInput.style.display = 'none';
             
             // 监听文件选择事件
             fileInput.addEventListener('change', (e) => {
                 const file = e.target.files[0];
                 if (file) {
-                    uploadImageFile(file);
+                    uploadFile(file);
                 }
             });
             
@@ -788,13 +837,13 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // 上传图片到服务器
-    function uploadImageFile(file) {
+    // 上传文件到服务器
+    function uploadFile(file) {
         const formData = new FormData();
-        formData.append('image', file);
+        formData.append('file', file);
         
         const xhr = new XMLHttpRequest();
-        xhr.open('POST', '/chat/upload-image');
+        xhr.open('POST', '/upload-file'); // 使用通用文件上传接口
         xhr.setRequestHeader('Accept', 'application/json');
         
         // 上传进度处理
@@ -810,25 +859,36 @@ document.addEventListener('DOMContentLoaded', function() {
             if (xhr.status >= 200 && xhr.status < 300) {
                 try {
                     const response = JSON.parse(xhr.responseText);
-                    if (response.imageUrl) {
-                        // 将图片URL插入到消息输入框
+                    if (response.fileUrl) {
                         const messageInput = document.getElementById('message-input');
-                        messageInput.value += `![${file.name}](${response.imageUrl})`;
-                        updateStatus('image uploaded');
+                        
+                        // 根据文件类型生成不同的消息内容
+                        const fileExtension = file.name.split('.').pop().toLowerCase();
+                        const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'svg'];
+                        
+                        if (imageExtensions.includes(fileExtension)) {
+                            // 图片文件仍使用Markdown图片格式
+                            messageInput.value += `![${file.name}](${response.fileUrl})`;
+                        } else {
+                            // 其他文件使用链接格式
+                            messageInput.value += `[${file.name}](${response.fileUrl})`;
+                        }
+                        
+                        updateStatus('File uploaded');
                     } else {
-                        updateStatus('upload failed: no image url', true);
+                        updateStatus('Upload failed: no file url', true);
                     }
                 } catch (error) {
-                    updateStatus('upload failed: server response format error', true);
+                    updateStatus('Upload failed: server response format error', true);
                 }
             } else {
-                updateStatus(`upload failed: ${xhr.statusText}`, true);
+                updateStatus(`Upload failed: ${xhr.statusText}`, true);
             }
         });
         
         // 错误处理
         xhr.addEventListener('error', () => {
-            updateStatus('network error, upload failed', true);
+            updateStatus('Network error, upload failed', true);
         });
         
         xhr.send(formData);
