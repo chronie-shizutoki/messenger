@@ -70,10 +70,10 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: './public/new-feather-webpack-template.html',
       filename: 'new-feather.html',
-      chunks: [],
+      chunks: ['i18n'],
       minify: {
         collapseWhitespace: true,
-        removeComments: true
+        removeComments: false
       }
     }),
     // 复制其他静态文件

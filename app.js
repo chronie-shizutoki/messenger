@@ -145,12 +145,16 @@ const commonUpload = multer({
   }
 });
 
+// 确定静态文件目录，默认为public，可通过环境变量STATIC_DIR覆盖
+const STATIC_DIR = process.env.STATIC_DIR || 'public';
+const STATIC_PATH = path.join(__dirname, STATIC_DIR);
+
 // 提供静态文件访问
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(STATIC_PATH));
 
 // 根路由返回HTML页面
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(STATIC_PATH, 'index.html'));
 });
 
 // 获取聊天图片
@@ -171,7 +175,7 @@ app.post('/chat/upload-image', chatUpload.single('image'), async (req, res) => {
 
   try {
     // 创建聊天缩略图目录
-    const chatThumbDir = path.join(__dirname, 'public', 'chat-thumbnails');
+    const chatThumbDir = path.join(__dirname, 'public', 'chat-thumbnails'); // 缩略图目录始终在public下，不随STATIC_DIR改变
     if (!fs.existsSync(chatThumbDir)) {
       fs.mkdirSync(chatThumbDir, { recursive: true });
     }
