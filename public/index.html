@@ -30,8 +30,9 @@
         left: 0;
         width: 100%;
         height: 30px;
-        background-color: rgba(99, 102, 241, 0.8);
-        color: white;
+        /* Use hexadecimal color with alpha channel for better readability and maintainability */
+        background-color: #c8c8d5cc;
+        color: #000000;
         display: flex;
         align-items: center;
         overflow: hidden;
@@ -120,8 +121,7 @@
     // 滚动动画控制
     let scrollAnimationId = null;
     let scrollPosition = 100; // 初始位置(100%右侧)
-    let baseScrollSpeed = 0.1; // 基础滚动速度，降低默认速度
-    const minScrollDuration = 10000; // 最小滚动时间(毫秒)
+    let baseScrollSpeed = 0.1; // 基础滚动速度
     
     function startScrollAnimation(element) {
         // 停止之前的动画
@@ -137,9 +137,6 @@
         const textWidth = element.offsetWidth;
         const containerWidth = element.parentElement.offsetWidth;
         
-        // 计算动画持续时间因子(基于文本长度和容器宽度)
-        const durationFactor = Math.max(1, textWidth / containerWidth);
-        
         // 根据屏幕宽度调整滚动速度
         const screenWidth = window.innerWidth;
         let adjustedSpeed = baseScrollSpeed;
@@ -150,27 +147,13 @@
             adjustedSpeed = baseScrollSpeed * 0.85;
         }
         
-        // 记录开始时间
-        const startTime = performance.now();
+        // 计算滚动一个完整周期的距离
+        const fullCycleDistance = 100 + (textWidth * 100 / containerWidth);
         
         // 使用requestAnimationFrame实现动画
-        function animate(timestamp) {
-            // 计算已过去的时间
-            const elapsedTime = timestamp - startTime;
-            
-            // 计算应该移动的距离
-            let distanceToMove = adjustedSpeed * durationFactor;
-            
-            // 如果时间太短，减缓速度以确保最小持续时间
-            if (elapsedTime < minScrollDuration && scrollPosition > -textWidth * 100 / containerWidth) {
-                const remainingTime = minScrollDuration - elapsedTime;
-                const remainingDistance = scrollPosition + textWidth * 100 / containerWidth;
-                if (remainingTime > 0 && remainingDistance > 0) {
-                    distanceToMove = Math.min(distanceToMove, remainingDistance / (remainingTime / 16));
-                }
-            }
-            
-            scrollPosition -= distanceToMove;
+        function animate() {
+            // 移动固定距离
+            scrollPosition -= adjustedSpeed;
             
             // 当文本完全滚动出左侧时，重置到右侧
             if (scrollPosition < -textWidth * 100 / containerWidth) {
@@ -202,9 +185,9 @@
 
     // 从文件加载滚动文字(添加了性能优化)
     function loadScrollTextFromFile() {
-        // 使用缓存优先的策略
+        // 禁用缓存，确保每次刷新都获取最新内容
         fetch('scroll-text.txt', {
-            cache: 'force-cache'
+            cache: 'no-cache'
         })
             .then(response => {
                 if (!response.ok) {
