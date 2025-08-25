@@ -41,16 +41,9 @@
     .scroll-text {
         white-space: nowrap;
         padding: 0 20px;
-        animation: scrollText 25s linear infinite;
-    }
-
-    @keyframes scrollText {
-        0% {
-            transform: translateX(100%);
-        }
-        100% {
-            transform: translateX(-100%);
-        }
+        will-change: transform; /* 提示浏览器即将变换，优化性能 */
+        backface-visibility: hidden; /* 防止闪烁 */
+        transform: translateZ(0); /* 启用GPU渲染 */
     }
 
     .scroll-text-container.hidden {
@@ -94,7 +87,7 @@
     // Update every second
     setInterval(updateTimeDate, 1000);
 
-    // 滚动文字控制函数
+    // 优化的滚动文字控制函数
     function showScrollText(message) {
         const container = document.getElementById('scroll-text-container');
         const content = document.getElementById('scroll-text-content');
@@ -113,11 +106,100 @@
         }
         
         container.classList.remove('hidden');
+        
+        // 启动滚动动画
+        startScrollAnimation(content);
     }
 
-    // 从文件加载滚动文字
+    // 滚动动画控制
+    let scrollAnimationId = null;
+    let scrollPosition = 100; // 初始位置(100%右侧)
+    let baseScrollSpeed = 0.1; // 基础滚动速度，降低默认速度
+    const minScrollDuration = 10000; // 最小滚动时间(毫秒)
+    
+    function startScrollAnimation(element) {
+        // 停止之前的动画
+        if (scrollAnimationId) {
+            cancelAnimationFrame(scrollAnimationId);
+        }
+        
+        // 重置位置
+        scrollPosition = 100;
+        element.style.transform = `translateX(${scrollPosition}%)`;
+        
+        // 获取文本宽度和容器宽度
+        const textWidth = element.offsetWidth;
+        const containerWidth = element.parentElement.offsetWidth;
+        
+        // 计算动画持续时间因子(基于文本长度和容器宽度)
+        const durationFactor = Math.max(1, textWidth / containerWidth);
+        
+        // 根据屏幕宽度调整滚动速度
+        const screenWidth = window.innerWidth;
+        let adjustedSpeed = baseScrollSpeed;
+        
+        if (screenWidth < 768) { // 小屏幕
+            adjustedSpeed = baseScrollSpeed * 0.7;
+        } else if (screenWidth < 1024) { // 中等屏幕
+            adjustedSpeed = baseScrollSpeed * 0.85;
+        }
+        
+        // 记录开始时间
+        const startTime = performance.now();
+        
+        // 使用requestAnimationFrame实现动画
+        function animate(timestamp) {
+            // 计算已过去的时间
+            const elapsedTime = timestamp - startTime;
+            
+            // 计算应该移动的距离
+            let distanceToMove = adjustedSpeed * durationFactor;
+            
+            // 如果时间太短，减缓速度以确保最小持续时间
+            if (elapsedTime < minScrollDuration && scrollPosition > -textWidth * 100 / containerWidth) {
+                const remainingTime = minScrollDuration - elapsedTime;
+                const remainingDistance = scrollPosition + textWidth * 100 / containerWidth;
+                if (remainingTime > 0 && remainingDistance > 0) {
+                    distanceToMove = Math.min(distanceToMove, remainingDistance / (remainingTime / 16));
+                }
+            }
+            
+            scrollPosition -= distanceToMove;
+            
+            // 当文本完全滚动出左侧时，重置到右侧
+            if (scrollPosition < -textWidth * 100 / containerWidth) {
+                scrollPosition = 100;
+            }
+            
+            element.style.transform = `translateX(${scrollPosition}%)`;
+            scrollAnimationId = requestAnimationFrame(animate);
+        }
+        
+        // 启动动画
+        requestAnimationFrame(animate);
+    }
+
+    // 停止滚动动画
+    function stopScrollAnimation() {
+        if (scrollAnimationId) {
+            cancelAnimationFrame(scrollAnimationId);
+            scrollAnimationId = null;
+        }
+    }
+
+    // 当隐藏滚动文字时，停止动画
+    function hideScrollText() {
+        const container = document.getElementById('scroll-text-container');
+        container.classList.add('hidden');
+        stopScrollAnimation();
+    }
+
+    // 从文件加载滚动文字(添加了性能优化)
     function loadScrollTextFromFile() {
-        fetch('scroll-text.txt')
+        // 使用缓存优先的策略
+        fetch('scroll-text.txt', {
+            cache: 'force-cache'
+        })
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -125,11 +207,17 @@
                 return response.text();
             })
             .then(text => {
+                // 对超长文本进行截断或处理
+                const maxLength = 500; // 设置最大长度
+                if (text.length > maxLength) {
+                    text = text.substring(0, maxLength) + '...';
+                }
                 showScrollText(text.trim());
             })
             .catch(error => {
                 console.error('Error loading scroll text from file:', error);
-                showScrollText('加载自定义滚动文字失败，请检查文件是否存在。');
+                // 降级处理：使用简短的错误消息
+                showScrollText('加载滚动文字失败');
             });
     }
 
