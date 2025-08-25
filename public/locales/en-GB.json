@@ -17,7 +17,7 @@
   "file.download_title": "Download file: {fileName}",
   "notification.settings_title": "Notification Settings",
   "sticker.modal_title": "Sticker Selection",
-  "version.info": "v5.2.0 | 24 Aug 2025",
+  "version.info": "v6.0.0 | 25 Aug 2025",
   "version.update_title": "Version Update",
   "version.update_content": "This update comprehensively optimizes system performance and interface interaction, further enhancing your user experience. We've refined multiple operation flows to make responses faster and feedback more natural. We hope every click you make will feel smooth and comfortable.\nAt the same time, the new version expands support for uploading and previewing various file formats. Whether it's documents, images, or compressed packages, you can now view and manage them online more conveniently, saying goodbye to format compatibility issues once and for all.\nAs always, we pay attention to every detail to provide you with a more user-friendly and reliable tool. Thank you for your continuous support. We'll keep working hard to bring you more practical features!",
   "version.got_it": "Got It!"

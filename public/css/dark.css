@@ -1,0 +1,102 @@
+@media (prefers-color-scheme: dark) {
+:root {
+            --primary: #818cf8;
+            --primary-dark: #6366f1;
+            --secondary: #f472b6;
+            --accent: #22d3ee;
+            --background: #0f172a;
+            --surface: #1e293b;
+            --surface-light: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --border: #475569;
+            --border-light: #64748b;
+        }
+
+        /* 优化深色模式下的对比度和可读性 */
+        body {
+            color: var(--text-primary);
+            background-color: var(--background);
+            background: linear-gradient(135deg, var(--background) 0%, var(--surface) 100%) !important;
+        }
+        html {
+            color-scheme: dark;
+        }
+
+        /* 优化滚动条样式 */
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: rgba(200, 200, 200, 0.4);
+        }
+
+        /* 优化模态框样式 */
+        .modal-content,
+        .sticker-modal-content {
+            background-color: rgba(30, 41, 59, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .language-button{
+            background-color: rgba(255, 255, 255, 0.05) !important;
+            border-color: var(--border);
+            color: var(--text-primary) !important;
+            &:hover {
+                background-color: rgba(255, 255, 255, 0.1);
+            }
+        }
+
+        .language-list {
+                    li {
+                        color: #ffffff !important;
+                    }
+                }
+
+        /* 优化输入框样式 */
+        .search-input,
+        .push-url-input {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-color: var(--border);
+            color: var(--text-primary);
+        }
+
+        .search-input:focus {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-color: var(--primary);
+        }
+
+        /* 优化消息样式 */
+        .message {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.7) 100%);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .file-item {
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.8) 100%);
+            border-color: var(--border);
+        }
+
+        /* 优化引用样式 */
+        .quote-content,
+        .quote-message {
+            background: linear-gradient(135deg, rgba(30, 41, 59, 0.5), rgba(15, 23, 42, 0.5));
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        /* 优化高亮样式 */
+        .highlight {
+            background-color: #3b82f6;
+            color: white;
+        }
+
+        /* 优化按钮样式 */
+        .chat-action-btn {
+            color: var(--text-secondary);
+        }
+
+        .chat-action-btn:hover {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+        }
+    }
