@@ -1043,61 +1043,79 @@ function renderStickers(stickers) {
         });
     }
     
-    // 简单的图片预览函数 - 替代magnific-popup
+    // 使用Viewer.js实现图片预览功能
+    let imageViewer = null;
+    
     function previewImage(imageUrl) {
-        // 创建预览模态框
-        const previewModal = document.createElement('div');
-        previewModal.className = 'image-preview-modal';
-        previewModal.style.cssText = `
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.9);
-            z-index: 9999;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            cursor: pointer;
-        `;
-        
-        // 创建图片元素
-        const img = document.createElement('img');
-        img.src = imageUrl;
-        img.style.maxWidth = '90%';
-        img.style.maxHeight = '90%';
-        img.style.objectFit = 'contain';
-        
-        // 添加关闭按钮
-        const closeBtn = document.createElement('button');
-        closeBtn.innerHTML = '<i class="fas fa-times"></i>';
-        closeBtn.style.cssText = `
-            position: absolute;
-            top: 20px;
-            right: 30px;
-            color: white;
-            background: transparent;
-            border: none;
-            font-size: 30px;
-            cursor: pointer;
-            z-index: 10;
-        `;
-        
-        // 添加事件监听器
-        closeBtn.addEventListener('click', function(e) {
-            e.stopPropagation();
-            document.body.removeChild(previewModal);
-        });
-        
-        previewModal.addEventListener('click', function() {
-            document.body.removeChild(previewModal);
-        });
-        
-        // 添加到DOM
-        previewModal.appendChild(img);
-        previewModal.appendChild(closeBtn);
-        document.body.appendChild(previewModal);
+        try {
+            // 创建临时容器用于Viewer.js
+            let tempContainer = document.getElementById('viewer-temp-container');
+            
+            if (!tempContainer) {
+                tempContainer = document.createElement('div');
+                tempContainer.id = 'viewer-temp-container';
+                tempContainer.style.display = 'none';
+                document.body.appendChild(tempContainer);
+            } else {
+                // 清空容器
+                tempContainer.innerHTML = '';
+            }
+            
+            // 创建图片元素
+            const img = document.createElement('img');
+            img.src = imageUrl;
+            img.alt = 'Preview Image';
+            tempContainer.appendChild(img);
+            
+            // 销毁已存在的viewer实例
+            if (imageViewer) {
+                imageViewer.destroy();
+                imageViewer = null;
+            }
+            
+            // 创建新的viewer实例
+            imageViewer = new Viewer(tempContainer, {
+                url: 'src',
+                title: false,
+                navbar: false,
+                toolbar: {
+                    zoomIn: 1,
+                    zoomOut: 1,
+                    oneToOne: 1,
+                    reset: 1,
+                    prev: 0,
+                    play: 0,
+                    next: 0,
+                    rotateLeft: 1,
+                    rotateRight: 1,
+                    flipHorizontal: 1,
+                    flipVertical: 1
+                },
+                movable: true,
+                zoomable: true,
+                rotatable: true,
+                scalable: true,
+                transition: true,
+                fullscreen: true,
+                keyboard: true,
+                show: function() {
+                    // 查看器显示时的回调
+                },
+                hide: function() {
+                    // 查看器隐藏时的回调
+                    if (imageViewer) {
+                        imageViewer.destroy();
+                        imageViewer = null;
+                    }
+                }
+            });
+            
+            // 打开查看器
+            imageViewer.show();
+        } catch (error) {
+            console.error('Failed to open image viewer:', error);
+            alert('图片查看失败，请重试。');
+        }
     }
 
     // 打开图片编辑器
