@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="version.update_title"></title>
+    <link rel="stylesheet" href="lib/font-awesome/all.min.css">
+    <link rel="stylesheet" href="css/index.css">
+    <div id="version-modal" class="modal version-modal">
+        <div class="modal-content version-modal-content">
+            <div class="modal-header version-modal-header">
+                <h3 class="modal-title version-modal-title" data-i18n="version.update_title"></h3>
+                <button id="close-version-modal" class="modal-close-btn version-modal-close-btn">×</button>
+            </div>
+            <div class="version-content">
+                <p data-i18n="version.update_content" style="white-space: pre-line;"></p>
+            </div>
+            <div class="version-footer">
+                <button id="got-it-version" class="version-got-it-btn" data-i18n="version.got_it"></button>
+            </div>
+            <!-- Decorative elements -->
+            <div class="decorative-blob blob-1"></div>
+              <div class="decorative-blob blob-2"></div>
+              <style>
+                @font-face {
+                    font-family: 'LXGWWenKaiGB-Regular';
+                    src: url('LXGWWenKaiGB-Regular.woff2');
+                    font-display: swap;
+                }
+                * {
+                    font-family: 'LXGWWenKaiGB-Regular';
+                }
+
+                .language-button {
+                    color: rgba(255, 255, 255, 0.8) !important;
+                }
+
+                .language-list {
+                    li {
+                        color: #ffffff !important;
+                    }
+                }
+
+                .decorative-blob {
+                    position: absolute;
+                    border-radius: 50%;
+                    filter: blur(50px);
+                    opacity: 0.3;
+                    z-index: -1;
+                    animation: float 8s infinite ease-in-out;
+                }
+
+                .blob-1 {
+                    top: -50px;
+                    right: -50px;
+                    width: 200px;
+                    height: 200px;
+                    background: rgba(138, 43, 226, 0.5);
+                    animation-delay: 0s;
+                }
+
+                .blob-2 {
+                    bottom: -80px;
+                    left: -50px;
+                    width: 250px;
+                    height: 250px;
+                    background: rgba(70, 130, 180, 0.5);
+                    animation-delay: -3s;
+                }
+
+                @keyframes float {
+                    0% {
+                        transform: translate(0px, 0px) scale(1);
+                    }
+                    50% {
+                        transform: translate(20px, 20px) scale(1.05);
+                    }
+                    100% {
+                        transform: translate(0px, 0px) scale(1);
+                    }
+                }
+            </style>
+        </div>
+    </div>
+
+    <!-- Auto-showing modal, no trigger button needed -->
+
+    <!-- CSS for Version Modal -->
+    <style>
+        /* Base Modal Styles */
+        .version-modal {
+            display: block;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+            background-color: rgba(0, 0, 0, 0.7);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            overflow: auto;
+        }
+
+        /* Modal Content Container */
+        .version-modal-content {
+            background-color: #f8f9fa;
+            margin: 15% auto;
+            padding: 2rem;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(145deg, #ffffff, #e0e0e0);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        /* Modal Header */
+        .version-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            position: relative;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        /* Modal Title */
+        .version-modal-title {
+            margin: 0;
+            font-size: 1.5rem;
+            color: #2c3e50;
+            font-weight: 600;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Close Button */
+        .version-modal-close-btn {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #7f8c8d;
+            transition: all 0.2s ease;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Modal Content */
+        .version-content {
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .version-content p {
+            margin: 0;
+            color: #34495e;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        /* Modal Footer */
+        .version-footer {
+            display: flex;
+            justify-content: flex-end;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Got It Button */
+        .version-got-it-btn {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            font-size: 1rem;
+            font-weight: 500;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <script>
+        // 等待DOM加载完成
+        document.addEventListener('DOMContentLoaded', function() {
+            // 如果i18n已经初始化，则立即应用翻译
+            if (window.i18n) {
+                window.i18n.applyTranslations();
+            }
+            const versionModal = document.getElementById('version-modal');
+            const closeVersionModalBtn = document.getElementById('close-version-modal');
+            const gotItBtn = document.getElementById('got-it-version');
+
+            // Add subtle animation to modal on load
+            setTimeout(() => {
+                versionModal.style.opacity = '1';
+            }, 100);
+
+            function closeModal() {
+                versionModal.style.opacity = '0';
+                setTimeout(() => {
+                    versionModal.style.display = 'none';
+                    setTimeout(() => {
+                        window.location.href = 'http://192.168.0.197:3000'; // Redirect to 192.168.0.197:3000
+                    }, 150);
+                }, 300);
+            }
+
+            closeVersionModalBtn.addEventListener('click', closeModal);
+            gotItBtn.addEventListener('click', closeModal);
+
+            window.addEventListener('click', function(event) {
+                if (event.target === versionModal) {
+                    closeModal();
+                }
+            });
+
+            // Add hover effect to buttons
+            const buttons = [closeVersionModalBtn, gotItBtn];
+            buttons.forEach(button => {
+                button.addEventListener('mouseenter', function() {
+                    this.style.transform = 'scale(1.05)';
+                    this.style.transition = 'transform 0.2s ease';
+                });
+                button.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1)';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

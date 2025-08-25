@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="app.title"></title>
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="stylesheet" href="css/dark.css">
+    <link rel="stylesheet" href="lib/tui-image-editor/tui-image-editor.min.css">
+    <link rel="stylesheet" href="lib/font-awesome/all.min.css">
+    <link rel="stylesheet" href="lib/viewerjs/viewer.min.css">
+    <style>
+        @font-face {
+            font-family: 'LXGWWenKaiGB-Regular';
+            src: url('LXGWWenKaiGB-Regular.woff2');
+            font-display: swap;
+        }
+        * {
+        font-family: 'LXGWWenKaiGB-Regular';
+    }
+    body {
+        background: linear-gradient(to bottom right, #f5f7fa, #c3cfe2);
+        background-size: cover;
+        background-attachment: fixed;
+    }
+
+    /* 滚动文字样式 */
+    .scroll-text-container {
+        position: fixed;
+        top: 50px;
+        left: 0;
+        width: 100%;
+        height: 30px;
+        /* Use hexadecimal color with alpha channel for better readability and maintainability */
+        background-color: #c8c8d5cc;
+        color: #000000;
+        display: flex;
+        align-items: center;
+        overflow: hidden;
+        z-index: 999;
+        transition: opacity 0.3s ease;
+        pointer-events: none; /* 不可点击 */
+    }
+
+    .scroll-text {
+        white-space: nowrap;
+        padding: 0 20px;
+        will-change: transform; /* 提示浏览器即将变换，优化性能 */
+        backface-visibility: hidden; /* 防止闪烁 */
+        transform: translateZ(0); /* 启用GPU渲染 */
+        user-select: none; /* 不可选择复制 */
+        -webkit-user-select: none; /* Safari */
+        -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* IE/Edge */
+    }
+
+    .scroll-text-container.hidden {
+        opacity: 0;
+        pointer-events: none;
+    }
+  </style>
+  <div>
+<div id="current-time-date" style="position: fixed; top: 15px; left: 50%; transform: translateX(-50%);">
+    <span id="date"></span>
+    <span id="time"></span>
+</div>
+
+<!-- 滚动文字容器 -->
+<div id="scroll-text-container" class="scroll-text-container hidden">
+    <div class="scroll-text" id="scroll-text-content" data-i18n="scroll_text.default"></div>
+</div>
+<script>
+    // Function to update time and date
+    function updateTimeDate() {
+        // Get the current time and date from browser
+        const now = new Date();
+        const timeElement = document.getElementById('time');
+        const dateElement = document.getElementById('date');
+
+        // Format time in HH:MM:SS
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        timeElement.textContent = `${hours}:${minutes}:${seconds}`;
+
+        // Format date in YYYY-MM-DD
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        dateElement.textContent = `${year}-${month}-${day}`;
+    }
+
+    // Initial call to update time and date
+    updateTimeDate();
+    // Update every second
+    setInterval(updateTimeDate, 1000);
+
+    // 优化的滚动文字控制函数
+    function showScrollText(message) {
+        const container = document.getElementById('scroll-text-container');
+        const content = document.getElementById('scroll-text-content');
+
+        // 设置滚动文字内容
+        content.textContent = message;
+
+        // 显示容器
+        container.classList.remove('hidden');
+
+        // 滚动动画
+        const scrollWidth = content.offsetWidth;
+        const containerWidth = container.offsetWidth;
+        let position = containerWidth;
+        
+        // 清除之前的动画
+        if (container.scrollAnimation) {
+            cancelAnimationFrame(container.scrollAnimation);
+        }
+
+        // 定义动画函数
+        function animate() {
+            position -= 2; // 滚动速度
+            if (position < -scrollWidth) {
+                position = containerWidth; // 循环滚动
+            }
+            content.style.transform = `translateX(${position}px)`;
+            container.scrollAnimation = requestAnimationFrame(animate);
+        }
+
+        // 启动动画
+        animate();
+
+        // 30秒后自动隐藏
+        setTimeout(() => {
+            container.classList.add('hidden');
+            if (container.scrollAnimation) {
+                cancelAnimationFrame(container.scrollAnimation);
+            }
+        }, 30000);
+    }
+
+    // 监听键盘事件，增加彩蛋功能
+    document.addEventListener('keydown', function(event) {
+        // 定义特定的按键组合
+        const keyCombo = event.ctrlKey && event.shiftKey && event.key === 'U';
+        
+        if (keyCombo) {
+            event.preventDefault();
+            // 显示一个有趣的消息
+            showScrollText('你发现了一个隐藏的功能！');
+        }
+    });
+</script>
+</head>
+<body>
+    <div id="status-indicator"></div>
+    <div id="login-container" class="login-container">
+        <div class="login-box">
+            <h2 data-i18n="login.title"></h2>
+            <div class="login-form">
+                <div class="form-group">
+                    <label for="username" data-i18n="login.username"></label>
+                    <input type="text" id="username" data-i18n-placeholder="login.username_placeholder">
+                </div>
+                <div class="form-group">
+                    <label for="password" data-i18n="login.password"></label>
+                    <input type="password" id="password" data-i18n-placeholder="login.password_placeholder">
+                </div>
+                <button id="login-button" data-i18n="login.login_button"></button>
+                <div class="form-options">
+                    <label class="remember-me">
+                        <input type="checkbox" id="remember-me">
+                        <span data-i18n="login.remember_me"></span>
+                    </label>
+                    <button id="register-button" data-i18n="login.register_button"></button>
+                </div>
+                <div class="form-options">
+                    <button id="language-button" class="language-button">
+                        <i class="fas fa-globe"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主聊天界面 -->
+    <div id="main-container" class="main-container hidden">
+        <div class="header">
+            <div class="header-left">
+                <h1 data-i18n="chat.title"></h1>
+            </div>
+            <div class="header-right">
+                <button id="language-button-header" class="language-button">
+                    <i class="fas fa-globe"></i>
+                </button>
+                <button id="logout-button" class="logout-button" data-i18n="chat.logout"></button>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="current-user" id="current-user-info">
+                    <div class="user-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="user-details">
+                        <div class="user-name" id="current-username"></div>
+                        <div class="user-status"><span class="status-dot"></span> <span data-i18n="chat.online"></span></div>
+                    </div>
+                </div>
+            </div>
+            <div class="search-container">
+                <input type="text" id="search-input" data-i18n-placeholder="chat.search_users">
+                <button id="search-button" class="search-button">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+            <div class="user-list" id="user-list">
+                <!-- 用户列表将通过JavaScript动态生成 -->
+            </div>
+        </div>
+
+        <div class="chat-area">
+            <div class="chat-header" id="current-chat-header">
+                <div class="chat-partner-info">
+                    <div class="partner-avatar">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <div class="partner-details">
+                        <div class="partner-name" id="current-partner-name"></div>
+                        <div class="partner-status"><span class="status-dot"></span> <span data-i18n="chat.online"></span></div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="sticker-modal" class="modal sticker-modal">
+                <div class="modal-content sticker-modal-content">
+                  <div class="modal-header">
+                    <h3 class="modal-title" data-i18n="sticker.modal_title"><i class="fas fa-box-open"></i></h3>
+                    <button id="close-sticker-modal" class="modal-close-btn"><i class="fas fa-times"></i></button>
+                  </div>
+                  <div id="sticker-categories" style="margin-bottom: 15px;"></div>
+                  <div id="sticker-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 10px;"></div>
+                </div>
+              </div>
+              
+              <!-- TUI Image Editor 容器 -->
+              <div id="image-editor-modal" class="modal" style="display: none; z-index: 1000;">
+                <div class="modal-content" style="width: 90%; height: 90%; max-width: 1400px; max-height: 90vh; margin: 0 auto;">
+                  <div class="modal-header">
+                    <h3 id="image-editor-title" data-i18n="image_editor.edit_image"></h3>
+                    <button id="close-image-editor" class="modal-close-btn"><i class="fas fa-times"></i></button>
+                  </div>
+                  <div id="tui-image-editor-container" style="width: 100%; height: calc(100% - 60px);"></div>
+                </div>
+              </div>
+
+            <div id="status-indicator"></div>
+                  <div id="chat-container" class="chat-messages-container">
+
+                  </div>
+                  <div id="input-area">
+                      <div id="message-preview" class="message-preview"></div>
+                      <div class="input-controls">
+                          <input type="text" id="message-input" data-i18n-placeholder="chat.placeholder">
+                          <button id="sticker-button" class="chat-action-btn sticker-btn"><i class="far fa-smile"></i></button>
+                          <button id="upload-image-button" class="chat-action-btn upload-image-btn"><i class="fas fa-image"></i></button>
+                          <button id="send-button" data-i18n="chat.send"></button>
+                      </div>
+                  </div>
+              </div>
+
+              <div class="version-info">
+                  <a href="new-feather.html" target="_blank" data-i18n="version.info"></a>
+              </div>
+<script>
+    // 等待i18n初始化完成后应用滚动文字翻译
+    document.addEventListener('i18nInitialized', function() {
+        if (window.i18n) {
+            window.i18n.applyTranslations();
+        }
+    });
+
+    // 如果i18n已经初始化，则立即应用翻译
+    if (window.i18n) {
+        window.i18n.applyTranslations();
+    }
+</script>
+</body>
+</html>
