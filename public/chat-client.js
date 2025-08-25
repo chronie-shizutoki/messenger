@@ -1279,12 +1279,12 @@ function renderStickers(stickers) {
             // 创建自定义模态框让用户选择操作
             const confirmModal = `
             <div id="image-action-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1001; display: flex; justify-content: center; align-items: center;">
-                <div style="background: #333; padding: 20px; border-radius: 8px; text-align: center;">
-                    <h3 style="color: white; margin-bottom: 20px;">${chooseActionText}</h3>
-                    <div style="display: flex; gap: 10px; justify-content: center;">
-                        <button id="view-image-btn" style="background: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;">${viewText}</button>
-                        <button id="edit-image-btn" style="background: #f39c12; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;">${editText}</button>
-                        <button id="cancel-image-btn" style="background: #e74c3c; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;">${cancelText}</button>
+                <div class="glass-modal" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 16px; padding: 30px; border: 1px solid rgba(255, 255, 255, 0.2); box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1); text-align: center; transition: all 0.3s ease;">
+                    <h3 style="color: white; margin-bottom: 20px; font-size: 18px;">${chooseActionText}</h3>
+                    <div style="display: flex; gap: 15px; justify-content: center;">
+                        <button id="view-image-btn" style="background: linear-gradient(145deg, #3498db, #2980b9); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: 500; transition: all 0.3s ease;">${viewText}</button>
+                        <button id="edit-image-btn" style="background: linear-gradient(145deg, #f39c12, #e67e22); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: 500; transition: all 0.3s ease;">${editText}</button>
+                        <button id="cancel-image-btn" style="background: linear-gradient(145deg, #e74c3c, #c0392b); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-weight: 500; transition: all 0.3s ease;">${cancelText}</button>
                     </div>
                 </div>
             </div>`;
@@ -1292,6 +1292,20 @@ function renderStickers(stickers) {
             document.body.insertAdjacentHTML('beforeend', confirmModal);
             
             const actionModal = document.getElementById('image-action-modal');
+            const modalContent = actionModal.querySelector('.glass-modal');
+            
+            // 添加按钮悬停效果
+            const buttons = actionModal.querySelectorAll('button');
+            buttons.forEach(button => {
+                button.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-2px)';
+                    this.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.2)';
+                });
+                button.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                    this.style.boxShadow = 'none';
+                });
+            });
             
             // 查看图片
             document.getElementById('view-image-btn').addEventListener('click', function() {
@@ -1309,6 +1323,13 @@ function renderStickers(stickers) {
             // 取消
             document.getElementById('cancel-image-btn').addEventListener('click', function() {
                 actionModal.remove();
+            });
+            
+            // 点击背景关闭弹窗
+            actionModal.addEventListener('click', function(event) {
+                if (event.target === actionModal) {
+                    actionModal.remove();
+                }
             });
         });
     });
