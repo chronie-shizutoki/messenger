@@ -36,6 +36,7 @@
         overflow: hidden;
         z-index: 999;
         transition: opacity 0.3s ease;
+        pointer-events: none; /* 不可点击 */
     }
 
     .scroll-text {
@@ -44,6 +45,10 @@
         will-change: transform; /* 提示浏览器即将变换，优化性能 */
         backface-visibility: hidden; /* 防止闪烁 */
         transform: translateZ(0); /* 启用GPU渲染 */
+        user-select: none; /* 不可选择复制 */
+        -webkit-user-select: none; /* Safari */
+        -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* IE/Edge */
     }
 
     .scroll-text-container.hidden {
