@@ -6,7 +6,7 @@
     <title data-i18n="app.title"></title>
     <link rel="stylesheet" href="css/index.css">
     <link rel="stylesheet" href="css/dark.css">
-    <link rel="stylesheet" href="lib/lightbox2/css/lightbox.min.css">
+    <link rel="stylesheet" href="lib/tui-image-editor/tui-image-editor.min.css">
     <link rel="stylesheet" href="lib/font-awesome/all.min.css">
     <style>
         @font-face {
@@ -258,6 +258,17 @@
       <div id="sticker-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(60px, 1fr)); gap: 10px;"></div>
     </div>
   </div>
+  
+  <!-- TUI Image Editor 容器 -->
+  <div id="image-editor-modal" class="modal" style="display: none; z-index: 1000;">
+    <div class="modal-content" style="width: 90%; height: 90%; max-width: 1400px; max-height: 90vh; margin: 0 auto;">
+      <div class="modal-header">
+        <h3 id="image-editor-title" data-i18n="image_editor.edit_image"></h3>
+        <button id="close-image-editor" class="modal-close-btn"><i class="fas fa-times"></i></button>
+      </div>
+      <div id="tui-image-editor-container" style="width: 100%; height: calc(100% - 60px);"></div>
+    </div>
+  </div>
 
   <div id="status-indicator"></div>
         <div id="chat-container" class="chat-messages-container">
@@ -288,10 +299,15 @@
         window.i18n.applyTranslations();
     }
 </script>
-    <script src="lib/jquery/jquery.min.js" defer></script>
-    <script src="lib/lightbox2/js/lightbox.min.js" defer></script>
+    <script src="lib/jquery/jquery.min.js"></script>
+    <!-- TUI Image Editor 依赖 -->
+    <script src="lib/fabric/fabric.min.js"></script>
+    <script src="lib/tui-color-picker/tui-color-picker.min.js"></script>
+    <!-- 通过CDN引入tui-code-snippet -->
+    <script src="https://cdn.jsdelivr.net/npm/tui-code-snippet@latest/dist/tui-code-snippet.min.js"></script>
+    <script src="lib/tui-image-editor/tui-image-editor.min.js"></script>
     <script src="js/i18n.js" defer></script>
-    <script src="chat-client.js" defer></script>
+    <script src="chat-client.js"></script>
 
     <div class="version-info">
         <a href="new-feather.html" target="_blank" data-i18n="version.info"></a>

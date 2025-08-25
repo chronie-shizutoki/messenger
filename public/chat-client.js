@@ -131,7 +131,7 @@ const safeTimestamp = new Date(decodedTimestamp).toLocaleString();
       const safeUrl = escapeHtml(trimmedUrl); // 也转义URL，防止URL中包含"等字符破坏属性
       const timestamp = new Date().getTime();
 
-      return `<a href="${safeUrl}?t=${timestamp}" data-lightbox="chat-images" data-title="${safeAlt || 'Image'}">
+      return `<a href="${safeUrl}?t=${timestamp}" class="image-popup" title="${safeAlt || 'Image'}">
         <img src="${safeUrl}?t=${timestamp}" alt="${safeAlt || 'sticker'}" class="chat-image">
       </a>`;
     }
@@ -985,4 +985,313 @@ function renderStickers(stickers) {
 
     // 原有初始化逻辑
     initSocket();
+
+    // 添加图片编辑模态框
+        function addImageEditorModal() {
+            // 使用i18n获取翻译文本
+            const closeText = window.i18n ? window.i18n.t('image_editor.close') : '关闭';
+            const saveText = window.i18n ? window.i18n.t('image_editor.save_send') : '保存并发送';
+            
+            const modalHtml = `
+            <div id="image-editor-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 1000;">
+                <div style="position: absolute; top: 15px; right: 15px;">
+                    <button id="close-editor-btn" style="background: #ff4757; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;">${closeText}</button>
+                    <button id="save-editor-btn" style="background: #2ed573; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; margin-left: 10px;">${saveText}</button>
+                </div>
+                <div id="tui-image-editor-container" style="width: 90%; height: 90%; margin: 50px auto;"></div>
+            </div>`;
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+
+    // 初始化图片编辑器
+    let imageEditor = null;
+    function initImageEditor() {
+        addImageEditorModal();
+        
+        const modal = document.getElementById('image-editor-modal');
+        const closeBtn = document.getElementById('close-image-editor');
+        const saveBtn = document.getElementById('save-editor-btn');
+        
+        // 关闭编辑器
+        closeBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+            if (imageEditor) {
+                imageEditor.destroy();
+                imageEditor = null;
+            }
+        });
+        
+        // 保存编辑后的图片
+        saveBtn.addEventListener('click', () => {
+            if (imageEditor) {
+                // 获取编辑后的图片数据URL
+                const dataURL = imageEditor.toDataURL();
+                
+                // 将dataURL转换为文件对象上传
+                fetch(dataURL)
+                    .then(res => res.blob())
+                    .then(blob => {
+                        const file = new File([blob], 'edited-image.png', { type: 'image/png' });
+                        uploadFile(file);
+                        
+                        // 关闭编辑器
+                        modal.style.display = 'none';
+                        imageEditor.destroy();
+                        imageEditor = null;
+                    });
+            }
+        });
+    }
+    
+    // 简单的图片预览函数 - 替代magnific-popup
+    function previewImage(imageUrl) {
+        // 创建预览模态框
+        const previewModal = document.createElement('div');
+        previewModal.className = 'image-preview-modal';
+        previewModal.style.cssText = `
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        `;
+        
+        // 创建图片元素
+        const img = document.createElement('img');
+        img.src = imageUrl;
+        img.style.maxWidth = '90%';
+        img.style.maxHeight = '90%';
+        img.style.objectFit = 'contain';
+        
+        // 添加关闭按钮
+        const closeBtn = document.createElement('button');
+        closeBtn.innerHTML = '<i class="fas fa-times"></i>';
+        closeBtn.style.cssText = `
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            color: white;
+            background: transparent;
+            border: none;
+            font-size: 30px;
+            cursor: pointer;
+            z-index: 10;
+        `;
+        
+        // 添加事件监听器
+        closeBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            document.body.removeChild(previewModal);
+        });
+        
+        previewModal.addEventListener('click', function() {
+            document.body.removeChild(previewModal);
+        });
+        
+        // 添加到DOM
+        previewModal.appendChild(img);
+        previewModal.appendChild(closeBtn);
+        document.body.appendChild(previewModal);
+    }
+
+    // 打开图片编辑器
+    function openImageEditor(imageUrl) {
+        try {
+            // 获取容器和模态框
+            const editorModal = document.getElementById('image-editor-modal');
+            const container = document.getElementById('tui-image-editor-container');
+            
+            if (!editorModal || !container) {
+                console.error('Image editor container not found');
+                return;
+            }
+            
+            // 清空容器
+            container.innerHTML = '';
+            
+            // 显示模态框
+            editorModal.style.display = 'block';
+            
+            // 使用i18n获取翻译文本
+            const editImageName = window.i18n ? window.i18n.t('image_editor.edit_image') : '编辑图片';
+            
+            // 创建新的图片编辑器
+            if (window.tui && window.tui.ImageEditor) {
+                imageEditor = new window.tui.ImageEditor('#tui-image-editor-container', {
+                    includeUI: {
+                        loadImage: {
+                            path: imageUrl,
+                            name: editImageName
+                        },
+                        theme: {
+                            'common.backgroundColor': '#1e1e1e',
+                            'common.border': '1px solid #333'
+                        },
+                        menuBarPosition: 'left'
+                    },
+                    cssMaxWidth: 1200,
+                    cssMaxHeight: 800
+                });
+                
+                // 确保保存按钮功能
+                setupImageEditorSave(editorModal);
+            } else {
+                console.error('TUI Image Editor is not available');
+                alert('图片编辑器加载失败，请刷新页面重试。');
+                editorModal.style.display = 'none';
+            }
+        } catch (error) {
+            console.error('Failed to open image editor:', error);
+            alert('图片编辑器打开失败: ' + error.message);
+        }
+    }
+    
+    // 设置图片编辑器的保存功能
+    function setupImageEditorSave(modal) {
+        if (!imageEditor) return;
+        
+        // 为关闭按钮添加事件 - 使用正确的ID
+        const closeBtn = document.getElementById('close-editor-btn');
+        if (closeBtn) {
+            // 先移除可能存在的事件监听器
+            const newCloseBtn = closeBtn.cloneNode(true);
+            closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
+            
+            // 添加新的事件监听器
+            newCloseBtn.addEventListener('click', function() {
+                closeImageEditor();
+            });
+        }
+        
+        // 使用已有的保存按钮
+        const saveButton = document.getElementById('save-editor-btn');
+        if (saveButton) {
+            // 先移除可能存在的事件监听器
+            const newSaveButton = saveButton.cloneNode(true);
+            saveButton.parentNode.replaceChild(newSaveButton, saveButton);
+            
+            // 添加保存事件
+            newSaveButton.addEventListener('click', function() {
+                try {
+                    // 获取编辑后的图片数据
+                    const imageData = imageEditor.toDataURL();
+                    
+                    // 发送图片
+                    sendEditedImage(imageData);
+                    
+                    // 关闭编辑器
+                    closeImageEditor();
+                } catch (error) {
+                    console.error('Failed to save image:', error);
+                    alert('保存图片失败: ' + error.message);
+                }
+            });
+        }
+    }
+    
+    // 关闭图片编辑器
+    function closeImageEditor() {
+        const editorModal = document.getElementById('image-editor-modal');
+        if (editorModal) {
+            editorModal.style.display = 'none';
+        }
+        
+        // 销毁编辑器实例
+        if (imageEditor) {
+            try {
+                imageEditor.destroy();
+            } catch (error) {
+                console.warn('Error destroying image editor:', error);
+            }
+            imageEditor = null;
+        }
+    }
+    
+    // 发送编辑后的图片
+    function sendEditedImage(imageData) {
+        // 这里是发送编辑后图片的逻辑
+        // 将Base64转换为Blob
+        const byteString = atob(imageData.split(',')[1]);
+        const mimeString = imageData.split(',')[0].split(':')[1].split(';')[0];
+        const ab = new ArrayBuffer(byteString.length);
+        const ia = new Uint8Array(ab);
+        
+        for (let i = 0; i < byteString.length; i++) {
+            ia[i] = byteString.charCodeAt(i);
+        }
+        
+        const blob = new Blob([ab], {type: mimeString});
+        
+        // 模拟文件对象
+        const file = new File([blob], 'edited-image.png', {type: 'image/png'});
+        
+        // 使用已有的上传文件函数
+        if (typeof uploadFile === 'function') {
+            uploadFile(file);
+        } else {
+            console.error('Upload file function not found');
+            alert('发送图片失败，请重试。');
+        }
+    }
+
+    // 初始化Magnific Popup图片预览 - 使用delegate选项处理动态元素
+    $(document).ready(function() {
+        // 初始化图片编辑器
+        initImageEditor();
+        
+        // 修改图片点击事件，添加编辑选项
+        $('#chat-container').on('click', '.image-popup', function(e) {
+            e.preventDefault();
+            
+            // 显示确认框让用户选择是查看还是编辑
+            const imageUrl = $(this).attr('href');
+            
+            // 使用i18n获取翻译文本
+            const chooseActionText = window.i18n ? window.i18n.t('image_action.choose') : '选择操作';
+            const viewText = window.i18n ? window.i18n.t('image_action.view') : '查看';
+            const editText = window.i18n ? window.i18n.t('image_action.edit') : '编辑';
+            const cancelText = window.i18n ? window.i18n.t('image_action.cancel') : '取消';
+            
+            // 创建自定义模态框让用户选择操作
+            const confirmModal = `
+            <div id="image-action-modal" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1001; display: flex; justify-content: center; align-items: center;">
+                <div style="background: #333; padding: 20px; border-radius: 8px; text-align: center;">
+                    <h3 style="color: white; margin-bottom: 20px;">${chooseActionText}</h3>
+                    <div style="display: flex; gap: 10px; justify-content: center;">
+                        <button id="view-image-btn" style="background: #3498db; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;">${viewText}</button>
+                        <button id="edit-image-btn" style="background: #f39c12; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;">${editText}</button>
+                        <button id="cancel-image-btn" style="background: #e74c3c; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer;">${cancelText}</button>
+                    </div>
+                </div>
+            </div>`;
+            
+            document.body.insertAdjacentHTML('beforeend', confirmModal);
+            
+            const actionModal = document.getElementById('image-action-modal');
+            
+            // 查看图片
+            document.getElementById('view-image-btn').addEventListener('click', function() {
+                actionModal.remove();
+                // 使用简单的替代方案来预览图片
+                previewImage(imageUrl);
+            });
+            
+            // 编辑图片
+            document.getElementById('edit-image-btn').addEventListener('click', function() {
+                actionModal.remove();
+                openImageEditor(imageUrl);
+            });
+            
+            // 取消
+            document.getElementById('cancel-image-btn').addEventListener('click', function() {
+                actionModal.remove();
+            });
+        });
+    });
 });
