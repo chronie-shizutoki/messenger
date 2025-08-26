@@ -196,12 +196,20 @@
                 return response.text();
             })
             .then(text => {
+                const trimmedText = text.trim();
+                
+                // 如果文本内容为 'empty'，则不显示滚动文字
+                if (trimmedText === 'empty') {
+                    hideScrollText();
+                    return;
+                }
+                
                 // 对超长文本进行截断或处理
                 const maxLength = 500; // 设置最大长度
-                if (text.length > maxLength) {
-                    text = text.substring(0, maxLength) + '...';
+                if (trimmedText.length > maxLength) {
+                    text = trimmedText.substring(0, maxLength) + '...';
                 }
-                showScrollText(text.trim());
+                showScrollText(trimmedText);
             })
             .catch(error => {
                 console.error('Error loading scroll text from file:', error);

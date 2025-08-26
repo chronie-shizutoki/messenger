@@ -54,7 +54,7 @@ module.exports = {
   plugins: [
     // 处理index.html模板
     new HtmlWebpackPlugin({
-      template: './public/index-webpack-template.html',
+      template: './public/index.html',
       filename: 'index.html',
       chunks: ['chat-client', 'i18n', 'vendors'],
       minify: {
@@ -68,7 +68,7 @@ module.exports = {
     }),
     // 处理new-feather.html模板
     new HtmlWebpackPlugin({
-      template: './public/new-feather-webpack-template.html',
+      template: './public/new-feather.html',
       filename: 'new-feather.html',
       chunks: ['i18n'],
       minify: {
