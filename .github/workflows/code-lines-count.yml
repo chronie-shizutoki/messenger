@@ -20,6 +20,6 @@ jobs:
       - name: Count lines in public directory (frontend)
         run: cloc public --exclude-dir=lib,css,fonts,images
       - name: Count lines in root directory (backend)
-        run: cloc . --exclude-dir=public,node_modules,.git,.github,certs,docs,lib,package,package-lock --include-ext=js,json
+        run: cloc . --exclude-dir=public,node_modules,.git,.github,certs,docs,lib,package --exclude-list-file=<(echo -e "package.json\npackage-lock.json") --include-ext=js,json
       - name: Count total lines
-        run: cloc . --exclude-dir=node_modules,.git,.github,certs,docs,lib,package,package-lock --include-ext=js,json,html,css
+        run: cloc . --exclude-dir=node_modules,.git,.github,certs,docs,lib,package --exclude-list-file=<(echo -e "package.json\npackage-lock.json") --include-ext=js,json,html,css
