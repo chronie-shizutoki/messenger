@@ -10,7 +10,6 @@ This documentation is available in the following languages:
 - [French](docs/README-fr.md)
 - [Japanese](docs/README-ja.md)
 - [Korean](docs/README-ko.md)
-- [Malay](docs/README-ms.md)
 - [Chinese (Simplified)](docs/README-zh-CN.md)
 - [Chinese (Taiwan)](docs/README-zh-TW.md)
 
