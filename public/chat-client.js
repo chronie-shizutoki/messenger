@@ -1487,8 +1487,9 @@ function renderStickers(stickers) {
                 }
             });
             
-            // 添加到容器
-            fileUploadContainer.appendChild(document.createTextNode('选择音频文件'));
+            // 使用i18n翻译
+            const selectAudioFileText = window.i18n ? window.i18n.t('audio_upload.select_file') : '选择音频文件';
+            fileUploadContainer.appendChild(document.createTextNode(selectAudioFileText));
             fileUploadContainer.appendChild(closeBtn);
             fileUploadContainer.appendChild(fileInput);
             

@@ -27,5 +27,7 @@
   "image_action.cancel": "キャンセル",
   "image_editor.close": "閉じる",
   "image_editor.save_send": "保存して送信",
-  "image_editor.edit_image": "画像を編集"
+  "image_editor.edit_image": "画像を編集",
+  "audio_upload.select_file": "オーディオファイルを選択",
+  "scroll_text.load_failed": "スクロールテキストの読み込みに失敗しました"
 }

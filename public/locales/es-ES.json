@@ -27,5 +27,7 @@
   "image_action.cancel": "Cancelar",
   "image_editor.close": "Cerrar",
   "image_editor.save_send": "Guardar y Enviar",
-  "image_editor.edit_image": "Editar Imagen"
+  "image_editor.edit_image": "Editar Imagen",
+  "audio_upload.select_file": "Seleccionar Audio",
+  "scroll_text.load_failed": "Error al cargar el texto de desplazamiento"
 }

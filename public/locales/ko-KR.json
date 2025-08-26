@@ -27,5 +27,7 @@
   "image_action.cancel": "취소",
   "image_editor.close": "닫기",
   "image_editor.save_send": "저장하고 보내기",
-  "image_editor.edit_image": "이미지 편집"
+  "image_editor.edit_image": "이미지 편집",
+  "audio_upload.select_file": "오디오 파일 선택",
+  "scroll_text.load_failed": "스크롤 텍스트 로딩에 실패했습니다"
 }

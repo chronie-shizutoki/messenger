@@ -27,5 +27,7 @@
   "image_action.cancel": "Annuler",
   "image_editor.close": "Fermer",
   "image_editor.save_send": "Enregistrer et envoyer",
-  "image_editor.edit_image": "Éditer l'image"
+  "image_editor.edit_image": "Éditer l'image",
+  "audio_upload.select_file": "Sélectionner un fichier audio",
+  "scroll_text.load_failed": "Échec du chargement du texte de défilement"
 }

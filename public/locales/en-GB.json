@@ -27,5 +27,8 @@
   "image_action.cancel": "Cancel",
   "image_editor.close": "Close",
   "image_editor.save_send": "Save and Send",
-  "image_editor.edit_image": "Edit Image"
+  "image_editor.edit_image": "Edit Image",
+  "audio_upload.select_file": "Select Audio File",
+  "scroll_text.load_failed": "Failed to load scroll text"
+
 }

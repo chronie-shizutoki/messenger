@@ -214,7 +214,9 @@
             .catch(error => {
                 console.error('Error loading scroll text from file:', error);
                 // 降级处理：使用简短的错误消息
-                showScrollText('加载滚动文字失败');
+                // 使用i18n翻译
+            const scrollTextFailed = window.i18n ? window.i18n.t('scroll_text.load_failed') : '加载滚动文字失败';
+            showScrollText(scrollTextFailed);
             });
     }
 

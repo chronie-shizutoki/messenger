@@ -27,5 +27,7 @@
   "image_action.cancel": "取消",
   "image_editor.close": "關閉",
   "image_editor.save_send": "保存並發送",
-  "image_editor.edit_image": "編輯圖像"
+  "image_editor.edit_image": "編輯圖像",
+  "audio_upload.select_file": "選擇音頻文件",
+  "scroll_text.load_failed": "加載滾動文本失敗"
 }
