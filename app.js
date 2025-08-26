@@ -60,7 +60,13 @@ const getFileTypeIcon = (fileExtension) => {
     '.css': 'fa-file-code-o',
     '.html': 'fa-file-code-o',
     '.php': 'fa-file-code-o',
-    '.py': 'fa-file-code-o'
+    '.py': 'fa-file-code-o',
+    '.mp3': 'fa-file-audio-o',
+    '.wav': 'fa-file-audio-o',
+    '.ogg': 'fa-file-audio-o',
+    '.aac': 'fa-file-audio-o',
+    '.m4a': 'fa-file-audio-o',
+    '.flac': 'fa-file-audio-o'
   };
   return iconMap[ext] || 'fa-file-o';
 };
@@ -117,6 +123,8 @@ const commonUpload = multer({
         subDir = 'archives';
       } else if (['.js', '.ts', '.css', '.html', '.php', '.py'].includes(ext)) {
         subDir = 'code';
+      } else if (['.mp3', '.wav', '.ogg', '.aac', '.m4a', '.flac'].includes(ext)) {
+        subDir = 'audio';
       }
       
       const uploadDir = path.join(COMMON_FILE_DIRECTORY, subDir);
@@ -233,6 +241,13 @@ app.get('/uploads/:subdir/:filename', (req, res) => {
     else if (ext === '.gif') contentType = 'image/gif';
     else if (ext === '.svg') contentType = 'image/svg+xml';
     else if (['.js', '.ts', '.css', '.html', '.php', '.py', '.txt'].includes(ext)) contentType = 'text/plain';
+    // 音频文件类型
+    else if (ext === '.mp3') contentType = 'audio/mpeg';
+    else if (ext === '.wav') contentType = 'audio/wav';
+    else if (ext === '.ogg') contentType = 'audio/ogg';
+    else if (ext === '.aac') contentType = 'audio/aac';
+    else if (ext === '.m4a') contentType = 'audio/mp4';
+    else if (ext === '.flac') contentType = 'audio/flac';
     
     // 设置Content-Disposition头，支持中文文件名下载
     res.setHeader('Content-Type', contentType);

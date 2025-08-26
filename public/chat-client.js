@@ -12,6 +12,13 @@ let pullToLoadIndicator = null;
 const VIRTUAL_SCROLL_THRESHOLD = 100; // 当消息超过100条时启用虚拟滚动
 const MAX_MESSAGES_IN_MEMORY = 200; // 内存中最多保存200条消息
 
+// 语音录制相关变量
+let mediaRecorder = null;
+let audioChunks = [];
+let isRecording = false;
+let recordingStartTime = null;
+let recordingTimer = null;
+
 // 状态更新函数
 function updateStatus(text, params = {}, isError = false) {
   statusEl.textContent = ` ${i18n.t(text, params || {})} (${new Date().toLocaleTimeString()})`;
@@ -217,6 +224,7 @@ result = result.replace(fileLinkRegex, (match, fileName, url) => {
 // 添加媒体播放器样式
 const style = document.createElement('style');
 style.textContent = `
+  /* 音频播放器样式 */
   .media-player {
     margin-top: 8px;
     max-width: 100%;
@@ -985,6 +993,9 @@ function renderStickers(stickers) {
 
     // 原有初始化逻辑
     initSocket();
+    
+    // 初始化语音录制功能
+    initAudioRecording();
 
     // 添加图片编辑模态框
         function addImageEditorModal() {
@@ -1333,4 +1344,395 @@ function renderStickers(stickers) {
             });
         });
     });
+
+    // 语音录制功能实现
+    function initAudioRecording() {
+        const recordButton = document.getElementById('record-audio-button');
+        if (!recordButton) {
+            console.warn('Record button not found');
+            return;
+        }
+
+        // 检查是否支持MediaRecorder API
+        const isRecordingSupported = !!navigator.mediaDevices && !!window.MediaRecorder;
+
+        // 对于不支持录音的浏览器（如Safari），点击按钮直接显示上传选项
+        if (!isRecordingSupported) {
+            recordButton.addEventListener('click', showAudioUploadOption);
+            recordButton.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                showAudioUploadOption();
+            });
+            return;
+        }
+
+        // 对于支持录音的浏览器，保留长按功能和点击功能
+        // 添加点击事件（桌面端快速录音）
+        recordButton.addEventListener('click', toggleRecording);
+        
+        // 添加长按录音功能（移动端体验优化）
+        let longPressTimer = null;
+        const LONG_PRESS_DELAY = 300; // 300ms长按触发
+
+        // 鼠标事件（桌面端）
+        recordButton.addEventListener('mousedown', () => {
+            longPressTimer = setTimeout(() => {
+                startRecording();
+            }, LONG_PRESS_DELAY);
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (longPressTimer) {
+                clearTimeout(longPressTimer);
+                longPressTimer = null;
+            }
+            if (isRecording) {
+                stopRecording();
+            }
+        });
+
+        document.addEventListener('mouseleave', () => {
+            if (longPressTimer) {
+                clearTimeout(longPressTimer);
+                longPressTimer = null;
+            }
+            if (isRecording) {
+                stopRecording();
+            }
+        });
+
+        // 触摸事件（移动端）
+        recordButton.addEventListener('touchstart', (e) => {
+            e.preventDefault(); // 防止触发鼠标事件
+            longPressTimer = setTimeout(() => {
+                startRecording();
+            }, LONG_PRESS_DELAY);
+        });
+
+        document.addEventListener('touchend', () => {
+            if (longPressTimer) {
+                clearTimeout(longPressTimer);
+                longPressTimer = null;
+            }
+            if (isRecording) {
+                stopRecording();
+            }
+        });
+
+        document.addEventListener('touchmove', (e) => {
+            // 检测手指是否移出按钮区域，如果是，则停止录音
+            if (isRecording && recordButton.getBoundingClientRect().contains(e.touches[0].clientX, e.touches[0].clientY)) {
+                recordButton.style.backgroundColor = '#d32f2f';
+            } else if (isRecording) {
+                recordButton.style.backgroundColor = '#f44336';
+            }
+        });
+    }
+
+    // 显示音频上传选项
+    function showAudioUploadOption() {
+        // 先检查是否支持confirm对话框
+        try {
+            // 使用简单的文本提示，避免复杂的confirm对话框
+            updateStatus('您的浏览器不支持直接录音，点击下方选择音频文件');
+            
+            // 为Safari优化：创建可见的文件输入按钮
+            const fileUploadContainer = document.createElement('div');
+            fileUploadContainer.id = 'audio-upload-container';
+            fileUploadContainer.style.position = 'fixed';
+            fileUploadContainer.style.bottom = '80px';
+            fileUploadContainer.style.right = '20px';
+            fileUploadContainer.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+            fileUploadContainer.style.color = 'white';
+            fileUploadContainer.style.padding = '10px 15px';
+            fileUploadContainer.style.borderRadius = '20px';
+            fileUploadContainer.style.zIndex = '999';
+            fileUploadContainer.style.display = 'flex';
+            fileUploadContainer.style.alignItems = 'center';
+            fileUploadContainer.style.cursor = 'pointer';
+            fileUploadContainer.style.minWidth = '150px';
+            fileUploadContainer.style.justifyContent = 'center';
+            
+            // 创建文件输入元素
+            const fileInput = document.createElement('input');
+            fileInput.type = 'file';
+            fileInput.accept = 'audio/*';
+            fileInput.style.display = 'none';
+            
+            // 监听文件选择事件
+            fileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    // 直接使用现有的上传文件函数
+                    uploadFile(file);
+                }
+                // 清理
+                setTimeout(() => {
+                    if (fileUploadContainer.parentNode) {
+                        document.body.removeChild(fileUploadContainer);
+                    }
+                }, 0);
+            });
+            
+            // 关闭按钮
+            const closeBtn = document.createElement('span');
+            closeBtn.innerHTML = '✕';
+            closeBtn.style.marginLeft = '10px';
+            closeBtn.style.fontSize = '18px';
+            closeBtn.style.cursor = 'pointer';
+            closeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (fileUploadContainer.parentNode) {
+                    document.body.removeChild(fileUploadContainer);
+                }
+            });
+            
+            // 添加到容器
+            fileUploadContainer.appendChild(document.createTextNode('选择音频文件'));
+            fileUploadContainer.appendChild(closeBtn);
+            fileUploadContainer.appendChild(fileInput);
+            
+            // 添加到文档
+            document.body.appendChild(fileUploadContainer);
+            
+            // 点击容器触发文件选择
+            fileUploadContainer.addEventListener('click', () => {
+                try {
+                    fileInput.click();
+                } catch (error) {
+                    console.error('Failed to trigger file selection:', error);
+                    // 在Safari等特殊浏览器中，尝试直接使用document.execCommand
+                    if (document.execCommand) {
+                        document.execCommand('SaveAs', true);
+                    }
+                }
+            });
+            
+        } catch (error) {
+            console.error('Error showing audio upload option:', error);
+            alert('无法显示上传选项，请手动选择文件上传。');
+        }
+    }
+
+    // 切换录音状态
+    function toggleRecording() {
+        if (isRecording) {
+            stopRecording();
+        } else {
+            startRecording();
+        }
+    }
+
+    // 开始录音
+    function startRecording() {
+        // 检查浏览器是否支持MediaRecorder API
+        if (!navigator.mediaDevices || !window.MediaRecorder) {
+            // 在不支持录音的浏览器中，提供上传音频文件的选项
+            showAudioUploadOption();
+            return;
+        }
+        
+        navigator.mediaDevices.getUserMedia({ audio: true })
+            .then(stream => {
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+                isRecording = true;
+                recordingStartTime = new Date();
+
+                // 更新按钮状态
+                const recordButton = document.getElementById('record-audio-button');
+                if (recordButton) {
+                    recordButton.innerHTML = '<i class="fas fa-microphone-slash"></i>';
+                    recordButton.style.backgroundColor = '#d32f2f';
+                    recordButton.style.animation = 'pulse 1s infinite';
+                }
+
+                // 添加录音动画样式
+                if (!document.getElementById('recording-animation-style')) {
+                    const style = document.createElement('style');
+                    style.id = 'recording-animation-style';
+                    style.textContent = `
+                        @keyframes pulse {
+                            0% { transform: scale(1); }
+                            50% { transform: scale(1.1); }
+                            100% { transform: scale(1); }
+                        }
+                        .recording-indicator {
+                            background-color: #d32f2f;
+                            animation: pulse 1s infinite;
+                            border-radius: 50%;
+                            width: 12px;
+                            height: 12px;
+                            display: inline-block;
+                            margin-right: 8px;
+                        }
+                    `;
+                    document.head.appendChild(style);
+                }
+
+                // 显示录音状态
+                updateStatus('正在录音... 点击或松开结束');
+
+                // 启动录音计时器
+                startRecordingTimer();
+
+                // 处理音频数据
+                mediaRecorder.ondataavailable = event => {
+                    if (event.data.size > 0) {
+                        audioChunks.push(event.data);
+                    }
+                };
+
+                // 录音结束时的处理
+                mediaRecorder.onstop = () => {
+                    // 停止所有音频轨道
+                    stream.getTracks().forEach(track => track.stop());
+                };
+
+                // 开始录音
+                mediaRecorder.start(100); // 每100ms收集一次数据
+            })
+            .catch(error => {
+                console.error('获取麦克风权限失败:', error);
+                updateStatus('获取麦克风权限失败，请检查浏览器设置', {}, true);
+            });
+    }
+
+    // 开始录音计时器
+    function startRecordingTimer() {
+        const startTime = new Date();
+        
+        // 创建计时器元素
+        let timerElement = document.getElementById('recording-timer');
+        if (!timerElement) {
+            timerElement = document.createElement('div');
+            timerElement.id = 'recording-timer';
+            timerElement.style.position = 'fixed';
+            timerElement.style.bottom = '80px';
+            timerElement.style.right = '20px';
+            timerElement.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+            timerElement.style.color = 'white';
+            timerElement.style.padding = '8px 12px';
+            timerElement.style.borderRadius = '20px';
+            timerElement.style.zIndex = '1000';
+            timerElement.style.display = 'flex';
+            timerElement.style.alignItems = 'center';
+            document.body.appendChild(timerElement);
+        }
+
+        // 更新计时器显示
+        function updateTimer() {
+            const currentTime = new Date();
+            const duration = Math.floor((currentTime - startTime) / 1000);
+            const minutes = Math.floor(duration / 60).toString().padStart(2, '0');
+            const seconds = (duration % 60).toString().padStart(2, '0');
+            
+            timerElement.innerHTML = `
+                <div class="recording-indicator"></div>
+                ${minutes}:${seconds}
+            `;
+            
+            recordingTimer = requestAnimationFrame(updateTimer);
+        }
+
+        updateTimer();
+    }
+
+    // 停止录音
+    function stopRecording() {
+        if (!mediaRecorder || !isRecording) return;
+
+        // 停止录音
+        mediaRecorder.stop();
+        isRecording = false;
+
+        // 清除计时器
+        if (recordingTimer) {
+            cancelAnimationFrame(recordingTimer);
+            recordingTimer = null;
+        }
+
+        // 移除计时器元素
+        const timerElement = document.getElementById('recording-timer');
+        if (timerElement) {
+            document.body.removeChild(timerElement);
+        }
+
+        // 恢复按钮状态
+        const recordButton = document.getElementById('record-audio-button');
+        if (recordButton) {
+            recordButton.innerHTML = '<i class="fas fa-microphone"></i>';
+            recordButton.style.backgroundColor = '';
+            recordButton.style.animation = '';
+        }
+
+        // 计算录音时长
+        const recordingDuration = Math.floor((new Date() - recordingStartTime) / 1000);
+        
+        // 如果录音时长太短，提示用户
+        if (recordingDuration < 1) {
+            updateStatus('录音时长太短，请重试', {}, true);
+            return;
+        }
+
+        // 创建音频文件
+        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+        const fileName = `recording-${Date.now()}.wav`;
+        
+        // 上传音频文件
+        uploadAudioFile(audioBlob, fileName, recordingDuration);
+    }
+
+    // 上传音频文件
+    function uploadAudioFile(audioBlob, fileName, duration) {
+        const formData = new FormData();
+        formData.append('file', audioBlob, fileName);
+        formData.append('duration', duration);
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', '/upload-file'); // 使用现有的通用文件上传接口
+        xhr.setRequestHeader('Accept', 'application/json');
+
+        // 上传进度处理
+        xhr.upload.addEventListener('progress', (e) => {
+            if (e.lengthComputable) {
+                const percent = Math.round((e.loaded / e.total) * 100);
+                updateStatus(`正在上传语音消息: ${percent}%`);
+            }
+        });
+
+        // 上传完成处理
+        xhr.addEventListener('load', () => {
+            if (xhr.status >= 200 && xhr.status < 300) {
+                try {
+                    const response = JSON.parse(xhr.responseText);
+                    if (response.fileUrl) {
+                        const messageInput = document.getElementById('message-input');
+                        // 插入音频链接到输入框
+                        messageInput.value += `[${fileName}](${response.fileUrl})`;
+                        
+                        // 自动发送录音消息
+                        window.sendMessage();
+                        
+                        updateStatus(`语音消息已发送 (${duration}秒)`);
+                    } else {
+                        updateStatus('上传失败: 服务器未返回文件URL', {}, true);
+                    }
+                } catch (error) {
+                    updateStatus('上传失败: 服务器响应格式错误', {}, true);
+                    console.error('解析服务器响应失败:', error);
+                }
+            } else {
+                updateStatus(`上传失败: ${xhr.statusText}`, {}, true);
+            }
+        });
+
+        // 错误处理
+        xhr.addEventListener('error', () => {
+            updateStatus('网络错误，上传失败', {}, true);
+        });
+
+        // 发送请求
+        xhr.send(formData);
+    }
 });
