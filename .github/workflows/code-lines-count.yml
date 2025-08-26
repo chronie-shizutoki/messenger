@@ -1,0 +1,25 @@
+name: Code Lines Count
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  count-lines:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.16.0'
+      - name: Install cloc
+        run: sudo apt-get install -y cloc
+      - name: Count lines in public directory (frontend)
+        run: cloc public --exclude-dir=lib,css,fonts,images
+      - name: Count lines in root directory (backend)
+        run: cloc . --exclude-dir=public,node_modules,.git,.github,certs,docs,lib --include-ext=js,json
+      - name: Count total lines
+        run: cloc . --exclude-dir=node_modules,.git,.github,certs,docs,lib --include-ext=js,json,html,css
