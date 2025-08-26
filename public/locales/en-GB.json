@@ -1,5 +1,5 @@
 {
-  "scroll_text.default": "Welcome to Messenger! Stay connected with your friends and family. You can customize the scrolling text via the scroll-text.txt file.",
+  "scroll_text.default": "Welcome to Messenger! Keep in touch with your friends and family. You can customise the scrolling text via the scroll-text.txt file.",
   "app.title": "Messenger",
   "chat.title": "Chat",
   "chat.send": "Send",
@@ -19,7 +19,7 @@
   "sticker.modal_title": "Sticker Selection",
   "version.info": "v6.1.0 | 25 Aug 2025",
   "version.update_title": "Version Update",
-  "version.update_content": "We're thrilled to announce the addition of dark mode to enhance your messaging experience! You can now enjoy chatting comfortably in low-light settings with our brand-new dark mode feature.\n\nDark mode has been meticulously crafted with a dedicated stylesheet, dark.css, which offers improved contrast and readability throughout the app. Whether you're messaging late at night or simply prefer a darker interface, this update ensures you won't strain your eyes while staying in touch with friends and family.\n\nOur development team has optimised the colours of all major UI elements to create a cohesive and visually appealing dark theme. Scrollbars are now easier to see and use, and modals stand out clearly against the dark background. Input fields have been adjusted for better visibility, so you can type your messages without any trouble.\n\nMessages themselves have also had special attention. The text colours and background combinations have been fine-tuned to ensure your conversations are always easy to read. That means no more squinting or adjusting your screen brightness when you're in a dimly lit room.\n\nTo switch to dark mode, simply go to the app's settings and look for the dark mode option. We believe this new feature will make your time on Messenger even more enjoyable, regardless of the lighting conditions. Give it a go and let us know what you think!",
+  "version.update_content": "We're delighted to announce the addition of dark mode to enhance your messaging experience! You can now enjoy chatting comfortably in low-light settings with our brand-new dark mode feature.\n\nDark mode has been meticulously crafted with a dedicated stylesheet, dark.css, which offers improved contrast and readability throughout the app. Whether you're messaging late at night or simply prefer a darker interface, this update ensures you won't strain your eyes while keeping in touch with friends and family.\n\nOur development team has optimised the colours of all major UI elements to create a cohesive and visually appealing dark theme. Scrollbars are now easier to see and use, and modals stand out clearly against the dark background. Input fields have been adjusted for better visibility, so you can type your messages without any hassle.\n\nMessages themselves have also received special attention. The text colours and background combinations have been fine-tuned to ensure your conversations are always easy to read. That means no more squinting or adjusting your screen brightness when you're in a dimly lit room.\n\nTo switch to dark mode, simply go to the app's settings and look for the dark mode option. We believe this new feature will make your time on Messenger even more enjoyable, regardless of the lighting conditions. Give it a try and let us know your thoughts!",
   "version.got_it": "Got It!",
   "image_action.choose": "Choose Action",
   "image_action.view": "View",
@@ -29,6 +29,12 @@
   "image_editor.save_send": "Save and Send",
   "image_editor.edit_image": "Edit Image",
   "audio_upload.select_file": "Select Audio File",
-  "scroll_text.load_failed": "Failed to load scroll text"
-
+  "audio_upload.browser_not_supported": "Your browser does not support audio capture. Please select an audio file from your computer.",
+  "scroll_text.load_failed": "Failed to load scroll text",
+  "error.image_preview_failed": "Failed to load image preview. Please try again.",
+  "error.image_editor_load_failed": "Failed to load image editor. Please try again.",
+  "error.image_editor_open_failed": "Failed to open image editor: {errorMessage}",
+  "error.save_image_failed": "Failed to save image: {errorMessage}",
+  "error.send_image_failed": "Failed to send image. Please try again.",
+  "error.audio_upload_option_failed": "Failed to show audio upload options. Please try again."
 }

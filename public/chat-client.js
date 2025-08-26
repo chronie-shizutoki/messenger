@@ -1125,7 +1125,9 @@ function renderStickers(stickers) {
             imageViewer.show();
         } catch (error) {
             console.error('Failed to open image viewer:', error);
-            alert('图片查看失败，请重试。');
+            // 使用i18n获取翻译文本
+            const errorText = window.i18n ? window.i18n.t('error.image_preview_failed') : '图片查看失败，请重试。';
+            alert(errorText);
         }
     }
 
@@ -1172,12 +1174,16 @@ function renderStickers(stickers) {
                 setupImageEditorSave(editorModal);
             } else {
                 console.error('TUI Image Editor is not available');
-                alert('图片编辑器加载失败，请刷新页面重试。');
+                // 使用i18n获取翻译文本
+                const errorText = window.i18n ? window.i18n.t('error.image_editor_load_failed') : '图片编辑器加载失败，请刷新页面重试。';
+                alert(errorText);
                 editorModal.style.display = 'none';
             }
         } catch (error) {
             console.error('Failed to open image editor:', error);
-            alert('图片编辑器打开失败: ' + error.message);
+            // 使用i18n获取翻译文本
+            const errorText = window.i18n ? window.i18n.t('error.image_editor_open_failed', { errorMessage: error.message }) : '图片编辑器打开失败: ' + error.message;
+            alert(errorText);
         }
     }
     
@@ -1218,7 +1224,9 @@ function renderStickers(stickers) {
                     closeImageEditor();
                 } catch (error) {
                     console.error('Failed to save image:', error);
-                    alert('保存图片失败: ' + error.message);
+                    // 使用i18n获取翻译文本
+                    const errorText = window.i18n ? window.i18n.t('error.save_image_failed', { errorMessage: error.message }) : '保存图片失败: ' + error.message;
+                    alert(errorText);
                 }
             });
         }
@@ -1265,7 +1273,9 @@ function renderStickers(stickers) {
             uploadFile(file);
         } else {
             console.error('Upload file function not found');
-            alert('发送图片失败，请重试。');
+            // 使用i18n获取翻译文本
+            const errorText = window.i18n ? window.i18n.t('error.send_image_failed') : '发送图片失败，请重试。';
+            alert(errorText);
         }
     }
 
@@ -1433,8 +1443,10 @@ function renderStickers(stickers) {
     function showAudioUploadOption() {
         // 先检查是否支持confirm对话框
         try {
+            // 使用i18n获取翻译文本
+            const browserNotSupportedText = window.i18n ? window.i18n.t('audio_upload.browser_not_supported') : '您的浏览器不支持直接录音，点击下方选择音频文件';
             // 使用简单的文本提示，避免复杂的confirm对话框
-            updateStatus('您的浏览器不支持直接录音，点击下方选择音频文件');
+            updateStatus(browserNotSupportedText);
             
             // 为Safari优化：创建可见的文件输入按钮
             const fileUploadContainer = document.createElement('div');
@@ -1511,7 +1523,9 @@ function renderStickers(stickers) {
             
         } catch (error) {
             console.error('Error showing audio upload option:', error);
-            alert('无法显示上传选项，请手动选择文件上传。');
+            // 使用i18n获取翻译文本
+            const errorText = window.i18n ? window.i18n.t('error.audio_upload_option_failed') : '无法显示上传选项，请手动选择文件上传。';
+            alert(errorText);
         }
     }
 

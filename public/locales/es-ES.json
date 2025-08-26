@@ -29,5 +29,12 @@
   "image_editor.save_send": "Guardar y Enviar",
   "image_editor.edit_image": "Editar Imagen",
   "audio_upload.select_file": "Seleccionar Audio",
-  "scroll_text.load_failed": "Error al cargar el texto de desplazamiento"
+  "audio_upload.browser_not_supported": "Su navegador no admite la captura de audio. Por favor, seleccione un archivo de audio desde su computadora.",
+  "scroll_text.load_failed": "Error al cargar el texto de desplazamiento",
+  "error.image_preview_failed": "Error al cargar la previsualización de la imagen. Por favor, inténtelo de nuevo.",
+  "error.image_editor_load_failed": "Error al cargar el editor de imagen. Por favor, inténtelo de nuevo.",
+  "error.image_editor_open_failed": "Error al abrir el editor de imagen: {errorMessage}",
+  "error.save_image_failed": "Error al guardar la imagen: {errorMessage}",
+  "error.send_image_failed": "Error al enviar la imagen. Por favor, inténtelo de nuevo.",
+  "error.audio_upload_option_failed": "Error al mostrar las opciones de carga de audio. Por favor, inténtelo de nuevo."
 }

@@ -29,5 +29,12 @@
   "image_editor.save_send": "保存並發送",
   "image_editor.edit_image": "編輯圖像",
   "audio_upload.select_file": "選擇音頻文件",
-  "scroll_text.load_failed": "加載滾動文本失敗"
+  "audio_upload.browser_not_supported": "您的瀏覽器不支援直接錄音，點擊下方選擇音訊檔案",
+  "scroll_text.load_failed": "載入滾動文字失敗",
+  "error.image_preview_failed": "圖像預覽失敗，請重試。",
+  "error.image_editor_load_failed": "圖像編輯器載入失敗，請重新整理頁面重試。",
+  "error.image_editor_open_failed": "圖像編輯器開啟失敗: {errorMessage}",
+  "error.save_image_failed": "儲存圖像失敗: {errorMessage}",
+  "error.send_image_failed": "傳送圖像失敗，請重試。",
+  "error.audio_upload_option_failed": "無法顯示上傳選項，請手動選擇檔案上傳。"
 }

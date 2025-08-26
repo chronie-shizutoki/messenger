@@ -29,5 +29,12 @@
   "image_editor.save_send": "Save and Send",
   "image_editor.edit_image": "Edit Image",
   "audio_upload.select_file": "Select Audio File",
-  "scroll_text.load_failed": "Failed to load scroll text"
+  "audio_upload.browser_not_supported": "Your browser does not support direct recording. Click below to select an audio file.",
+  "scroll_text.load_failed": "Failed to load scroll text",
+  "error.image_preview_failed": "Failed to preview image, please try again.",
+  "error.image_editor_load_failed": "Failed to load image editor, please refresh the page and try again.",
+  "error.image_editor_open_failed": "Failed to open image editor: {errorMessage}",
+  "error.save_image_failed": "Failed to save image: {errorMessage}",
+  "error.send_image_failed": "Failed to send image, please try again.",
+  "error.audio_upload_option_failed": "Unable to show upload options, please select a file manually."
 }

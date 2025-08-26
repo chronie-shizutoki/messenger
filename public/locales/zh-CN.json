@@ -29,5 +29,12 @@
   "image_editor.save_send": "保存并发送",
   "image_editor.edit_image": "编辑图片",
   "audio_upload.select_file": "选择音频文件",
-  "scroll_text.load_failed": "加载滚动文字失败"
+  "audio_upload.browser_not_supported": "您的浏览器不支持直接录音，点击下方选择音频文件",
+  "scroll_text.load_failed": "加载滚动文字失败",
+  "error.image_preview_failed": "图片查看失败，请重试。",
+  "error.image_editor_load_failed": "图片编辑器加载失败，请刷新页面重试。",
+  "error.image_editor_open_failed": "图片编辑器打开失败: {errorMessage}",
+  "error.save_image_failed": "保存图片失败: {errorMessage}",
+  "error.send_image_failed": "发送图片失败，请重试。",
+  "error.audio_upload_option_failed": "无法显示上传选项，请手动选择文件上传。"
 }

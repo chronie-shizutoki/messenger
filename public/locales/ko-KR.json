@@ -29,5 +29,12 @@
   "image_editor.save_send": "저장하고 보내기",
   "image_editor.edit_image": "이미지 편집",
   "audio_upload.select_file": "오디오 파일 선택",
-  "scroll_text.load_failed": "스크롤 텍스트 로딩에 실패했습니다"
+  "audio_upload.browser_not_supported": "사용 중인 브라우저에서는 직접 녹음을 지원하지 않습니다. 아래에서 오디오 파일을 선택하세요.",
+  "scroll_text.load_failed": "스크롤 텍스트 로딩에 실패했습니다",
+  "error.image_preview_failed": "이미지 미리보기 로딩에 실패했습니다. 다시 시도해 주세요.",
+  "error.image_editor_load_failed": "이미지 편집기 로딩에 실패했습니다. 다시 시도해 주세요.",
+  "error.image_editor_open_failed": "이미지 편집기 열기 실패: {errorMessage}",
+  "error.save_image_failed": "이미지 저장 실패: {errorMessage}",
+  "error.send_image_failed": "이미지 전송 실패. 다시 시도해 주세요.",
+  "error.audio_upload_option_failed": "오디오 업로드 옵션 표시 실패. 다시 시도해 주세요."
 }

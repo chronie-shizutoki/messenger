@@ -29,5 +29,12 @@
   "image_editor.save_send": "保存して送信",
   "image_editor.edit_image": "画像を編集",
   "audio_upload.select_file": "オーディオファイルを選択",
-  "scroll_text.load_failed": "スクロールテキストの読み込みに失敗しました"
+  "audio_upload.browser_not_supported": "使用中のブラウザは直接録音をサポートしていません。下記からオーディオファイルを選択してください。",
+  "scroll_text.load_failed": "スクロールテキストの読み込みに失敗しました",
+  "error.image_preview_failed": "画像のプレビューの読み込みに失敗しました。再試行してください。",
+  "error.image_editor_load_failed": "画像エディタの読み込みに失敗しました。再試行してください。",
+  "error.image_editor_open_failed": "画像エディタの開きに失敗しました: {errorMessage}",
+  "error.save_image_failed": "画像の保存に失敗しました: {errorMessage}",
+  "error.send_image_failed": "画像の送信に失敗しました。再試行してください。",
+  "error.audio_upload_option_failed": "オーディオアップロードオプションの表示に失敗しました。再試行してください。"
 }

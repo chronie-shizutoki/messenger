@@ -29,5 +29,12 @@
   "image_editor.save_send": "Enregistrer et envoyer",
   "image_editor.edit_image": "Éditer l'image",
   "audio_upload.select_file": "Sélectionner un fichier audio",
-  "scroll_text.load_failed": "Échec du chargement du texte de défilement"
+  "audio_upload.browser_not_supported": "Votre navigateur ne prend pas en charge la capture audio. Veuillez sélectionner un fichier audio à partir de votre ordinateur.",
+  "scroll_text.load_failed": "Échec du chargement du texte de défilement",
+  "error.image_preview_failed": "Échec du chargement de la prévisualisation de l'image. Veuillez réessayer.",
+  "error.image_editor_load_failed": "Échec du chargement de l'éditeur d'image. Veuillez réessayer.",
+  "error.image_editor_open_failed": "Échec de l'ouverture de l'éditeur d'image: {errorMessage}",
+  "error.save_image_failed": "Échec de l'enregistrement de l'image: {errorMessage}",
+  "error.send_image_failed": "Échec de l'envoi de l'image. Veuillez réessayer.",
+  "error.audio_upload_option_failed": "Échec de l'affichage des options d'upload audio. Veuillez réessayer."
 }
