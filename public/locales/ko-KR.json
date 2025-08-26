@@ -48,6 +48,7 @@
   "file_upload.progress": "파일 업로드 중: {percent}%",
   "file_upload.uploaded": "파일 업로드 완료",
   "upload.no_file_url": "업로드 실패: 서버에서 파일 URL이 반환되지 않았습니다",
+  "file_upload.button_title": "파일 업로드",
   "upload.server_response_format_error": "업로드 실패: 서버 응답 형식이 올바르지 않습니다",
   "upload.failed": "업로드 실패: {statusText}",
   "upload.network_error": "네트워크 오류, 업로드 실패",

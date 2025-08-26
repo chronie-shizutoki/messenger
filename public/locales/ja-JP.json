@@ -48,6 +48,7 @@
   "file_upload.progress": "ファイルをアップロード中: {percent}%",
   "file_upload.uploaded": "ファイルのアップロードが完了しました",
   "upload.no_file_url": "アップロード失敗: サーバーからファイルURLが返されませんでした",
+  "file_upload.button_title": "ファイルをアップロード",
   "upload.server_response_format_error": "アップロード失敗: サーバーの応答形式が正しくありません",
   "upload.failed": "アップロード失敗: {statusText}",
   "upload.network_error": "ネットワークエラー、アップロードに失敗しました",

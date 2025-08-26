@@ -48,6 +48,7 @@
   "file_upload.progress": "正在上传文件: {percent}%",
   "file_upload.uploaded": "文件上传成功",
   "upload.no_file_url": "上传失败: 服务器未返回文件URL",
+  "file_upload.button_title": "上传文件",
   "upload.server_response_format_error": "上传失败: 服务器响应格式错误",
   "upload.failed": "上传失败: {statusText}",
   "upload.network_error": "网络错误，上传失败",

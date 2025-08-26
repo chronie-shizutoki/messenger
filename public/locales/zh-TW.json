@@ -48,6 +48,7 @@
   "file_upload.progress": "正在上傳檔案: {percent}%",
   "file_upload.uploaded": "檔案上傳完成",
   "upload.no_file_url": "上傳失敗: 未從伺服器獲取到檔案URL",
+  "file_upload.button_title": "上傳檔案",
   "upload.server_response_format_error": "上傳失敗: 伺服器回應格式不正確",
   "upload.failed": "上傳失敗: {statusText}",
   "upload.network_error": "網路錯誤，上傳失敗",

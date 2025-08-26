@@ -48,6 +48,7 @@
   "file_upload.progress": "Subiendo archivo: {percent}%",
   "file_upload.uploaded": "Archivo subido con éxito",
   "upload.no_file_url": "Error al subir: El servidor no devolvió URL de archivo",
+  "file_upload.button_title": "Subir archivo",
   "upload.server_response_format_error": "Error al subir: Formato de respuesta del servidor incorrecto",
   "upload.failed": "Error al subir: {statusText}",
   "upload.network_error": "Error de red, subida fallida",

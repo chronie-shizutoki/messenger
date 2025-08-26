@@ -48,6 +48,7 @@
   "file_upload.progress": "Uploading file: {percent}%",
   "file_upload.uploaded": "File uploaded successfully",
   "upload.no_file_url": "Upload failed: Server did not return file URL",
+  "file_upload.button_title": "Upload file",
   "upload.server_response_format_error": "Upload failed: Server response format error",
   "upload.failed": "Upload failed: {statusText}",
   "upload.network_error": "Network error, upload failed",

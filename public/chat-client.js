@@ -827,7 +827,8 @@ document.addEventListener('DOMContentLoaded', function() {
     if (uploadButton) {
         // 更新按钮文本以反映支持多种文件类型
         uploadButton.innerHTML = '<i class="fas fa-paperclip"></i>';
-        uploadButton.title = 'Upload file';
+        // 使用i18n获取翻译文本
+        uploadButton.title = window.i18n ? window.i18n.t('file_upload.button_title') : 'Upload file';
         
         uploadButton.addEventListener('click', () => {
             // 创建隐藏的文件输入元素
