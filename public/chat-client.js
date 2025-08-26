@@ -21,7 +21,9 @@ let recordingTimer = null;
 
 // 状态更新函数
 function updateStatus(text, params = {}, isError = false) {
-  statusEl.textContent = ` ${i18n.t(text, params || {})} (${new Date().toLocaleTimeString()})`;
+  // 使用window.i18n并添加降级处理
+  const translatedText = window.i18n ? window.i18n.t(text, params || {}) : text;
+  statusEl.textContent = ` ${translatedText} (${new Date().toLocaleTimeString()})`;
   statusEl.style.color = isError ? 'red' : 'green';
 }
 
@@ -475,15 +477,25 @@ function initSocket() {
 
   // 事件处理
   socket.on('connect', () => {
-    updateStatus('Connected');
+    // 使用i18n获取翻译文本
+    const connectText = window.i18n ? window.i18n.t('socket.connected') : 'Connected';
+    updateStatus(connectText);
     if (!historyLoaded) {
       loadHistory(1);
       historyLoaded = true;
     }
   });
 
-  socket.on('disconnect', () => updateStatus('Disconnected', true));
-  socket.on('connect_error', err => updateStatus(`Connection error: ${err.message}`, true));
+  socket.on('disconnect', () => {
+    // 使用i18n获取翻译文本
+    const disconnectText = window.i18n ? window.i18n.t('socket.disconnected') : 'Disconnected';
+    updateStatus(disconnectText, true);
+  });
+  socket.on('connect_error', err => {
+    // 使用i18n获取翻译文本
+    const errorText = window.i18n ? window.i18n.t('socket.connection_error', { errorMessage: err.message }) : `Connection error: ${err.message}`;
+    updateStatus(errorText, true);
+  });
   socket.on('chat message', addMessageToDOM);
 
   // 发送消息处理
@@ -514,7 +526,11 @@ function initSocket() {
 
   socket.emit('chat message', {content, quote}, err => {
       if (!err) inputEl.value = '';
-      else updateStatus(`send message error: ${err}`, true);
+      else {
+        // 使用i18n获取翻译文本
+        const sendErrorText = window.i18n ? window.i18n.t('message.send_error', { errorMessage: err }) : `send message error: ${err}`;
+        updateStatus(sendErrorText, true);
+      }
     });
   };
 
@@ -526,10 +542,16 @@ document.getElementById('save-push-url').addEventListener('click', () => {
   const pushUrl = document.getElementById('push-url-input').value.trim();
   if (pushUrl) {
     socket.emit('save push url', pushUrl, (err, msg) => {
-      updateStatus(err ? `save push url error: ${err}` : msg);
+      // 使用i18n获取翻译文本
+      const statusText = err 
+        ? (window.i18n ? window.i18n.t('push_url.save_error', { errorMessage: err }) : `save push url error: ${err}`) 
+        : msg;
+      updateStatus(statusText);
     });
   } else {
-    updateStatus('not input push url');
+    // 使用i18n获取翻译文本
+    const emptyUrlText = window.i18n ? window.i18n.t('push_url.empty_url') : 'not input push url';
+    updateStatus(emptyUrlText);
   }
 });
 
@@ -552,7 +574,11 @@ function renderPushUrls(urls) {
     removeBtn.innerHTML = '<i class="fa fa-trash"></i> ×';
     removeBtn.onclick = () => {
       socket.emit('remove push url', url, (err, msg) => {
-        updateStatus(err ? `remove push url error: ${err}` : msg);
+        // 使用i18n获取翻译文本
+        const statusText = err 
+          ? (window.i18n ? window.i18n.t('push_url.remove_error', { errorMessage: err }) : `remove push url error: ${err}`) 
+          : msg;
+        updateStatus(statusText);
         urlItem.remove();
       });
     };
@@ -649,6 +675,8 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!pullToLoadIndicator) {
             pullToLoadIndicator = document.createElement('div');
             pullToLoadIndicator.id = 'pull-to-load-indicator';
+            // 使用i18n获取翻译文本
+            const getMoreText = window.i18n ? window.i18n.t('pull_to_load.more') : '↑ get more';
             pullToLoadIndicator.innerHTML = `
                 <div style="
                     text-align: center;
@@ -660,7 +688,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     margin: 5px;
                     transition: opacity 0.3s ease;
                 ">
-                    ↑ get more
+                    ${getMoreText}
                 </div>
             `;
             chatContainer.parentNode.insertBefore(pullToLoadIndicator, chatContainer);
@@ -838,7 +866,9 @@ document.addEventListener('DOMContentLoaded', function() {
         xhr.upload.addEventListener('progress', (e) => {
             if (e.lengthComputable) {
                 const percent = Math.round((e.loaded / e.total) * 100);
-                updateStatus(`uploading: ${percent}%`);
+                // 使用i18n获取翻译文本
+                const progressText = window.i18n ? window.i18n.t('file_upload.progress', { percent }) : `uploading: ${percent}%`;
+                updateStatus(progressText);
             }
         });
         
@@ -862,21 +892,31 @@ document.addEventListener('DOMContentLoaded', function() {
                             messageInput.value += `[${file.name}](${response.fileUrl})`;
                         }
                         
-                        updateStatus('File uploaded');
+                        // 使用i18n获取翻译文本
+                        const uploadedText = window.i18n ? window.i18n.t('file_upload.uploaded') : 'File uploaded';
+                        updateStatus(uploadedText);
                     } else {
-                        updateStatus('Upload failed: no file url', true);
+                        // 使用i18n获取翻译文本
+                        const noUrlText = window.i18n ? window.i18n.t('upload.no_file_url') : 'Upload failed: no file url';
+                        updateStatus(noUrlText, true);
                     }
                 } catch (error) {
-                    updateStatus('Upload failed: server response format error', true);
+                    // 使用i18n获取翻译文本
+                    const formatErrorText = window.i18n ? window.i18n.t('upload.server_response_format_error') : 'Upload failed: server response format error';
+                    updateStatus(formatErrorText, true);
                 }
             } else {
-                updateStatus(`Upload failed: ${xhr.statusText}`, true);
+                // 使用i18n获取翻译文本
+                const uploadErrorText = window.i18n ? window.i18n.t('upload.failed', { statusText: xhr.statusText }) : `Upload failed: ${xhr.statusText}`;
+                updateStatus(uploadErrorText, true);
             }
         });
         
         // 错误处理
         xhr.addEventListener('error', () => {
-            updateStatus('Network error, upload failed', true);
+            // 使用i18n获取翻译文本
+            const networkErrorText = window.i18n ? window.i18n.t('upload.network_error') : 'Network error, upload failed';
+            updateStatus(networkErrorText, true);
         });
         
         xhr.send(formData);
@@ -899,7 +939,9 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         } catch (error) {
             console.error('Error loading stickers:', error);
-            stickerGrid.innerHTML = '<div style="color: white; text-align: center; padding: 20px;">Failed to load stickers</div>';
+            // 使用i18n获取翻译文本
+            const errorText = window.i18n ? window.i18n.t('sticker.load_failed') : 'Failed to load stickers';
+            stickerGrid.innerHTML = `<div style="color: white; text-align: center; padding: 20px;">${errorText}</div>`;
         }
     }
 
@@ -1585,8 +1627,9 @@ function renderStickers(stickers) {
                     document.head.appendChild(style);
                 }
 
-                // 显示录音状态
-                updateStatus('正在录音... 点击或松开结束');
+                // 显示录音状态，使用i18n获取翻译文本
+                const recordingText = window.i18n ? window.i18n.t('recording.in_progress') : '正在录音... 点击或松开结束';
+                updateStatus(recordingText);
 
                 // 启动录音计时器
                 startRecordingTimer();
@@ -1609,7 +1652,9 @@ function renderStickers(stickers) {
             })
             .catch(error => {
                 console.error('获取麦克风权限失败:', error);
-                updateStatus('获取麦克风权限失败，请检查浏览器设置', {}, true);
+                // 使用i18n获取翻译文本
+                const permissionErrorText = window.i18n ? window.i18n.t('recording.microphone_permission_failed') : '获取麦克风权限失败，请检查浏览器设置';
+                updateStatus(permissionErrorText, {}, true);
             });
     }
 
@@ -1686,7 +1731,9 @@ function renderStickers(stickers) {
         
         // 如果录音时长太短，提示用户
         if (recordingDuration < 1) {
-            updateStatus('录音时长太短，请重试', {}, true);
+            // 使用i18n获取翻译文本
+            const tooShortText = window.i18n ? window.i18n.t('recording.too_short') : '录音时长太短，请重试';
+            updateStatus(tooShortText, {}, true);
             return;
         }
 
@@ -1712,7 +1759,9 @@ function renderStickers(stickers) {
         xhr.upload.addEventListener('progress', (e) => {
             if (e.lengthComputable) {
                 const percent = Math.round((e.loaded / e.total) * 100);
-                updateStatus(`正在上传语音消息: ${percent}%`);
+                // 使用i18n获取翻译文本
+                const progressText = window.i18n ? window.i18n.t('audio_upload.progress', { percent }) : `正在上传语音消息: ${percent}%`;
+                updateStatus(progressText);
             }
         });
 
@@ -1729,22 +1778,32 @@ function renderStickers(stickers) {
                         // 自动发送录音消息
                         window.sendMessage();
                         
-                        updateStatus(`语音消息已发送 (${duration}秒)`);
+                        // 使用i18n获取翻译文本
+                        const sentText = window.i18n ? window.i18n.t('audio_upload.sent', { duration }) : `语音消息已发送 (${duration}秒)`;
+                        updateStatus(sentText);
                     } else {
-                        updateStatus('上传失败: 服务器未返回文件URL', {}, true);
+                        // 使用i18n获取翻译文本
+                        const noUrlText = window.i18n ? window.i18n.t('upload.no_file_url') : '上传失败: 服务器未返回文件URL';
+                        updateStatus(noUrlText, {}, true);
                     }
                 } catch (error) {
-                    updateStatus('上传失败: 服务器响应格式错误', {}, true);
+                    // 使用i18n获取翻译文本
+                    const formatErrorText = window.i18n ? window.i18n.t('upload.server_response_format_error') : '上传失败: 服务器响应格式错误';
+                    updateStatus(formatErrorText, {}, true);
                     console.error('解析服务器响应失败:', error);
                 }
             } else {
-                updateStatus(`上传失败: ${xhr.statusText}`, {}, true);
+                // 使用i18n获取翻译文本
+                const uploadErrorText = window.i18n ? window.i18n.t('upload.failed', { statusText: xhr.statusText }) : `上传失败: ${xhr.statusText}`;
+                updateStatus(uploadErrorText, {}, true);
             }
         });
 
         // 错误处理
         xhr.addEventListener('error', () => {
-            updateStatus('网络错误，上传失败', {}, true);
+            // 使用i18n获取翻译文本
+            const networkErrorText = window.i18n ? window.i18n.t('upload.network_error') : '网络错误，上传失败';
+            updateStatus(networkErrorText, {}, true);
         });
 
         // 发送请求
