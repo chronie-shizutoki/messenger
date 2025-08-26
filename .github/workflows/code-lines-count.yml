@@ -19,9 +19,7 @@ jobs:
         run: sudo apt-get install -y cloc
       - name: Count lines in public directory (frontend)
         run: cloc public --exclude-dir=lib,css,fonts,images
-      - name: Create exclude list file
-        run: echo -e "package.json\npackage-lock.json" > exclude.txt
       - name: Count lines in root directory (backend)
-        run: cloc . --exclude-dir=public,node_modules,.git,.github,certs,docs,lib,package --exclude-list-file=exclude.txt --include-ext=js,json
+        run: cloc . --exclude-dir=public,node_modules,.git,.github,certs,docs,lib,package --not-match-f="(package\.json|package-lock\.json)" --include-ext=js,json
       - name: Count total lines
-        run: cloc . --exclude-dir=node_modules,.git,.github,certs,docs,lib,package --exclude-list-file=exclude.txt --include-ext=js,json,html,css
+        run: cloc . --exclude-dir=node_modules,.git,.github,certs,docs,lib,package --not-match-f="(package\.json|package-lock\.json)" --include-ext=js,json,html,css
