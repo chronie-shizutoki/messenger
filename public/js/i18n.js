@@ -34,17 +34,24 @@ class I18n {
   }
 
   async init() {
-    // 加载语言文件
-    await this.loadTranslations();
-    // 创建语言下拉菜单
-    this.createLanguageDropdown();
-    // 应用翻译
-    this.applyTranslations();
-    // 修改页面语言
-    this.setDocumentLanguage();
-    // 触发初始化完成事件
-    const event = new Event('i18nInitialized');
-    document.dispatchEvent(event);
+    try {
+      // 加载语言文件
+      await this.loadTranslations();
+      // 创建语言下拉菜单
+      this.createLanguageDropdown();
+      // 应用翻译
+      this.applyTranslations();
+      // 修改页面语言
+      this.setDocumentLanguage();
+      // 触发初始化完成事件，通知其他组件国际化已完成
+      const event = new Event('i18nInitialized');
+      document.dispatchEvent(event);
+    } catch (error) {
+      console.error('Error during i18n initialization:', error);
+      // 即使出错，也触发事件，避免页面永久等待
+      const event = new Event('i18nInitialized');
+      document.dispatchEvent(event);
+    }
   }
 
   async loadTranslations() {
@@ -260,5 +267,12 @@ languageList.style.borderColor = 'rgba(255, 255, 255, 0.18)';
   }
 }
 // 在DOM加载完成后初始化国际化
-// 立即初始化i18n实例
-window.i18n = I18n.getInstance();
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', function() {
+    // 立即初始化i18n实例
+    window.i18n = I18n.getInstance();
+  });
+} else {
+  // DOM已加载完成，直接初始化
+  window.i18n = I18n.getInstance();
+}

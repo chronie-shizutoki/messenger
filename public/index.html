@@ -22,6 +22,51 @@
         background-size: cover;
         background-attachment: fixed;
     }
+    
+    /* 加载状态样式 */
+    body.loading {
+        overflow: hidden;
+    }
+    
+    body.loading > * {
+        visibility: hidden;
+    }
+    
+    body.loading::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(to bottom right, #f5f7fa, #c3cfe2);
+        background-size: cover;
+        background-attachment: fixed;
+        z-index: 9999;
+        visibility: visible;
+    }
+    
+    body.loading::after {
+        content: '';
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 50px;
+        height: 50px;
+        border: 5px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: #3498db;
+        animation: spin 1s ease-in-out infinite;
+        z-index: 10000;
+        visibility: visible;
+    }
+    
+    @keyframes spin {
+        to {
+            transform: translate(-50%, -50%) rotate(360deg);
+        }
+    }
 
     /* 滚动文字样式 */
     .scroll-text-container {
@@ -320,11 +365,44 @@
     <!-- 通过CDN引入tui-code-snippet -->
     <script src="https://cdn.jsdelivr.net/npm/tui-code-snippet@latest/dist/tui-code-snippet.min.js"></script>
     <script src="lib/tui-image-editor/tui-image-editor.min.js"></script>
-    <script src="js/i18n.js" defer></script>
-    <script src="chat-client.js"></script>
+    <script src="js/i18n.js"></script>
+    <script defer src="chat-client.js"></script>
 
     <div class="version-info">
         <a href="new-feather.html" target="_blank" data-i18n="version.info"></a>
     </div>
+    
+    <!-- 确保国际化完成后再显示页面内容 -->
+    <script>
+        // 页面加载时显示加载状态
+        document.body.classList.add('loading');
+        
+        // 等待i18n初始化完成后再显示页面内容
+        function handleI18nInitialized() {
+            if (window.i18n && window.i18n.applyTranslations) {
+                window.i18n.applyTranslations();
+            }
+            
+            // 移除加载状态，显示页面内容
+            document.body.classList.remove('loading');
+        }
+        
+        // 检查i18n是否已经初始化
+        if (window.i18n && window.i18n.translations && Object.keys(window.i18n.translations).length > 0) {
+            // 如果已经初始化，直接处理
+            handleI18nInitialized();
+        } else {
+            // 否则监听初始化事件
+            document.addEventListener('i18nInitialized', handleI18nInitialized);
+            
+            // 添加超时处理，以防i18n初始化失败
+            setTimeout(function() {
+                if (!window.i18n || !window.i18n.translations || Object.keys(window.i18n.translations).length === 0) {
+                    console.warn('i18n initialization timed out, proceeding with page load');
+                    document.body.classList.remove('loading');
+                }
+            }, 5000); // 5秒超时
+        }
+    </script>
 </body>
 </html>

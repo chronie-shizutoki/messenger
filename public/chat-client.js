@@ -118,7 +118,7 @@ const decodedTimestamp = decodeHtmlEntities(timestamp).replace(/^\$/, '').trim()
 const safeTimestamp = new Date(decodedTimestamp).toLocaleString();
       
       return `<div class="quote-content">
-        <div class="quote-meta">${i18n.t('chat.quote_from', {safeTimestamp})}</div>
+        <div class="quote-meta">${window.i18n ? window.i18n.t('chat.quote_from', {safeTimestamp}) : `Quote from: ${safeTimestamp}`}</div>
         <div class="quote-text">${quotedContentHtml}</div>
       </div>`;
     });
@@ -198,7 +198,7 @@ result = result.replace(fileLinkRegex, (match, fileName, url) => {
       // 添加音频播放器
       mediaContent = `<audio controls class="media-player">
         <source src="${safeUrl}" type="audio/${fileExtension}">
-        ${i18n.t('audio_player.not_supported')}
+        ${window.i18n ? window.i18n.t('audio_player.not_supported') : 'Your browser does not support the audio element'}
       </audio>`;
     } else if (['mp4', 'webm', 'ogg', 'mov', 'avi', 'mkv'].includes(fileExtension)) {
       fileIcon = 'fa-file-video-o';
@@ -206,12 +206,12 @@ result = result.replace(fileLinkRegex, (match, fileName, url) => {
       const videoType = fileExtension === 'mov' ? 'quicktime' : fileExtension;
       mediaContent = `<video controls class="media-player" width="100%">
         <source src="${safeUrl}" type="video/${videoType}">
-        ${i18n.t('video_player.not_supported')}
+        ${window.i18n ? window.i18n.t('video_player.not_supported') : 'Your browser does not support the video element'}
       </video>`;
     }
     
     return `<div class="file-item">
-      <a href="${safeUrl}" download class="file-link" title="${i18n.t('file.download_title', { fileName: safeFileName })}">
+      <a href="${safeUrl}" download class="file-link" title="${window.i18n ? window.i18n.t('file.download_title', { fileName: safeFileName }) : `Download ${safeFileName}`}">
         <i class="fas ${fileIcon}"></i> ${safeFileName}
         <i class="fas fa-download download-icon"></i>
       </a>
@@ -336,7 +336,7 @@ function showLoadingIndicator(show = true) {
           animation: spin 1s linear infinite;
           margin-right: 8px;
         "></div>
-        ${i18n.t('loading_indicator.text')}
+        ${window.i18n ? window.i18n.t('loading_indicator.text') : 'Loading...'}
       </div>
     `;
     
@@ -2103,6 +2103,15 @@ function addFallbackMenuItem(menu, id, html, onClick) {
     item.addEventListener('click', onClick);
     
     menu.appendChild(item);
+}
+
+// 等待i18n初始化完成后再初始化其他功能
+function initializeApp() {
+    // 初始化Socket连接
+    initSocket();
+    
+    // 设置移动设备的操作界面
+    setupMobileActionsWithDelay();
 }
 
 // 确保DOM加载完成后初始化，同时添加延迟以防初始化顺序问题
