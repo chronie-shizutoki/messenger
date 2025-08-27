@@ -6,8 +6,6 @@ A real-time chat application with WebSocket support, featuring a modern UI and i
 This documentation is available in the following languages:
 - [English (US)](README.md)
 - [English (UK)](docs/README-en-GB.md)
-- [Spanish](docs/README-es.md)
-- [French](docs/README-fr.md)
 - [Japanese](docs/README-ja.md)
 - [Korean](docs/README-ko.md)
 - [Chinese (Simplified)](docs/README-zh-CN.md)

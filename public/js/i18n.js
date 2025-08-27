@@ -3,7 +3,7 @@ class I18n {
     // 首先尝试从localStorage读取保存的语言
     const savedLanguage = localStorage.getItem('preferredLanguage');
     const userLanguage = savedLanguage || navigator.language || 'en-US';
-    this.supportedLanguages = ['en-GB', 'en-US', 'es-ES', 'fr-FR', 'ja-JP', 'ko-KR', 'zh-CN', 'zh-TW']; // 支持的语言列表
+    this.supportedLanguages = ['en-GB', 'en-US', 'ja-JP', 'ko-KR', 'zh-CN', 'zh-TW']; // 支持的语言列表
     this.locale = this.getBestMatchingLanguage(userLanguage);
     this.translations = {};
     this.init();
@@ -91,8 +91,6 @@ class I18n {
     const languageNames = {
       'en-GB': 'English (UK)',
       'en-US': 'English (US)',
-      'es-ES': 'Español (España)',
-      'fr-FR': 'Français (France)',
       'ja-JP': '日本語 (日本)',
       'ko-KR': '한국어 (대한민국)',
       'zh-CN': '简体中文（中国大陆）',
