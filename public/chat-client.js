@@ -1811,3 +1811,313 @@ function renderStickers(stickers) {
         xhr.send(formData);
     }
 });
+
+// 移动端+按钮功能实现
+function initMobileActions() {
+    try {
+        // 检查是否已添加+按钮，避免重复添加
+        if (document.querySelector('.more-actions-btn')) {
+            console.log('More actions button already exists');
+            return;
+        }
+        
+        const inputControls = document.querySelector('.input-controls');
+        if (!inputControls) {
+            console.log('Input controls not found, skipping mobile actions initialization');
+            // 如果找不到input-controls，尝试直接在body中添加按钮
+            createFallbackMobileButton();
+            return;
+        }
+        
+        // 创建+按钮
+        const moreBtn = document.createElement('button');
+        moreBtn.className = 'more-actions-btn chat-action-btn';
+        moreBtn.innerHTML = '<i class="fas fa-plus"></i>';
+        moreBtn.title = window.i18n ? window.i18n.t('chat.more_actions') : '更多选项';
+        // 确保在移动设备上按钮总是显示
+        moreBtn.style.display = 'flex';
+        moreBtn.style.zIndex = '1000';
+        
+        // 创建更多操作菜单
+        const moreMenu = document.createElement('div');
+        moreMenu.className = 'more-actions-menu';
+        
+        // 查找现有按钮并复制到菜单中
+        const actionBtns = inputControls.querySelectorAll('.chat-action-btn:not(#send-button)');
+        
+        // 复制现有按钮到菜单中
+        actionBtns.forEach(btn => {
+            // 不使用cloneNode，而是创建新的按钮元素
+            const menuBtn = document.createElement('button');
+            menuBtn.className = 'chat-action-btn';
+            menuBtn.id = 'menu-' + btn.id;
+            menuBtn.innerHTML = btn.innerHTML;
+            menuBtn.title = btn.title;
+            menuBtn.style.display = 'flex';
+            menuBtn.style.width = '100%';
+            menuBtn.style.justifyContent = 'flex-start';
+            menuBtn.style.padding = '0.5rem 1rem';
+            
+            // 根据按钮ID绑定相应的功能
+            if (btn.id === 'sticker-button') {
+                menuBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    // 直接触发原始按钮的点击事件
+                    const originalBtn = document.getElementById('sticker-button');
+                    if (originalBtn) {
+                        const event = new MouseEvent('click', {
+                            bubbles: true,
+                            cancelable: true,
+                            view: window
+                        });
+                        originalBtn.dispatchEvent(event);
+                    }
+                    moreMenu.classList.remove('show');
+                });
+            } else if (btn.id === 'upload-image-button') {
+                menuBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    // 直接触发原始按钮的点击事件
+                    const originalBtn = document.getElementById('upload-image-button');
+                    if (originalBtn) {
+                        const event = new MouseEvent('click', {
+                            bubbles: true,
+                            cancelable: true,
+                            view: window
+                        });
+                        originalBtn.dispatchEvent(event);
+                    }
+                    moreMenu.classList.remove('show');
+                });
+            } else if (btn.id === 'record-audio-button') {
+                menuBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    // 直接触发原始按钮的点击事件
+                    const originalBtn = document.getElementById('record-audio-button');
+                    if (originalBtn) {
+                        const event = new MouseEvent('click', {
+                            bubbles: true,
+                            cancelable: true,
+                            view: window
+                        });
+                        originalBtn.dispatchEvent(event);
+                    }
+                    moreMenu.classList.remove('show');
+                });
+            } else {
+                // 为其他按钮添加点击事件
+                menuBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    // 点击后关闭菜单
+                    moreMenu.classList.remove('show');
+                });
+            }
+            
+            moreMenu.appendChild(menuBtn);
+        });
+        
+        // 添加菜单到输入控制区域
+        inputControls.appendChild(moreMenu);
+        
+        // 添加+按钮到输入控制区域，但确保它在发送按钮之前
+        const sendButton = document.getElementById('send-button');
+        if (sendButton && sendButton.parentNode === inputControls) {
+            inputControls.insertBefore(moreBtn, sendButton);
+        } else {
+            inputControls.appendChild(moreBtn);
+        }
+        
+        // 点击+按钮显示/隐藏菜单
+        moreBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            moreMenu.classList.toggle('show');
+        });
+        
+        // 点击页面其他地方关闭菜单
+        document.addEventListener('click', function(e) {
+            if (!moreBtn.contains(e.target) && !moreMenu.contains(e.target)) {
+                moreMenu.classList.remove('show');
+            }
+        });
+        
+        console.log('Mobile actions initialized successfully');
+    } catch (error) {
+        console.error('Error initializing mobile actions:', error);
+        // 出错时创建备用按钮
+        createFallbackMobileButton();
+    }
+}
+
+// 创建备用移动端按钮
+function createFallbackMobileButton() {
+    try {
+        const existingFallback = document.getElementById('fallback-mobile-button');
+        if (existingFallback) return;
+        
+        const fallbackBtn = document.createElement('button');
+        fallbackBtn.id = 'fallback-mobile-button';
+        fallbackBtn.className = 'more-actions-btn chat-action-btn';
+        fallbackBtn.innerHTML = '<i class="fas fa-plus"></i>';
+        fallbackBtn.title = window.i18n ? window.i18n.t('chat.more_actions') : '更多选项';
+        
+        // 设置样式确保按钮显示在右下角
+        fallbackBtn.style.position = 'fixed';
+        fallbackBtn.style.bottom = '20px';
+        fallbackBtn.style.right = '20px';
+        fallbackBtn.style.width = '50px';
+        fallbackBtn.style.height = '50px';
+        fallbackBtn.style.borderRadius = '50%';
+        fallbackBtn.style.backgroundColor = '#4F46E5';
+        fallbackBtn.style.color = 'white';
+        fallbackBtn.style.border = 'none';
+        fallbackBtn.style.boxShadow = '0 4px 12px rgba(79, 70, 229, 0.4)';
+        fallbackBtn.style.display = 'flex';
+        fallbackBtn.style.alignItems = 'center';
+        fallbackBtn.style.justifyContent = 'center';
+        fallbackBtn.style.zIndex = '9999';
+        fallbackBtn.style.fontSize = '20px';
+        
+        document.body.appendChild(fallbackBtn);
+        
+        // 创建一个简单的菜单
+        const fallbackMenu = document.createElement('div');
+        fallbackMenu.id = 'fallback-mobile-menu';
+        fallbackMenu.style.position = 'fixed';
+        fallbackMenu.style.bottom = '80px';
+        fallbackMenu.style.right = '20px';
+        fallbackMenu.style.backgroundColor = 'rgba(30, 41, 59, 0.95)';
+        fallbackMenu.style.backdropFilter = 'blur(24px)';
+        fallbackMenu.style.borderRadius = '8px';
+        fallbackMenu.style.padding = '10px';
+        fallbackMenu.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.3)';
+        fallbackMenu.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+        fallbackMenu.style.display = 'none';
+        fallbackMenu.style.flexDirection = 'column';
+        fallbackMenu.style.gap = '8px';
+        fallbackMenu.style.zIndex = '9998';
+        
+        document.body.appendChild(fallbackMenu);
+        
+        // 点击按钮显示/隐藏菜单
+        fallbackBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            fallbackMenu.style.display = fallbackMenu.style.display === 'flex' ? 'none' : 'flex';
+        });
+        
+        // 添加基本功能按钮
+        // 贴纸按钮
+        addFallbackMenuItem(fallbackMenu, 'sticker-button', '<i class="far fa-smile"></i> 贴图', function() {
+            const stickerButton = document.getElementById('sticker-button');
+            if (stickerButton) {
+                // 使用dispatchEvent而不是直接click()，确保事件正确传播
+                const event = new MouseEvent('click', {
+                    bubbles: true,
+                    cancelable: true,
+                    view: window
+                });
+                stickerButton.dispatchEvent(event);
+            }
+            fallbackMenu.style.display = 'none';
+        });
+        
+        // 上传按钮
+        addFallbackMenuItem(fallbackMenu, 'upload-image-button', '<i class="fas fa-paperclip"></i> 上传', function() {
+            const uploadButton = document.getElementById('upload-image-button');
+            if (uploadButton) {
+                // 使用dispatchEvent而不是直接click()，确保事件正确传播
+                const event = new MouseEvent('click', {
+                    bubbles: true,
+                    cancelable: true,
+                    view: window
+                });
+                uploadButton.dispatchEvent(event);
+            }
+            fallbackMenu.style.display = 'none';
+        });
+        
+        // 语音录制按钮
+        addFallbackMenuItem(fallbackMenu, 'record-audio-button', '<i class="fas fa-microphone"></i> 语音', function() {
+            const recordButton = document.getElementById('record-audio-button');
+            if (recordButton) {
+                // 使用dispatchEvent而不是直接click()，确保事件正确传播
+                const event = new MouseEvent('click', {
+                    bubbles: true,
+                    cancelable: true,
+                    view: window
+                });
+                recordButton.dispatchEvent(event);
+            }
+            fallbackMenu.style.display = 'none';
+        });
+        
+        // 点击页面其他地方关闭菜单
+        document.addEventListener('click', function(e) {
+            if (!fallbackBtn.contains(e.target) && !fallbackMenu.contains(e.target)) {
+                fallbackMenu.style.display = 'none';
+            }
+        });
+        
+    } catch (error) {
+        console.error('Error creating fallback mobile button:', error);
+    }
+}
+
+// 添加备用菜单项
+function addFallbackMenuItem(menu, id, html, onClick) {
+    const item = document.createElement('button');
+    item.id = 'fallback-' + id;
+    item.innerHTML = html;
+    item.style.width = '100%';
+    item.style.padding = '12px 16px';
+    item.style.backgroundColor = 'transparent';
+    item.style.color = 'white';
+    item.style.border = 'none';
+    item.style.borderRadius = '4px';
+    item.style.textAlign = 'left';
+    item.style.cursor = 'pointer';
+    item.style.transition = 'background-color 0.2s';
+    
+    item.addEventListener('mouseenter', function() {
+        this.style.backgroundColor = 'rgba(255, 255, 255, 0.1)';
+    });
+    
+    item.addEventListener('mouseleave', function() {
+        this.style.backgroundColor = 'transparent';
+    });
+    
+    item.addEventListener('click', onClick);
+    
+    menu.appendChild(item);
+}
+
+// 确保DOM加载完成后初始化，同时添加延迟以防初始化顺序问题
+function setupMobileActionsWithDelay() {
+    // 检查是否为移动设备
+    function isMobile() {
+        return window.innerWidth <= 768;
+    }
+    
+    // 只在移动设备上初始化
+    if (isMobile()) {
+        // 立即尝试初始化
+        initMobileActions();
+        
+        // 1秒后再次尝试，确保DOM完全加载
+        setTimeout(initMobileActions, 1000);
+    }
+    
+    // 添加窗口大小变化监听器，在切换到移动端视图时初始化
+    window.addEventListener('resize', function() {
+        if (isMobile()) {
+            initMobileActions();
+        }
+    });
+}
+
+// 确保DOM加载完成后初始化
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupMobileActionsWithDelay);
+} else {
+    // DOM已加载完成
+    initMobileActions();
+}
