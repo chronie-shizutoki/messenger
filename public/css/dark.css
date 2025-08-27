@@ -99,4 +99,14 @@
         .chat-action-btn:hover {
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
         }
+        
+        /* 深色模式下的加载状态样式 */
+        body.loading::before {
+            background: linear-gradient(135deg, var(--background) 0%, var(--surface) 100%) !important;
+        }
+        
+        body.loading::after {
+            border-color: rgba(255, 255, 255, 0.1);
+            border-top-color: var(--primary);
+        }
     }
