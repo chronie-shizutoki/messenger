@@ -433,16 +433,31 @@ function createMessageElement(message, isHistorical = false, searchTerm = '') {
   const div = document.createElement('div');
   div.className = 'message';
   div.dataset.timestamp = message.timestamp;
+  
+  // 检查消息是否是当前用户发送的并且在2分钟内
+  const now = new Date();
+  const messageTime = new Date(message.timestamp);
+  const timeDifference = now - messageTime;
+  const isWithinTwoMinutes = timeDifference < 2 * 60 * 1000; // 2分钟
+  const isOwnMessage = true; // 假设所有消息都是当前用户发送的，实际应用中应该根据用户ID判断
+  
+  // 添加撤回按钮（如果满足条件）
+  const undoButtonHtml = isOwnMessage && isWithinTwoMinutes ? 
+    '<button class="undo-btn" data-i18n-title="chat.undo_message"><i class="fas fa-undo"></i></button>' : '';
+  
   div.innerHTML = `
   <div class="message-header">
     <div class="meta">${new Date(message.timestamp).toLocaleString()}</div>
-    <button class="quote-btn" data-i18n-title="chat.quote_reply"><i class="fas fa-quote-right"></i></button>
+    <div class="message-actions">
+      ${undoButtonHtml}
+      <button class="quote-btn" data-i18n-title="chat.quote_reply"><i class="fas fa-quote-right"></i></button>
+    </div>
   </div>
   ${message.quote ? `<div class="quote-content">
     <div class="quote-meta">${new Date(message.quote.timestamp).toLocaleString()}</div>
     <div class="quote-text">${parseMessageContent(message.quote.content)}</div>
   </div>` : ''}
-  <div class="content">${parseMessageContent(message.content, searchTerm)}</div>
+  <div class="content">${message.isUndo ? `<span class="message-undo-text">${window.i18n ? window.i18n.t('chat.message_undone') : 'This message has been withdrawn.'}</span>` : parseMessageContent(message.content, searchTerm)}</div>
 `;
 
   // 添加引用按钮事件
@@ -455,7 +470,55 @@ function createMessageElement(message, isHistorical = false, searchTerm = '') {
     inputEl.focus();
   });
   
+  // 添加撤回按钮事件
+  const undoBtn = div.querySelector('.undo-btn');
+  if (undoBtn) {
+    undoBtn.addEventListener('click', () => {
+      undoMessage(message.timestamp);
+    });
+  }
+  
   return div;
+}
+
+// 撤回消息函数
+function undoMessage(timestamp) {
+  // 确认撤回
+  const confirmText = window.i18n ? window.i18n.t('chat.confirm_undo') : 'Are you sure you want to withdraw this message?';
+  if (!confirm(confirmText)) return;
+  
+  // 发送撤回请求到服务器
+  if (window.socket && window.socket.connected) {
+    window.socket.emit('undo message', timestamp, (err, result) => {
+      if (err) {
+        // 处理对象类型的错误
+        const errorMessage = typeof err === 'object' && err.message ? err.message : String(err);
+        const errorText = window.i18n ? window.i18n.t('chat.undo_failed', { errorMessage }) : `Failed to withdraw message: ${errorMessage}`;
+        updateStatus(errorText, {}, true);
+        return;
+      }
+      
+      // 成功撤回后的处理
+      const successText = window.i18n ? window.i18n.t('chat.message_undone_success') : 'Message has been withdrawn successfully';
+      updateStatus(successText);
+      
+      // 更新本地消息状态
+      const message = allMessages.find(m => m.timestamp === timestamp);
+      if (message) {
+        message.isUndo = true;
+        
+        // 重新渲染消息
+        const element = chatContainer.querySelector(`[data-timestamp="${timestamp}"]`);
+        if (element) {
+          const newElement = createMessageElement(message);
+          element.parentNode.replaceChild(newElement, element);
+        }
+      }
+    });
+  } else {
+    const offlineText = window.i18n ? window.i18n.t('chat.offline') : 'You are offline, cannot withdraw message';
+    updateStatus(offlineText, {}, true);
+  }
 }
 
 // 初始化Socket

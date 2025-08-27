@@ -1,5 +1,10 @@
-{
-  "scroll_text.default": "Messenger에 오신 것을 환영합니다! 친구와 가족과의 연결을 유지하세요. scroll-text.txt 파일을 통해 스크롤 텍스트를 사용자 정의할 수 있습니다.",
+{  "scroll_text.default": "Messenger에 오신 것을 환영합니다! 친구와 가족과의 연결을 유지하세요. scroll-text.txt 파일을 통해 스크롤 텍스트를 사용자 정의할 수 있습니다.",
+  "chat.undo_message": "메시지 취소",
+  "chat.message_undone": "이 메시지는 취소되었습니다.",
+  "chat.confirm_undo": "이 메시지를 취소하시겠습니까?",
+  "chat.undo_failed": "메시지 취소 실패: {errorMessage}",
+  "chat.message_undone_success": "메시지가 성공적으로 취소되었습니다",
+  "chat.offline": "오프라인 상태입니다. 메시지를 취소할 수 없습니다",
   "app.title": "메신저",
   "chat.title": "채팅",
   "chat.send": "보내기",

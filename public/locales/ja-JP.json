@@ -1,5 +1,10 @@
-{
-  "scroll_text.default": "Messengerへようこそ！友達や家族とのつながりを維持しましょう。scroll-text.txtファイルを使用してスクロールテキストをカスタマイズできます。",
+{  "scroll_text.default": "Messengerへようこそ！友達や家族とのつながりを維持しましょう。scroll-text.txtファイルを使用してスクロールテキストをカスタマイズできます。",
+  "chat.undo_message": "メッセージを撤回",
+  "chat.message_undone": "このメッセージは撤回されました",
+  "chat.confirm_undo": "このメッセージを撤回しますか？",
+  "chat.undo_failed": "メッセージの撤回に失敗しました: {errorMessage}",
+  "chat.message_undone_success": "メッセージが正常に撤回されました",
+  "chat.offline": "オフライン状態です。メッセージを撤回できません",
   "app.title": "メッセンジャー",
   "chat.title": "チャット",
   "chat.send": "送信",

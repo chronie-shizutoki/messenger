@@ -586,6 +586,27 @@ callback(null);
     });
   });
 
+  // 处理消息撤回请求
+  socket.on('undo message', (timestamp, callback) => {
+    console.log('emit undo message:', timestamp);
+    // 从数据库中删除指定时间戳的消息
+    const deleteQuery = 'DELETE FROM messages WHERE timestamp = ?';
+    db.run(deleteQuery, [timestamp], function(err) {
+      if (err) {
+        console.error('undo message error:', err);
+        return callback(err);
+      }
+      // 检查是否有行被删除
+      if (this.changes === 0) {
+        console.error('undo message failed: message not found');
+        return callback(new Error('Message not found'));
+      }
+      // 广播消息撤回事件给所有客户端
+      io.emit('message undone', timestamp);
+      callback(null);
+    });
+  });
+
   socket.on('disconnect', () => {
     console.log('emit disconnect:', socket.id);
   });

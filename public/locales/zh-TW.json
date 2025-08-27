@@ -1,5 +1,10 @@
-{
-  "scroll_text.default": "歡迎使用Messenger！與您的朋友和家人保持聯繫。您可以透過scroll-text.txt檔案自訂滾動文字。",
+{  "scroll_text.default": "歡迎使用Messenger！與您的朋友和家人保持聯繫。您可以透過scroll-text.txt檔案自訂滾動文字。",
+  "chat.undo_message": "撤回訊息",
+  "chat.message_undone": "此訊息已被撤回。",
+  "chat.confirm_undo": "您確定要撤回此訊息嗎？",
+  "chat.undo_failed": "撤回訊息失敗: {errorMessage}",
+  "chat.message_undone_success": "訊息已成功撤回",
+  "chat.offline": "您處於離線狀態，無法撤回訊息",
   "app.title": "訊息信使",
   "chat.title": "聊天",
   "chat.send": "傳送",

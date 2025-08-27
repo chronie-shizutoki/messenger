@@ -1,5 +1,10 @@
-{
-  "scroll_text.default": "Welcome to Messenger! Keep in touch with your friends and family. You can customise the scrolling text via the scroll-text.txt file.",
+{  "scroll_text.default": "Welcome to Messenger! Keep in touch with your friends and family. You can customise the scrolling text via the scroll-text.txt file.",
+  "chat.undo_message": "Delete message",
+  "chat.message_undone": "This message has been deleted.",
+  "chat.confirm_undo": "Are you sure you want to delete this message?",
+  "chat.undo_failed": "Failed to delete message: {errorMessage}",
+  "chat.message_undone_success": "Message has been deleted successfully",
+  "chat.offline": "You are offline, cannot delete message",
   "app.title": "Messenger",
   "chat.title": "Chat",
   "chat.send": "Send",

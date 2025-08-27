@@ -1,5 +1,10 @@
-{
-  "scroll_text.default": "Welcome to Messenger! Stay connected with your friends and family. You can customize the scrolling text through the scroll-text.txt file.",
+{  "scroll_text.default": "Welcome to Messenger! Stay connected with your friends and family. You can customize the scrolling text through the scroll-text.txt file.",
+  "chat.undo_message": "Withdraw message",
+  "chat.message_undone": "This message has been withdrawn.",
+  "chat.confirm_undo": "Are you sure you want to withdraw this message?",
+  "chat.undo_failed": "Failed to withdraw message: {errorMessage}",
+  "chat.message_undone_success": "Message has been withdrawn successfully",
+  "chat.offline": "You are offline, cannot withdraw message",
   "app.title": "Messenger",
   "chat.title": "Chat",
   "chat.send": "Send",

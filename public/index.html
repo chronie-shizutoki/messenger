@@ -102,6 +102,48 @@
         opacity: 0;
         pointer-events: none;
     }
+    
+    /* 消息撤回功能样式 */
+    .message-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .message-actions {
+        display: flex;
+        gap: 5px;
+    }
+    .undo-btn {
+        background: none;
+        border: none;
+        color: #888;
+        cursor: pointer;
+        padding: 5px;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+    }
+    .undo-btn:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        color: #f44336;
+    }
+    .message-undo-text {
+        color: #888;
+        font-style: italic;
+        font-size: 14px;
+    }
+    .quote-btn {
+        background: none;
+        border: none;
+        color: #888;
+        cursor: pointer;
+        padding: 5px;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+    }
+    .quote-btn:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        color: #4CAF50;
+    }
   </style>
   <div>
 <div id="current-time-date" style="position: fixed; top: 15px; left: 50%; transform: translateX(-50%);">
