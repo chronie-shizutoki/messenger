@@ -57,5 +57,8 @@
   "recording.microphone_permission_failed": "無法獲取麥克風權限，請檢查瀏覽器設定",
   "recording.too_short": "錄音時間過短，請重新嘗試",
   "audio_upload.progress": "語音訊息上傳中: {percent}%",
-  "audio_upload.sent": "語音訊息已傳送 ({duration}秒)"
+  "audio_upload.sent": "語音訊息已傳送 ({duration}秒)",
+  "chat.sticker": "傳送貼圖",
+  "chat.upload": "上傳檔案",
+  "chat.record_audio": "錄音"
 }

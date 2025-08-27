@@ -2138,10 +2138,31 @@ function setupMobileActionsWithDelay() {
     });
 }
 
-// 确保DOM加载完成后初始化
+// 监听i18n初始化完成事件，确保国际化完成后再初始化应用
+function initializeAppWhenReady() {
+    if (window.i18n && window.i18n.translations && Object.keys(window.i18n.translations).length > 0) {
+        // 如果i18n已经初始化完成，直接初始化应用
+        initializeApp();
+    } else {
+        // 否则等待i18n初始化完成
+        document.addEventListener('i18nInitialized', function() {
+            initializeApp();
+        });
+        
+        // 添加超时处理，以防i18n初始化事件永远不触发
+        setTimeout(function() {
+            if (!window.i18n || !window.i18n.translations || Object.keys(window.i18n.translations).length === 0) {
+                console.warn('i18n initialization timed out, proceeding with default texts');
+                initializeApp();
+            }
+        }, 5000); // 5秒超时
+    }
+}
+
+// 确保DOM加载完成后再开始等待i18n初始化
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', setupMobileActionsWithDelay);
+    document.addEventListener('DOMContentLoaded', initializeAppWhenReady);
 } else {
     // DOM已加载完成
-    initMobileActions();
+    initializeAppWhenReady();
 }
