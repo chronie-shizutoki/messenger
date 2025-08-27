@@ -1846,17 +1846,32 @@ function initMobileActions() {
         const actionBtns = inputControls.querySelectorAll('.chat-action-btn:not(#send-button)');
         
         // 复制现有按钮到菜单中
-        actionBtns.forEach(btn => {
-            // 不使用cloneNode，而是创建新的按钮元素
-            const menuBtn = document.createElement('button');
-            menuBtn.className = 'chat-action-btn';
-            menuBtn.id = 'menu-' + btn.id;
-            menuBtn.innerHTML = btn.innerHTML;
-            menuBtn.title = btn.title;
-            menuBtn.style.display = 'flex';
-            menuBtn.style.width = '100%';
-            menuBtn.style.justifyContent = 'flex-start';
-            menuBtn.style.padding = '0.5rem 1rem';
+            actionBtns.forEach(btn => {
+                // 不使用cloneNode，而是创建新的按钮元素
+                const menuBtn = document.createElement('button');
+                menuBtn.className = 'chat-action-btn';
+                menuBtn.id = 'menu-' + btn.id;
+                
+                // Get internationalized text
+                let buttonText = '';
+                if (window.i18n && typeof window.i18n.t === 'function') {
+                    const translations = {
+                        'sticker-button': window.i18n.t('chat.sticker') || '',
+                        'upload-image-button': window.i18n.t('chat.upload') || '',
+                        'record-audio-button': window.i18n.t('chat.record_audio') || ''
+                    };
+                    buttonText = translations[btn.id] || btn.innerHTML;
+                }
+                
+                // 设置按钮内容，包括图标和文本
+                menuBtn.innerHTML = btn.innerHTML + ' ' + buttonText;
+                menuBtn.title = btn.title;
+                menuBtn.style.display = 'flex';
+                menuBtn.style.width = '100%';
+                menuBtn.style.justifyContent = 'flex-start';
+                menuBtn.style.alignItems = 'center';
+                menuBtn.style.padding = '0.75rem 1rem';
+                menuBtn.style.gap = '0.75rem';
             
             // 根据按钮ID绑定相应的功能
             if (btn.id === 'sticker-button') {

@@ -49,12 +49,28 @@ class I18n {
 
   async loadTranslations() {
     try {
-      const response = await fetch(`/locales/${this.locale}.json`);
-      if (!response.ok) throw new Error(`Failed to load translations for ${this.locale}`);
-      this.translations = await response.json();
+      // 先加载en-US作为基础回退语言
+      const enUSResponse = await fetch('/locales/en-US.json');
+      const enUSTranslations = await enUSResponse.json();
+      
+      // 然后加载用户选择的语言
+      if (this.locale !== 'en-US') {
+        const response = await fetch(`/locales/${this.locale}.json`);
+        if (response.ok) {
+          const userTranslations = await response.json();
+          // 合并翻译，用户语言有翻译的使用用户语言，没有的使用en-US
+          this.translations = { ...enUSTranslations, ...userTranslations };
+        } else {
+          console.warn(`Failed to load translations for ${this.locale}, using en-US instead`);
+          this.translations = enUSTranslations;
+          this.locale = 'en-US';
+        }
+      } else {
+        this.translations = enUSTranslations;
+      }
     } catch (error) {
       console.error('Error loading translations:', error);
-      // 加载失败时回退
+      // 加载失败时回退到en-US
       const response = await fetch('/locales/en-US.json');
       this.translations = await response.json();
       this.locale = 'en-US';
@@ -237,7 +253,7 @@ languageList.style.borderColor = 'rgba(255, 255, 255, 0.18)';
     }
     return text;
   }
- 
+  
   // 设置页面语言
   setDocumentLanguage() {
     document.documentElement.lang = this.locale;
