@@ -148,11 +148,147 @@
         color: #4CAF50;
     }
   </style>
-  <div>
-<div id="current-time-date" style="position: fixed; top: 15px; left: 50%; transform: translateX(-50%);">
-    <span id="date"></span>
-    <span id="time"></span>
-</div>
+  <!-- 优雅的状态栏 -->
+  <div class="status-bar">
+    <div class="status-bar-left">
+      <!-- 左侧 -->
+        <span id="time" class="time-text"></span>
+    </div>
+    <div class="status-bar-center">
+      <div class="time-date-container">
+        <!-- 中间 -->
+        <span id="week" class="week-text"></span>
+        <script>
+            function updateWeekDay() {
+                const now = new Date();
+                const weekElement = document.getElementById('week');
+                // Use the Intl.DateTimeFormat browser API to format the weekday
+                const weekdayFormatter = new Intl.DateTimeFormat(navigator.language, { weekday: 'long' });
+                weekElement.textContent = weekdayFormatter.format(now);
+            }
+            updateWeekDay();
+            setInterval(updateWeekDay, 1000);
+        </script>
+      </div>
+    </div>
+    <div class="status-bar-right">
+      <!-- 右侧 -->
+       <span id="date" class="date-text"></span>
+    </div>
+  </div>
+
+  <style>
+    /* 状态栏样式 */
+    .status-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 40px;
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      z-index: 1000;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      transition: all 0.3s ease;
+    }
+
+    /* 深色模式适配 */
+    .dark-mode .status-bar {
+      background: rgba(15, 23, 42, 0.8);
+      border-bottom-color: rgba(255, 255, 255, 0.1);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .status-bar-left,
+    .status-bar-right {
+      flex: 1;
+    }
+
+    .status-bar-left {
+      position: relative;
+      left: 2%;
+    }
+
+    .status-bar-center {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .status-bar-right {
+      position: relative;
+      text-align: right;
+      right: 2%;
+    }
+
+    .time-date-container {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 4px 12px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.2);
+      transition: all 0.3s ease;
+    }
+
+    .dark-mode .time-date-container {
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .date-text,
+    .time-text,
+    .week-text {
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--text-primary);
+      transition: color 0.3s ease;
+    }
+
+    /* 滚动文字容器位置调整 */
+    .scroll-text-container {
+      top: 40px !important;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .status-bar {
+        background: rgba(15, 23, 42, 0.8);
+        border-bottom-color: rgba(255, 255, 255, 0.1);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+      }
+    }
+
+    /* 响应式设计 */
+    @media (max-width: 768px) {
+      .status-bar {
+        padding: 0 10px;
+      }
+      
+      .time-date-container {
+        padding: 3px 8px;
+      }
+      
+      .date-text,
+      .time-text,
+      .week-text {
+        font-size: 12px;
+      }
+    }
+
+    /* 悬停效果 */
+    .status-bar:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .dark-mode .status-bar:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+  </style>
 
 <!-- 滚动文字容器 -->
 <div id="scroll-text-container" class="scroll-text-container hidden">
@@ -166,17 +302,21 @@
         const timeElement = document.getElementById('time');
         const dateElement = document.getElementById('date');
 
-        // Format time in HH:MM:SS
-        const hours = String(now.getHours()).padStart(2, '0');
-        const minutes = String(now.getMinutes()).padStart(2, '0');
-        const seconds = String(now.getSeconds()).padStart(2, '0');
-        timeElement.textContent = `${hours}:${minutes}:${seconds}`;
+        // Format time using browser's Intl.DateTimeFormat API for internationalization
+        const timeFormatter = new Intl.DateTimeFormat(navigator.language, {
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+        });
+        timeElement.textContent = timeFormatter.format(now);
 
-        // Format date in YYYY-MM-DD
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        const day = String(now.getDate()).padStart(2, '0');
-        dateElement.textContent = `${year}-${month}-${day}`;
+        // Format date using browser's Intl.DateTimeFormat API for internationalization
+        const dateFormatter = new Intl.DateTimeFormat(navigator.language, {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit'
+        });
+        dateElement.textContent = dateFormatter.format(now);
     }
 
     // Initial call to update time and date
